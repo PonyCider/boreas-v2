@@ -222,7 +222,7 @@ function VisualSection() {
           data-visual-device
           className="mt-16 sm:mt-20"
         >
-          <MacbookShowcase />
+          <MacbookShowcase mode="simulator" />
         </div>
       </div>
     </SectionFrame>

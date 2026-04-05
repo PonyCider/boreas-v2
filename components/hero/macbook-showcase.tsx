@@ -5,7 +5,11 @@ import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-moti
 
 import { ChatUI } from "@/components/hero/chat-ui";
 
-export function MacbookShowcase() {
+export function MacbookShowcase({
+  mode = "static",
+}: {
+  mode?: "static" | "simulator";
+}) {
   const reduceMotion = useReducedMotion();
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
@@ -72,7 +76,7 @@ export function MacbookShowcase() {
             ))}
           </div>
           <div className="aspect-[16/10]">
-            <ChatUI />
+            <ChatUI mode={mode} />
           </div>
         </div>
       </motion.div>
