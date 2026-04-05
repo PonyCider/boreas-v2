@@ -163,7 +163,7 @@ export function BoreasHero() {
               </p>
 
               <h1 className="mt-6 flex max-w-[12ch] flex-col items-center text-center text-[clamp(4.1rem,11vw,8.3rem)] font-medium leading-[0.98] tracking-[-0.075em] text-[#f7f1ea]">
-                <span className="block text-white/92">Más</span>
+                <span className="block text-[#c5ccd2]">Más</span>
                 <span className="mt-1 block min-h-[1.22em]">
                   <RotatingHeadline words={rotatingWords} />
                 </span>
@@ -177,7 +177,7 @@ export function BoreasHero() {
               <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
                 <a
                   href="mailto:hola@boreas.ai"
-                  className="inline-flex min-w-[13rem] items-center justify-center rounded-full bg-[#d4c0a1] px-6 py-3.5 text-sm font-medium text-[#0f1215] transition-all duration-300 hover:bg-[#deccb3]"
+                  className="inline-flex min-w-[13rem] items-center justify-center rounded-full border border-white/14 bg-[linear-gradient(180deg,rgba(216,204,178,0.18)_0%,rgba(216,204,178,0.11)_100%)] px-6 py-3.5 text-sm font-medium text-[#fbfcfd] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.08),0_14px_34px_rgba(0,0,0,0.18)] backdrop-blur-xl transition-all duration-500 hover:scale-[1.015] hover:border-white/22 hover:bg-[linear-gradient(180deg,rgba(216,204,178,0.24)_0%,rgba(216,204,178,0.16)_100%)] hover:brightness-105"
                 >
                   Agendar llamada
                 </a>

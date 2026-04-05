@@ -63,10 +63,10 @@ export function MacbookShowcase() {
 
         <div className="overflow-hidden rounded-[1.55rem] border border-white/8 bg-[#0b0d10] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
           <div className="flex items-center gap-2 border-b border-white/6 bg-[#161a1f] px-4 py-3">
-            {["#70757d", "#666c73", "#5b6168"].map((color) => (
+            {["#FF5F57", "#FEBC2E", "#28C840"].map((color) => (
               <span
                 key={color}
-                className="h-2.5 w-2.5 rounded-full"
+                className="h-2.5 w-2.5 rounded-full shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]"
                 style={{ backgroundColor: color }}
               />
             ))}

@@ -31,16 +31,31 @@ export function RotatingHeadline({ words }: RotatingHeadlineProps) {
       <AnimatePresence initial={false} mode="sync">
         <motion.span
           key={words[index]}
-          initial={reduceMotion ? false : { y: "-34%", opacity: 0 }}
-          animate={reduceMotion ? { opacity: 1 } : { y: "0%", opacity: 1 }}
-          exit={reduceMotion ? { opacity: 0 } : { y: "34%", opacity: 0 }}
+          initial={
+            reduceMotion
+              ? false
+              : { y: "-24%", opacity: 0.18, filter: "blur(5px)" }
+          }
+          animate={
+            reduceMotion
+              ? { opacity: 1 }
+              : { y: "0%", opacity: 1, filter: "blur(0px)" }
+          }
+          exit={
+            reduceMotion
+              ? { opacity: 0 }
+              : { y: "24%", opacity: 0.22, filter: "blur(5px)" }
+          }
           transition={{
-            duration: reduceMotion ? 0.15 : 0.5,
-            ease: [0.32, 0.72, 0, 1],
+            duration: reduceMotion ? 0.15 : 0.72,
+            ease: "easeInOut",
+            opacity: { duration: reduceMotion ? 0.15 : 0.58, ease: "easeInOut" },
+            filter: { duration: reduceMotion ? 0.15 : 0.62, ease: "easeInOut" },
           }}
-          className="absolute inset-0 flex items-center justify-center whitespace-nowrap text-[#dde3e8] will-change-transform"
+          className="absolute inset-0 flex items-center justify-center whitespace-nowrap bg-[linear-gradient(180deg,#ebe2cf_0%,#d8ccb2_52%,#cec1a8_100%)] bg-clip-text text-center text-transparent [font-variation-settings:'wght'_610]"
           style={{
-            textShadow: "0 1px 10px rgba(0, 0, 0, 0.12)",
+            textShadow: "0 2px 10px rgba(0, 0, 0, 0.12)",
+            willChange: "transform, opacity, filter",
           }}
         >
           {words[index]}
