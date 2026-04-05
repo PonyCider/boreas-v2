@@ -1,0 +1,36 @@
+import type { Metadata } from "next";
+import { JetBrains_Mono, Manrope } from "next/font/google";
+import "./globals.css";
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "Boreas | Automatización AI para negocios de belleza",
+  description:
+    "Automatiza conversaciones, reservas y seguimientos para salones, spas y artistas de belleza con Boreas.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html
+      lang="es"
+      className={`${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
+    >
+      <body className="min-h-full bg-background text-foreground selection:bg-[#d4c0a1]/20 selection:text-[#f7f1ea]">
+        {children}
+      </body>
+    </html>
+  );
+}
