@@ -29,26 +29,30 @@ function MessageBubble({
   text,
   containerRef,
   children,
+  muted = false,
 }: {
   align?: "left" | "right";
   sender: string;
   text?: string;
   containerRef?: Ref<HTMLDivElement>;
   children?: ReactNode;
+  muted?: boolean;
 }) {
   const isRight = align === "right";
 
   return (
     <div
       ref={containerRef}
-      className={`flex ${isRight ? "justify-end" : "justify-start"} w-full`}
+      className={`flex w-full ${isRight ? "justify-end" : "justify-start"} ${
+        muted ? "opacity-60" : ""
+      }`}
     >
       <div
         className={`max-w-[24rem] rounded-[1.5rem] px-4 py-3 ${
           isRight
             ? "rounded-br-md bg-[#d4c0a1] text-[#0f1215]"
             : "rounded-bl-md border border-white/8 bg-white/[0.04] text-[#f5f1ea]"
-        }`}
+        } ${muted ? "border-white/6 bg-white/[0.025]" : ""}`}
       >
         <p
           className={`text-[0.68rem] uppercase tracking-[0.28em] ${
@@ -89,7 +93,7 @@ function EngineStepRow({
   return (
     <div
       ref={rowRef}
-      className={`flex items-center justify-between rounded-2xl border px-3.5 py-3 transition-colors duration-300 ${
+      className={`flex h-[4.5rem] min-w-0 items-center justify-between gap-3 overflow-hidden rounded-2xl border px-3.5 py-3 transition-colors duration-300 ${
         status === "done"
           ? "border-[#d4c0a1]/16 bg-[#1a1f24]"
           : status === "loading"
@@ -97,9 +101,11 @@ function EngineStepRow({
             : "border-white/8 bg-black/18"
       }`}
     >
-      <p className="text-sm text-[#f5f1ea]">{label}</p>
+      <p className="min-w-0 flex-1 truncate whitespace-nowrap pr-2 text-sm text-[#f5f1ea]">
+        {label}
+      </p>
       <div
-        className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[0.62rem] uppercase tracking-[0.22em] ${
+        className={`inline-flex min-w-[8.8rem] shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full px-2.5 py-1 text-[0.62rem] uppercase tracking-[0.22em] ${
           status === "done"
             ? "bg-[#d4c0a1]/12 text-[#d4c0a1]"
             : status === "loading"
@@ -414,15 +420,40 @@ function InteractiveChatUI() {
 
   const buttonLabel =
     phase === "done" ? "Repetir demo" : phase === "running" || phase === "typing" ? "Procesando" : "Enviar";
+  const inputPreview =
+    phase === "idle"
+      ? "Hola, ¿tienen disponibilidad para esta semana?"
+      : phase === "done"
+        ? "Demo finalizada. Lista para reiniciar."
+        : "Boreas está procesando el mensaje...";
 
   return (
     <>
       <div
         ref={simulatorRef}
-        className="grid flex-1 gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[1.25fr_0.75fr]"
+        className="grid flex-1 gap-4 px-5 py-5 sm:px-6 lg:grid-cols-[1.25fr_0.75fr]"
       >
-        <div className="flex min-h-0 flex-col gap-4">
-          <div className="flex flex-1 flex-col justify-end gap-4">
+        <div className="flex min-h-0 flex-col">
+          <div className="flex flex-1 flex-col justify-end gap-3">
+            <div className="flex justify-center pb-1">
+              <span className="rounded-full border border-white/6 bg-white/[0.02] px-3 py-1 text-[0.58rem] uppercase tracking-[0.32em] text-white/18">
+                conversación activa
+              </span>
+            </div>
+
+            <MessageBubble
+              sender="Boreas"
+              text="Hola, soy Boreas. Puedo ayudarte a encontrar el mejor horario disponible."
+              muted
+            />
+
+            <MessageBubble
+              align="right"
+              sender="Clienta"
+              text="Perfecto, quiero revisar opciones para esta semana."
+              muted
+            />
+
             <MessageBubble
               align="right"
               sender="Clienta"
@@ -457,7 +488,7 @@ function InteractiveChatUI() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex min-w-0 flex-col gap-4 lg:min-w-[24rem]">
           <div className="rounded-[1.65rem] border border-white/8 bg-white/[0.03] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.16)]">
             <p className="text-[0.62rem] uppercase tracking-[0.34em] text-white/28">
               AI Engine Activity
@@ -497,10 +528,14 @@ function InteractiveChatUI() {
         <div className="flex items-center justify-between gap-3 rounded-[1.3rem] border border-white/8 bg-black/20 px-4 py-3">
           <div className="min-w-0">
             <p className="text-[0.62rem] uppercase tracking-[0.24em] text-white/28">
-              Mensaje entrante
+              {phase === "idle" ? "Mensaje entrante" : "Input bloqueado"}
             </p>
-            <p className="mt-1 truncate text-sm text-[#f5f1ea]/72">
-              Hola, ¿tienen disponibilidad para esta semana?
+            <p
+              className={`mt-1 truncate text-sm ${
+                phase === "idle" ? "text-[#f5f1ea]/72" : "text-white/34"
+              }`}
+            >
+              {inputPreview}
             </p>
           </div>
 
