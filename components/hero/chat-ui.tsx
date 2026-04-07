@@ -11,6 +11,10 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 type ChatUIMode = "static" | "simulator";
 type StepStatus = "idle" | "loading" | "done";
 
+const INCOMING_MESSAGE = "Hola, ¿tienen disponibilidad para esta semana?";
+const BOREAS_REPLY =
+  "Sí, tengo disponibilidad este jueves a las 4:30pm. ¿Te lo agendo?";
+
 const ENGINE_STEPS = [
   "Analizando intención...",
   "Extrayendo datos...",
@@ -219,11 +223,13 @@ function InteractiveChatUI() {
   const userBubbleRef = useRef<HTMLDivElement>(null);
   const typingBubbleRef = useRef<HTMLDivElement>(null);
   const replyBubbleRef = useRef<HTMLDivElement>(null);
+  const inputCursorRef = useRef<HTMLSpanElement>(null);
   const stepRefs = useRef<Array<HTMLDivElement | null>>([]);
   const typingDotRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const typingLoopRef = useRef<gsap.core.Tween | null>(null);
   const autoTriggerRef = useRef<gsap.core.Tween | null>(null);
+  const cursorTweenRef = useRef<gsap.core.Tween | null>(null);
   const startSimulationRef = useRef<(() => void) | null>(null);
 
   const [phase, setPhase] = useState<"idle" | "running" | "typing" | "done">("idle");
@@ -248,10 +254,19 @@ function InteractiveChatUI() {
         (element): element is HTMLSpanElement => element !== null,
       );
 
+      cursorTweenRef.current = gsap.to(inputCursorRef.current, {
+        autoAlpha: 0.16,
+        duration: 0.58,
+        ease: "none",
+        repeat: -1,
+        yoyo: true,
+      });
+
       const resetSimulation = wrapContextSafe(() => {
         timelineRef.current?.kill();
         autoTriggerRef.current?.kill();
         typingLoopRef.current?.pause(0);
+        cursorTweenRef.current?.play(0);
 
         setPhase("idle");
         setStepStates(createInitialStepStates());
@@ -270,6 +285,9 @@ function InteractiveChatUI() {
           autoAlpha: 0,
           y: 18,
           filter: "blur(4px)",
+        });
+        gsap.set(inputCursorRef.current, {
+          autoAlpha: 1,
         });
         gsap.set(stepElements, {
           autoAlpha: 0,
@@ -306,6 +324,10 @@ function InteractiveChatUI() {
         resetSimulation();
         setPhase("running");
         setEngineSummary("Mensaje recibido. Boreas está procesando la conversación.");
+        cursorTweenRef.current?.pause(0);
+        gsap.set(inputCursorRef.current, {
+          autoAlpha: 0,
+        });
 
         const timeline = gsap.timeline({
           defaults: {
@@ -407,6 +429,7 @@ function InteractiveChatUI() {
         autoTriggerRef.current?.kill();
         timelineRef.current?.kill();
         typingLoopRef.current?.kill();
+        cursorTweenRef.current?.kill();
         startSimulationRef.current = null;
       };
     },
@@ -420,12 +443,7 @@ function InteractiveChatUI() {
 
   const buttonLabel =
     phase === "done" ? "Repetir demo" : phase === "running" || phase === "typing" ? "Procesando" : "Enviar";
-  const inputPreview =
-    phase === "idle"
-      ? "Hola, ¿tienen disponibilidad para esta semana?"
-      : phase === "done"
-        ? "Demo finalizada. Lista para reiniciar."
-        : "Boreas está procesando el mensaje...";
+  const inputPreview = phase === "idle" ? INCOMING_MESSAGE : "";
 
   return (
     <>
@@ -434,30 +452,11 @@ function InteractiveChatUI() {
         className="grid flex-1 gap-4 px-5 py-5 sm:px-6 lg:grid-cols-[1.25fr_0.75fr]"
       >
         <div className="flex min-h-0 flex-col">
-          <div className="flex flex-1 flex-col justify-end gap-3">
-            <div className="flex justify-center pb-1">
-              <span className="rounded-full border border-white/6 bg-white/[0.02] px-3 py-1 text-[0.58rem] uppercase tracking-[0.32em] text-white/18">
-                conversación activa
-              </span>
-            </div>
-
-            <MessageBubble
-              sender="Boreas"
-              text="Hola, soy Boreas. Puedo ayudarte a encontrar el mejor horario disponible."
-              muted
-            />
-
+          <div className="mt-auto flex max-w-[31rem] flex-col gap-2.5">
             <MessageBubble
               align="right"
               sender="Clienta"
-              text="Perfecto, quiero revisar opciones para esta semana."
-              muted
-            />
-
-            <MessageBubble
-              align="right"
-              sender="Clienta"
-              text="Hola, ¿tienen disponibilidad para esta semana?"
+              text={INCOMING_MESSAGE}
               containerRef={userBubbleRef}
             />
 
@@ -483,7 +482,7 @@ function InteractiveChatUI() {
             <MessageBubble
               sender="Boreas"
               containerRef={replyBubbleRef}
-              text="Sí, tengo disponibilidad este jueves a las 4:30pm. ¿Te lo agendo?"
+              text={BOREAS_REPLY}
             />
           </div>
         </div>
@@ -508,7 +507,7 @@ function InteractiveChatUI() {
             </div>
           </div>
 
-          <div className="rounded-[1.35rem] border border-white/8 bg-black/18 px-4 py-4">
+          <div className="min-h-[8.25rem] rounded-[1.35rem] border border-white/8 bg-black/18 px-4 py-4">
             <div className="flex items-center justify-between">
               <p className="text-sm text-[#f5f1ea]">Estado del motor</p>
               <span className="rounded-full bg-[#d4c0a1]/12 px-2.5 py-1 text-[0.62rem] uppercase tracking-[0.24em] text-[#d4c0a1]">
@@ -519,7 +518,9 @@ function InteractiveChatUI() {
                     : "espera"}
               </span>
             </div>
-            <p className="mt-2 text-sm leading-6 text-white/44">{engineSummary}</p>
+            <p className="mt-2 min-h-[3rem] text-sm leading-6 text-white/44">
+              {engineSummary}
+            </p>
           </div>
         </div>
       </div>
@@ -528,15 +529,23 @@ function InteractiveChatUI() {
         <div className="flex items-center justify-between gap-3 rounded-[1.3rem] border border-white/8 bg-black/20 px-4 py-3">
           <div className="min-w-0">
             <p className="text-[0.62rem] uppercase tracking-[0.24em] text-white/28">
-              {phase === "idle" ? "Mensaje entrante" : "Input bloqueado"}
+              Mensaje entrante
             </p>
-            <p
-              className={`mt-1 truncate text-sm ${
-                phase === "idle" ? "text-[#f5f1ea]/72" : "text-white/34"
-              }`}
-            >
-              {inputPreview}
-            </p>
+            <div className="mt-1 flex min-h-6 items-center gap-1 overflow-hidden">
+              <span
+                className={`truncate text-sm ${
+                  phase === "idle" ? "text-[#f5f1ea]/72" : "text-white/18"
+                }`}
+              >
+                {inputPreview || "\u00A0"}
+              </span>
+              <span
+                ref={inputCursorRef}
+                className={`h-4 w-px shrink-0 bg-[#d4c0a1] ${
+                  phase === "idle" ? "" : "hidden"
+                }`}
+              />
+            </div>
           </div>
 
           <button
