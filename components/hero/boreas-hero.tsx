@@ -10,11 +10,11 @@ import { RotatingHeadline } from "@/components/hero/rotating-headline";
 
 const rotatingWords = [
   "citas",
+  "pacientes",
+  "clientes",
   "reservas",
-  "clientas",
+  "leads",
   "ingresos",
-  "control",
-  "tiempo",
 ];
 
 const contourPaths = [
@@ -159,7 +159,7 @@ export function BoreasHero() {
               className="relative z-10 flex max-w-[860px] flex-col items-center text-center"
             >
               <p className="text-[0.72rem] uppercase tracking-[0.42em] text-white/34">
-                Boreas · IA para salones, spas y beauty studios
+                Boreas · La IA a tu favor
               </p>
 
               <h1 className="mt-6 flex max-w-[12ch] flex-col items-center text-center text-[clamp(4.1rem,11vw,8.3rem)] font-medium leading-[0.98] tracking-[-0.075em] text-[#f7f1ea]">

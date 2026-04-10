@@ -5,12 +5,13 @@ import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-moti
 
 import { ChatUI } from "@/components/hero/chat-ui";
 
-export function MacbookShowcase({
-  mode = "static",
+function MacbookFrame({
+  children,
+  reduceMotion,
 }: {
-  mode?: "static" | "simulator";
+  children: React.ReactNode;
+  reduceMotion: boolean | null;
 }) {
-  const reduceMotion = useReducedMotion();
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
 
@@ -44,7 +45,7 @@ export function MacbookShowcase({
   };
 
   return (
-    <div id="demo" className="relative mx-auto w-full max-w-[1080px] px-2 sm:px-4">
+    <>
       <motion.div
         onPointerMove={handlePointerMove}
         onPointerLeave={resetTilt}
@@ -75,14 +76,50 @@ export function MacbookShowcase({
               />
             ))}
           </div>
-          <div className="aspect-[16/10]">
-            <ChatUI mode={mode} />
-          </div>
+          <div className="aspect-[16/10]">{children}</div>
         </div>
       </motion.div>
 
       <div className="mx-auto h-4 w-[93%] rounded-b-[999px] bg-[linear-gradient(180deg,#454c55_0%,#1c2025_36%,#08090c_100%)] shadow-[0_12px_60px_rgba(0,0,0,0.3)]" />
       <div className="mx-auto h-8 w-[68%] rounded-full bg-[#d8c7ae]/12 blur-3xl" />
+    </>
+  );
+}
+
+function MobileFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="relative rounded-[1.8rem] border border-white/10 bg-[linear-gradient(180deg,#1b2026_0%,#0b0d10_100%)] p-1.5 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+      <div className="absolute inset-x-[18%] top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+      <div className="overflow-hidden rounded-[1.4rem] border border-white/8 bg-[#0b0d10] shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+        {children}
+      </div>
+      <div className="mx-auto mt-1 h-6 w-[50%] rounded-full bg-[#d8c7ae]/8 blur-2xl" />
+    </div>
+  );
+}
+
+export function MacbookShowcase({
+  mode = "static",
+}: {
+  mode?: "static" | "simulator";
+}) {
+  const reduceMotion = useReducedMotion();
+
+  return (
+    <div id="demo" className="relative mx-auto w-full max-w-[1080px] px-2 sm:px-4">
+      {/* Desktop: Full MacBook frame */}
+      <div className="hidden lg:block">
+        <MacbookFrame reduceMotion={reduceMotion}>
+          <ChatUI mode={mode} />
+        </MacbookFrame>
+      </div>
+
+      {/* Mobile/Tablet: Standalone app frame */}
+      <div className="block lg:hidden">
+        <MobileFrame>
+          <ChatUI mode={mode} />
+        </MobileFrame>
+      </div>
     </div>
   );
 }
