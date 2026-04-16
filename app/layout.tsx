@@ -13,9 +13,21 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Boreas | Automatización AI para negocios de belleza",
+  title: "Boreas | Sistema operativo de revenue con IA",
   description:
-    "Automatiza conversaciones, reservas y seguimientos para salones, spas y artistas de belleza con Boreas.",
+    "Boreas organiza revenue con IA. Relevo, su módulo activo de conversión, responde, califica y empuja leads a acciones concretas para salud, belleza e inmobiliario.",
+  openGraph: {
+    title: "Boreas | Sistema operativo de revenue con IA",
+    description:
+      "Relevo es el módulo de conversión de Boreas: playbooks por industria para responder, calificar y cerrar acciones medibles.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Boreas | Sistema operativo de revenue con IA",
+    description:
+      "Playbooks por industria para convertir conversaciones en acciones medibles en salud, belleza e inmobiliario.",
+  },
 };
 
 export default function RootLayout({

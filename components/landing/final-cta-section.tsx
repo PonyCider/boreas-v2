@@ -23,10 +23,10 @@ export function FinalCtaSection() {
           <p className="mt-6 text-lg text-white/50">Automatiza la calificación y las reservas desde hoy. Desplegable en 24h.</p>
 
           <a
-            href="mailto:hola@boreas.ai"
+            href="#diagnostico"
             className="mt-12 inline-flex items-center justify-center rounded-full border border-white/14 bg-[linear-gradient(180deg,rgba(216,204,178,0.22)_0%,rgba(216,204,178,0.12)_100%)] px-10 py-5 text-[1.1rem] font-medium text-[#fbfcfd] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.08),0_18px_44px_rgba(0,0,0,0.25)] backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-[#d8ccb2]/30"
           >
-            Agendar llamada
+            Recibir diagnóstico
           </a>
         </div>
       </div>

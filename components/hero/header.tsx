@@ -16,10 +16,10 @@ export function Header() {
         </Link>
 
         <a
-          href="mailto:hola@boreas.ai"
+          href="#diagnostico"
           className="inline-flex items-center rounded-full border border-[#d4c0a1]/25 bg-white/[0.03] px-4 py-2.5 text-sm font-medium text-[#f7f1ea] transition-all duration-300 hover:border-[#d4c0a1]/45 hover:bg-white/[0.07]"
         >
-          Agendar llamada
+          Recibir diagnóstico
         </a>
       </div>
     </div>

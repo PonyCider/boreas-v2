@@ -5,9 +5,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useRef } from "react";
 
+import { onboardingSteps, verticals } from "@/content/boreas-home";
 import { MacbookShowcase } from "@/components/hero/macbook-showcase";
 
-// Import modules (EPIC 4 & 5 & Re-designs)
 import { ProblemSection } from "./problem-section";
 import { MechanismSectionB } from "./mechanism-section-b";
 import { ComparisonSection } from "./comparison-section";
@@ -15,45 +15,10 @@ import { BentoGridSection } from "./bento-grid-section";
 import { FaqSection } from "./faq-section";
 import { GuaranteeSection } from "./guarantee-section";
 import { TrustAndProofSection } from "./trust-proof-section";
-import { FinalCtaSection } from "./final-cta-section";
+import { PlatformSystemSection } from "./platform-system-section";
+import { DiagnosticCtaSection } from "./diagnostic-cta-section";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
-
-const steps = [
-  {
-    number: "01",
-    title: "Un cliente escribe",
-    description: "Desde WhatsApp, Instagram o cualquier canal donde llegue la intención.",
-  },
-  {
-    number: "02",
-    title: "Boreas responde",
-    description: "Aclara dudas, filtra al prospecto y propone horarios sin fricción.",
-  },
-  {
-    number: "03",
-    title: "La cita se agenda",
-    description: "La conversación avanza sola hasta la reserva, confirmación y seguimiento.",
-  },
-];
-
-const useCases = [
-  {
-    vertical: "Salud y Clínicas",
-    lead: "Pacientes con dudas o buscando agendar",
-    value: "Pacientes atendidos 24/7 sin colapsar la recepción. Boreas responde, filtra y agenda.",
-  },
-  {
-    vertical: "Inmobiliario y Construcción",
-    lead: "Prospectos interesados en propiedades o presupuestos",
-    value: "Calificación inmediata de leads fríos vs calientes. Captura de datos clave al instante.",
-  },
-  {
-    vertical: "Belleza y Bienestar",
-    lead: "Clientes buscando servicios y disponibilidad",
-    value: "Un recepcionista digital que no descansa. Cierra reservas mientras tú atiendes el negocio.",
-  },
-];
 
 export function SectionEyebrow({ children }: { children: React.ReactNode }) {
   return (
@@ -91,17 +56,23 @@ function HowItWorksSection() {
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
         <div data-reveal className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow>Cómo funciona</SectionEyebrow>
+          <SectionEyebrow>Onboarding</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.1rem,4.6vw,4rem)] font-medium leading-[1.06] tracking-[-0.052em] text-[#f7f1ea]">
-            Tres movimientos precisos para que una conversación termine en cita.
+            El negocio aporta contexto.
+            <br className="hidden sm:block" />
+            Boreas pone la estructura.
           </h2>
+          <p className="mt-6 text-lg text-white/50">
+            El onboarding está diseñado para generar confianza y velocidad. No hace falta construir
+            un flujo desde cero ni aprender a prompting.
+          </p>
         </div>
 
         <div
           data-step-group
-          className="mt-14 grid gap-4 lg:grid-cols-3 lg:gap-5"
+          className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-4 xl:gap-5"
         >
-          {steps.map((step) => (
+          {onboardingSteps.map((step) => (
             <article
               key={step.number}
               data-step-card
@@ -154,12 +125,18 @@ function VisualSection() {
         className="pointer-events-none absolute left-1/2 top-20 h-96 w-[44rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(216,204,178,0.08),transparent_68%)] blur-[120px]"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-        <div data-reveal className="mx-auto max-w-4xl text-center">
-          <SectionEyebrow>En acción</SectionEyebrow>
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+          <div data-reveal className="mx-auto max-w-4xl text-center">
+          <SectionEyebrow>Relevo en acción</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.2rem,4.9vw,4.2rem)] font-medium leading-[1.06] tracking-[-0.055em] text-[#f7f1ea]">
-            Así se ve cuando alguien sí está trabajando por ti 24/7.
+            Así se ve cuando la intención
+            <br className="hidden sm:block" />
+            se empuja a un siguiente paso real.
           </h2>
+          <p className="mt-6 text-lg text-white/50">
+            La demo no muestra un chat genérico. Muestra a Relevo calificando y llevando la
+            conversación a una acción concreta.
+          </p>
         </div>
 
         <div
@@ -186,17 +163,23 @@ function UseCasesSection() {
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
         <div data-reveal className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow>Casos de uso</SectionEyebrow>
+          <SectionEyebrow>Verticales activas</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.1rem,4.6vw,4rem)] font-medium leading-[1.06] tracking-[-0.052em] text-[#f7f1ea]">
-            Diseñado para negocios donde cada mensaje importa.
+            Tres industrias, una tesis:
+            <br className="hidden sm:block" />
+            convertir intención con playbooks.
           </h2>
+          <p className="mt-6 text-lg text-white/50">
+            Salud, belleza e inmobiliario comparten el problema de respuesta y seguimiento, pero
+            cada una necesita preguntas, filtros y cierres distintos.
+          </p>
         </div>
 
         <div
           data-step-group
           className="mt-14 grid gap-4 lg:grid-cols-3 lg:gap-5"
         >
-          {useCases.map((useCase) => (
+          {verticals.map((useCase) => (
             <article
               key={useCase.vertical}
               data-step-card
@@ -208,12 +191,16 @@ function UseCasesSection() {
               </p>
               <div className="mt-8 flex flex-col gap-5">
                 <div>
-                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Escenario</h4>
-                  <p className="mt-1 text-base leading-snug text-[#f7f1ea]">{useCase.lead}</p>
+                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Fuga principal</h4>
+                  <p className="mt-1 text-base leading-snug text-[#f7f1ea]">{useCase.pain}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Boreas</h4>
-                  <p className="mt-1 text-base leading-snug text-white/56">{useCase.value}</p>
+                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Lead típico</h4>
+                  <p className="mt-1 text-base leading-snug text-white/56">{useCase.lead}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Acción objetivo</h4>
+                  <p className="mt-1 text-base leading-snug text-white/56">{useCase.action}</p>
                 </div>
               </div>
             </article>
@@ -377,17 +364,18 @@ export function BoreasLandingSections() {
 
   return (
     <div ref={scopeRef} className="relative overflow-clip bg-[#0e1114] text-[#f5f1ea]">
+      <PlatformSystemSection />
       <ProblemSection />
-      <MechanismSectionB />
       <ComparisonSection />
+      <MechanismSectionB />
       <BentoGridSection />
-      <HowItWorksSection />
       <VisualSection />
       <UseCasesSection />
+      <HowItWorksSection />
       <TrustAndProofSection />
       <GuaranteeSection />
       <FaqSection />
-      <FinalCtaSection />
+      <DiagnosticCtaSection />
     </div>
   );
 }

@@ -4,18 +4,10 @@ import { motion, useMotionTemplate, useReducedMotion, useScroll, useTransform } 
 import Link from "next/link";
 import { useRef } from "react";
 
+import { heroWords } from "@/content/boreas-home";
 import { Header } from "@/components/hero/header";
 import { MacbookShowcase } from "@/components/hero/macbook-showcase";
 import { RotatingHeadline } from "@/components/hero/rotating-headline";
-
-const rotatingWords = [
-  "citas",
-  "pacientes",
-  "clientes",
-  "reservas",
-  "leads",
-  "ingresos",
-];
 
 const contourPaths = [
   "M-80 220C90 130 250 140 420 220C610 312 760 304 980 220C1150 154 1300 154 1505 256C1630 320 1740 320 1840 268",
@@ -159,35 +151,48 @@ export function BoreasHero() {
               className="relative z-10 flex max-w-[860px] flex-col items-center text-center"
             >
               <p className="text-[0.72rem] uppercase tracking-[0.42em] text-white/34">
-                Boreas · La IA a tu favor
+                Boreas · Sistema operativo de revenue
               </p>
 
-              <h1 className="mt-6 flex max-w-[12ch] flex-col items-center text-center text-[clamp(4.1rem,11vw,8.3rem)] font-medium leading-[0.98] tracking-[-0.075em] text-[#f7f1ea]">
-                <span className="block text-[#c5ccd2]">Más</span>
+              <h1 className="mt-6 flex max-w-[14ch] flex-col items-center text-center text-[clamp(3.5rem,10vw,7.6rem)] font-medium leading-[0.98] tracking-[-0.075em] text-[#f7f1ea]">
+                <span className="block text-[#c5ccd2]">Revenue estructurado para</span>
                 <span className="mt-1 block min-h-[1.22em]">
-                  <RotatingHeadline words={rotatingWords} />
+                  <RotatingHeadline words={heroWords} />
                 </span>
               </h1>
 
-              <p className="mt-8 max-w-[42rem] text-base leading-8 text-white/58 sm:text-lg">
-                Automatización inteligente para negocios que quieren llenar su
-                agenda sin perseguir mensajes.
+              <p className="mt-8 max-w-[46rem] text-base leading-8 text-white/58 sm:text-lg">
+                Boreas organiza adquisición, conversión y retención como un
+                sistema. Relevo es el módulo activo que hoy responde, califica y
+                empuja leads a acciones concretas con playbooks por industria.
               </p>
 
               <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
                 <a
-                  href="mailto:hola@boreas.ai"
+                  href="#diagnostico"
                   className="inline-flex min-w-[13rem] items-center justify-center rounded-full border border-white/14 bg-[linear-gradient(180deg,rgba(216,204,178,0.18)_0%,rgba(216,204,178,0.11)_100%)] px-6 py-3.5 text-sm font-medium text-[#fbfcfd] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.08),0_14px_34px_rgba(0,0,0,0.18)] backdrop-blur-xl transition-all duration-500 hover:scale-[1.015] hover:border-white/22 hover:bg-[linear-gradient(180deg,rgba(216,204,178,0.24)_0%,rgba(216,204,178,0.16)_100%)] hover:brightness-105"
                 >
-                  Agendar llamada
+                  Recibir diagnóstico inicial
                 </a>
 
                 <Link
                   href="#demo"
                   className="inline-flex min-w-[13rem] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-6 py-3.5 text-sm font-medium text-[#f5f1ea] transition-all duration-300 hover:border-white/20 hover:bg-white/[0.06]"
                 >
-                  Ver cómo funciona
+                  Ver Relevo en acción
                 </Link>
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-[0.68rem] uppercase tracking-[0.26em] text-white/34">
+                <span className="rounded-full border border-white/10 px-3 py-2">
+                  Playbooks por industria
+                </span>
+                <span className="rounded-full border border-white/10 px-3 py-2">
+                  Conversión activa ahora
+                </span>
+                <span className="rounded-full border border-white/10 px-3 py-2">
+                  Medición desde el día uno
+                </span>
               </div>
             </motion.div>
 
