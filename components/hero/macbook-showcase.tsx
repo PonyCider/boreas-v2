@@ -99,14 +99,16 @@ function MobileFrame({ children }: { children: React.ReactNode }) {
 }
 
 export function MacbookShowcase({
+  id,
   mode = "static",
 }: {
+  id?: string;
   mode?: "static" | "simulator";
 }) {
   const reduceMotion = useReducedMotion();
 
   return (
-    <div id="demo" className="relative mx-auto w-full max-w-[1080px] px-2 sm:px-4">
+    <div id={id} className="relative mx-auto w-full max-w-[1080px] px-2 sm:px-4">
       {/* Desktop: Full MacBook frame */}
       <div className="hidden lg:block">
         <MacbookFrame reduceMotion={reduceMotion}>

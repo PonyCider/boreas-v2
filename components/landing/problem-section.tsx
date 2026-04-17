@@ -36,7 +36,7 @@ export function ProblemSection() {
         className="pointer-events-none absolute left-[20%] top-20 h-96 w-96 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(216,204,178,0.08),transparent_70%)] blur-[110px]"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+      <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
         <div className="grid items-center gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
           <div data-reveal className="max-w-2xl px-2">
             <SectionEyebrow>El Problema</SectionEyebrow>

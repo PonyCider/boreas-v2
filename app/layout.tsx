@@ -13,9 +13,21 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Boreas | Automatización AI para negocios de belleza",
+  title: "Boreas | IA para responder y cerrar mejor",
   description:
-    "Automatiza conversaciones, reservas y seguimientos para salones, spas y artistas de belleza con Boreas.",
+    "Boreas ayuda a salud, belleza e inmobiliario a responder más rápido, atender mejor y llevar más conversaciones a citas, visitas y oportunidades.",
+  openGraph: {
+    title: "Boreas | IA para responder y cerrar mejor",
+    description:
+      "Relevo es la experiencia de Boreas que hoy ya responde, guía y ayuda a cerrar más conversaciones.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Boreas | IA para responder y cerrar mejor",
+    description:
+      "Más respuestas a tiempo, mejor atención y más citas, visitas y oportunidades.",
+  },
 };
 
 export default function RootLayout({

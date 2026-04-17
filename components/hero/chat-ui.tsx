@@ -11,9 +11,10 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 type ChatUIMode = "static" | "simulator";
 type LogEntryStatus = "idle" | "running" | "done";
 
-const INCOMING_MESSAGE = "Me encantaría. ¿Qué día tienen disponible?";
-const BOREAS_REPLY =
-  "¡Claro! Tengo un espacio este domingo 21 de junio a las 4:30 PM. ¿Te lo confirmo?";
+const INCOMING_MESSAGE =
+  "Quiero avanzar esta semana. ¿Qué opción me recomiendan?";
+const RELEVO_REPLY =
+  "Sí. Ya vi lo que necesitas y te recomiendo una llamada inicial este domingo 21 de junio a las 4:30 PM. ¿Te la aparto ahora?";
 
 /* ─── Activity Log data (telemetry-style) ─── */
 interface LogEntry {
@@ -23,11 +24,11 @@ interface LogEntry {
 }
 
 const ENGINE_LOG: LogEntry[] = [
-  { tag: "INTENT",   label: "Clasif. intención",  output: "scheduling · 0.97" },
-  { tag: "EXTRACT",  label: "Extracción",         output: "periodo: semana" },
-  { tag: "QUERY",    label: "Disponibilidad",      output: "3 slots" },
-  { tag: "MATCH",    label: "Match horario",       output: "dom 21/06 16:30" },
-  { tag: "COMPOSE",  label: "Respuesta",           output: "42 tok · brand_v2" },
+  { tag: "NECES", label: "Qué busca", output: "quiere avanzar esta semana" },
+  { tag: "RUTA", label: "Ruta elegida", output: "llamada inicial" },
+  { tag: "DUDAS", label: "Punto a resolver", output: "horario" },
+  { tag: "PASO", label: "Siguiente paso", output: "domingo 4:30 PM" },
+  { tag: "CIERRE", label: "Acción", output: "apartar ahora" },
 ];
 
 function createInitialLogStates(): LogEntryStatus[] {
@@ -158,15 +159,15 @@ function ActivityLogEntry({
   );
 }
 
-/* ─── Confirmed Appointment Card (embedded in Boreas reply) ─── */
+/* ─── Next Step Card (embedded in Relevo reply) ─── */
 
 function AppointmentCard({ containerRef }: { containerRef?: Ref<HTMLDivElement> }) {
   return (
     <div ref={containerRef} className="mt-2.5 rounded-xl border border-[#d4c0a1]/15 bg-[#171b20] px-3.5 py-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-[#f5f1ea]">Consulta inicial</p>
+        <p className="text-xs font-medium text-[#f5f1ea]">Llamada inicial</p>
         <span className="rounded-full bg-[#d4c0a1]/12 px-2 py-0.5 text-[0.58rem] font-semibold uppercase tracking-[0.2em] text-[#d4c0a1]">
-          confirmada
+          siguiente paso
         </span>
       </div>
       <div className="mt-2 flex items-center gap-3 text-[11px] text-white/40">
@@ -202,22 +203,22 @@ function StaticChatUI() {
     <>
       <div className="grid flex-1 gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[1.25fr_0.75fr]">
         <div className="flex flex-col gap-4">
-          <MessageBubble align="right" sender="Cliente" text="Hola, ¿tienen citas disponibles?" />
+          <MessageBubble align="right" sender="Cliente" text="Hola, quiero avanzar esta semana." />
           <MessageBubble
-            sender="Boreas"
-            text="Sí, te muestro los horarios disponibles para hoy y mañana."
+            sender="Relevo"
+            text="Perfecto. Relevo ya entendió lo que buscas y te propone las mejores opciones para avanzar."
           />
 
           <div className="flex flex-wrap gap-2 pl-1">
             <QuickReply label="Hoy 5:30 PM" />
             <QuickReply label="Mañana 11:00 AM" />
-            <QuickReply label="Ver más horarios" />
+            <QuickReply label="Llamada rápida" />
           </div>
 
-          <MessageBubble sender="Boreas">
-            <p className="text-[0.68rem] uppercase tracking-[0.28em] text-white/35">Boreas</p>
+          <MessageBubble sender="Relevo">
+            <p className="text-[0.68rem] uppercase tracking-[0.28em] text-white/35">Relevo</p>
             <p className="mt-2 text-sm leading-6">
-              Perfecto, te agendo para hoy a las 5:30 PM. Te envío confirmación y recordatorio automático.
+              El mejor siguiente paso es hoy a las 5:30 PM. Si me dices que sí, Relevo lo confirma y te acompaña hasta cerrar.
             </p>
             <AppointmentCard />
           </MessageBubble>
@@ -226,17 +227,17 @@ function StaticChatUI() {
         {/* Reservation card (simplified) */}
         <div className="rounded-[1.65rem] border border-white/8 bg-white/[0.03] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.16)]">
           <p className="text-[0.62rem] uppercase tracking-[0.34em] text-white/28">
-            Reserva sugerida
+            Siguiente paso sugerido
           </p>
 
           <div className="mt-4 rounded-[1.35rem] border border-[#d4c0a1]/12 bg-[#171b20] px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-[#f5f1ea]">
-                  Consulta inicial
+                  Llamada inicial
                 </p>
                 <p className="mt-1.5 text-xs uppercase tracking-[0.22em] text-white/28">
-                  30 min · Confirmación automática
+                  30 min · Empuje a acción
                 </p>
               </div>
               <span className="rounded-full border border-[#d4c0a1]/18 px-3 py-1 text-[0.62rem] uppercase tracking-[0.24em] text-[#d4c0a1]">
@@ -253,7 +254,7 @@ function StaticChatUI() {
                 >
                   <span>{slot}</span>
                   <span className="text-xs uppercase tracking-[0.2em] text-white/30">
-                    reservar
+                    avanzar
                   </span>
                 </button>
               ))}
@@ -264,9 +265,9 @@ function StaticChatUI() {
 
       <div className="border-t border-white/6 px-5 py-4 sm:px-6">
         <div className="flex items-center justify-between gap-3 rounded-[1.3rem] border border-white/8 bg-black/20 px-4 py-3">
-          <p className="text-sm text-white/38">Responder como Boreas</p>
+          <p className="text-sm text-white/38">Responder como Relevo</p>
           <span className="rounded-full bg-[#d4c0a1] px-3.5 py-2 text-[0.62rem] font-medium uppercase tracking-[0.24em] text-[#0f1215]">
-            Enviar horarios
+            Mover a acción
           </span>
         </div>
       </div>
@@ -431,7 +432,7 @@ function InteractiveChatUI() {
           cumulativeOffset += 380 + Math.floor(Math.random() * 200);
         });
 
-        /* ── Phase 3: Chat back in focus, Boreas types ── */
+        /* ── Phase 3: Chat back in focus, Relevo types ── */
         tl.to(enginePanelRef.current, {
           opacity: 0.6,
           duration: 0.5,
@@ -459,7 +460,7 @@ function InteractiveChatUI() {
           ease: "power2.in",
         });
 
-        /* ── Boreas reply with appointment card ── */
+        /* ── Relevo reply with next-step card ── */
         tl.to(replyBubbleRef.current, {
           autoAlpha: 1,
           y: 0,
@@ -517,8 +518,8 @@ function InteractiveChatUI() {
     phase === "done"
       ? "Repetir demo"
       : phase === "engine" || phase === "typing"
-        ? "Procesando"
-        : "Enviar";
+        ? "Ejecutando"
+        : "Activar Relevo";
   const inputPreview = phase === "idle" ? INCOMING_MESSAGE : "";
 
   return (
@@ -531,15 +532,15 @@ function InteractiveChatUI() {
       >
         {/* Chat panel */}
         <div ref={chatPanelRef} className="flex min-h-0 flex-col justify-end">
-          <p className="mb-2 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-[#d4c0a1]/60">Lo que ves</p>
+          <p className="mb-2 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-[#d4c0a1]/60">Lo que ve la persona</p>
           <div
             className="relative flex max-w-[31rem] flex-col gap-1.5"
             style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 12%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 12%)" }}
           >
 
             {/* Conversation history (pre-existing) */}
-            <MessageBubble align="right" sender="Cliente" text="Me recomendaron con ustedes." muted />
-            <MessageBubble sender="Boreas" text="Excelentes noticias. ¿Te gustaría agendar una cita?" muted />
+            <MessageBubble align="right" sender="Cliente" text="Vi su anuncio, pero no sé cuál sería el mejor siguiente paso." muted />
+            <MessageBubble sender="Relevo" text="No pasa nada. Relevo entiende qué busca y lo lleva al siguiente paso más probable." muted />
 
             {/* Current demo flow */}
             <MessageBubble
@@ -552,7 +553,7 @@ function InteractiveChatUI() {
             <div ref={typingBubbleRef} className="flex justify-start">
               <div className="rounded-[1.5rem] rounded-bl-md border border-white/8 bg-white/[0.04] px-4 py-3 text-[#f5f1ea]">
                 <p className="text-[0.68rem] uppercase tracking-[0.28em] text-white/35">
-                  Boreas
+                  Relevo
                 </p>
                 <div className="mt-2 flex items-center gap-1.5">
                   {[0, 1, 2].map((dot) => (
@@ -569,10 +570,10 @@ function InteractiveChatUI() {
             </div>
 
             <MessageBubble
-              sender="Boreas"
+              sender="Relevo"
               containerRef={replyBubbleRef}
             >
-              <p className="mt-2 text-sm leading-6">{BOREAS_REPLY}</p>
+              <p className="mt-2 text-sm leading-6">{RELEVO_REPLY}</p>
               <AppointmentCard containerRef={appointmentCardRef} />
             </MessageBubble>
           </div>
@@ -580,11 +581,11 @@ function InteractiveChatUI() {
 
         {/* Engine Activity Log */}
         <div ref={enginePanelRef} className="flex min-w-0 flex-col gap-3 transition-opacity duration-500 lg:min-w-[20rem]">
-          <p className="mb-0 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-[#d4c0a1]/60">La magia detrás</p>
+          <p className="mb-0 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-[#d4c0a1]/60">Lo que revisa Relevo</p>
           <div className="flex flex-1 flex-col rounded-[1.65rem] border border-white/8 bg-white/[0.03] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.16)]">
             <div className="flex items-center justify-between">
               <p className="font-mono text-[0.62rem] uppercase tracking-[0.34em] text-white/28">
-                Activity Log
+                Resumen
               </p>
               <span className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[0.56rem] uppercase tracking-wider ${
                 phase === "done"
@@ -599,7 +600,7 @@ function InteractiveChatUI() {
                     <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 )}
-                {phase === "done" ? "complete" : phase === "engine" || phase === "typing" ? "processing" : "standby"}
+                {phase === "done" ? "listo" : phase === "engine" || phase === "typing" ? "revisando" : "espera"}
               </span>
             </div>
 
@@ -621,7 +622,7 @@ function InteractiveChatUI() {
           {/* Engine Summary */}
           <div className="min-h-[5rem] rounded-[1.35rem] border border-white/8 bg-black/18 px-4 py-3">
             <div className="flex items-center justify-between">
-              <p className="font-mono text-xs text-[#f5f1ea]/70">Estado</p>
+              <p className="font-mono text-xs text-[#f5f1ea]/70">Estado Relevo</p>
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
                   phase === "done"
@@ -633,10 +634,10 @@ function InteractiveChatUI() {
               />
             </div>
             <p className="mt-1.5 font-mono text-[11px] leading-5 text-white/40">
-              {phase === "idle" && "Esperando mensaje entrante…"}
-              {phase === "engine" && "Pipeline en ejecución — clasificando y extrayendo…"}
-              {phase === "typing" && "Componiendo respuesta con voice model…"}
-              {phase === "done" && "Flujo completado · respuesta entregada · cita confirmada"}
+              {phase === "idle" && "Esperando una nueva conversación para que Relevo entre en acción…"}
+              {phase === "engine" && "Relevo entiende qué busca la persona y decide cómo ayudarla a avanzar."}
+              {phase === "typing" && "Relevo prepara la respuesta y propone el mejor siguiente paso."}
+              {phase === "done" && "Conversación entendida · mejor siguiente paso listo"}
             </p>
           </div>
         </div>
@@ -690,11 +691,11 @@ export function ChatUI({ mode = "static" }: { mode?: ChatUIMode }) {
       <div className="flex items-center justify-between border-b border-white/6 px-5 py-4 sm:px-6">
         <div>
           <p className="text-[0.62rem] uppercase tracking-[0.34em] text-white/28">
-            Boreas Flow
+            Boreas
           </p>
           <div className="mt-2 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#d4c0a1] shadow-[0_0_14px_rgba(212,192,161,0.5)]" />
-            <span className="text-sm text-[#f5f1ea]">Concierge activo</span>
+            <span className="text-sm text-[#f5f1ea]">Relevo · atención que guía y convierte</span>
           </div>
         </div>
 
@@ -703,7 +704,7 @@ export function ChatUI({ mode = "static" }: { mode?: ChatUIMode }) {
             WhatsApp
           </span>
           <span className="rounded-full border border-white/8 px-3 py-1.5">
-            24/7
+            Playbook
           </span>
         </div>
       </div>
