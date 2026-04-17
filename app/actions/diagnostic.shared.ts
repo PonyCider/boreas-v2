@@ -61,10 +61,10 @@ export const leadVolumeOptions: Array<{
   value: LeadVolumeBand;
   label: string;
 }> = [
-  { value: "1-20", label: "1 a 20 leads al mes" },
-  { value: "21-60", label: "21 a 60 leads al mes" },
-  { value: "61-150", label: "61 a 150 leads al mes" },
-  { value: "151-plus", label: "Más de 150 leads al mes" },
+  { value: "1-20", label: "1 a 20 contactos al mes" },
+  { value: "21-60", label: "21 a 60 contactos al mes" },
+  { value: "61-150", label: "61 a 150 contactos al mes" },
+  { value: "151-plus", label: "Más de 150 contactos al mes" },
 ];
 
 export const responseTimeOptions: Array<{
@@ -84,7 +84,7 @@ export const bookingFlowOptions: Array<{
   { value: "manual", label: "Manual, entre mensajes y llamadas" },
   { value: "whatsapp", label: "Principalmente por WhatsApp" },
   { value: "crm", label: "Con CRM o agenda digital" },
-  { value: "mixed", label: "Mixto, con varios hand-offs" },
+  { value: "mixed", label: "Mixto, con varios pasos manuales" },
 ];
 
 export function isDiagnosticVertical(value: string): value is DiagnosticVertical {

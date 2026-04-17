@@ -5,7 +5,7 @@ import { SectionFrame } from "./boreas-landing-sections";
 export function GuaranteeSection() {
   return (
     <SectionFrame className="py-20 sm:py-32">
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
+      <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
         <div data-reveal className="relative overflow-hidden rounded-[2.5rem] border border-[#d8ccb2]/15 bg-[linear-gradient(180deg,rgba(216,204,178,0.06)_0%,rgba(216,204,178,0.01)_100%)] px-8 py-16 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_80px_rgba(0,0,0,0.3)] md:px-20 md:py-24 backdrop-blur-md">
           {/* Subtle Glows */}
           <div className="absolute left-1/2 top-0 h-56 w-[70%] -translate-x-1/2 rounded-full bg-[#d8ccb2]/10 blur-[80px] pointer-events-none" />
@@ -20,9 +20,9 @@ export function GuaranteeSection() {
               </h2>
 
               <p className="mt-8 max-w-2xl text-lg leading-relaxed text-[#f7f1ea]/60">
-                El negocio no tiene que inventar la lógica conversacional ni entrenar un bot desde
-                cero. En v2.1 solo comparte sus datos operativos, y Boreas activa el playbook
-                correcto para que Relevo arranque con estructura, supervisión y criterios medibles.
+                Tu equipo no tiene que inventar cada respuesta ni armar flujos complejos desde
+                cero. Compartes la información clave del negocio y Boreas deja a Relevo listo para
+                atender con orden, claridad y seguimiento.
               </p>
 
               <a

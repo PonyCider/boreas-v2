@@ -2,97 +2,97 @@ export const heroWords = ["salud", "belleza", "inmobiliario"];
 
 export const platformLayers = [
   {
-    title: "Adquisición",
-    status: "Futuro",
+    title: "Atraer",
+    status: "Más adelante",
     description:
-      "Boreas ordenará la generación de tráfico e intención cuando la capa de conversión ya esté dominada.",
+      "Más adelante Boreas también ayudará a atraer más interés y más conversaciones nuevas.",
   },
   {
-    title: "Conversión",
-    status: "Activo ahora",
+    title: "Atender y convertir",
+    status: "Disponible hoy",
     description:
-      "Relevo responde, califica y empuja leads a acciones concretas con playbooks diseñados por industria.",
+      "Hoy Relevo responde, entiende lo que busca cada persona y la lleva al siguiente paso.",
   },
   {
-    title: "Retención",
-    status: "Siguiente fase",
+    title: "Volver a activar",
+    status: "Próximo paso",
     description:
-      "Seguimiento, reactivación y fidelización se activarán sobre una base ya medida de revenue y conversiones.",
+      "Después llegarán recordatorios, seguimiento y formas de hacer que más clientes regresen.",
   },
 ];
 
 export const playbookPhases = [
   {
     number: "01",
-    title: "Apertura",
+    title: "Primer mensaje",
     description:
-      "Relevo toma la intención entrante sin sonar a bot y abre la conversación con el tono correcto.",
+      "Relevo responde rápido y con el tono correcto desde el primer momento.",
   },
   {
     number: "02",
-    title: "Calificación mínima",
+    title: "Entender qué necesita",
     description:
-      "Obtiene la información indispensable para separar curiosidad, urgencia y lead realmente accionable.",
+      "Hace las preguntas justas para saber si la persona quiere una cita, una visita o más información.",
   },
   {
     number: "03",
-    title: "Micro venta",
+    title: "Resolver dudas",
     description:
-      "Aclara valor, reduce fricción y orienta la conversación hacia una decisión concreta.",
+      "Aclara lo importante y ayuda a que la conversación no se enfríe.",
   },
   {
     number: "04",
-    title: "Push a acción",
+    title: "Llevarlo al siguiente paso",
     description:
-      "Conduce al lead hacia agenda, visita, consulta o siguiente paso sin dejar la conversación abierta.",
+      "Propone una cita, visita, llamada o siguiente paso sin dejar la conversación abierta.",
   },
   {
     number: "05",
-    title: "Objeciones y cierre",
+    title: "Cerrar bien",
     description:
-      "Maneja dudas comunes, refuerza contexto y cierra con una acción medible para el negocio.",
+      "Responde objeciones comunes y busca cerrar con una acción clara para el negocio.",
   },
 ];
 
 export const playbookCards = [
   {
-    title: "Playbook por industria",
+    title: "Guía por industria",
     description:
-      "La lógica de conversación no se improvisa. Cada vertical activa una estructura distinta de preguntas, filtros y cierres.",
+      "Cada sector necesita una manera distinta de responder, orientar y cerrar.",
     accent: "main",
   },
   {
-    title: "Contexto del negocio",
+    title: "Datos de tu negocio",
     description:
-      "Relevo usa horarios, precios, ubicación, servicios y reglas comerciales para responder con precisión operativa.",
+      "Relevo usa horarios, precios, ubicación y servicios para responder con contexto real.",
     accent: "neutral",
   },
   {
-    title: "Estilo y tono",
+    title: "Tu forma de hablar",
     description:
-      "La personalización sucede sobre el estilo, no sobre la lógica de conversión. Eso mantiene consistencia y control.",
+      "El tono se adapta a tu marca sin perder claridad ni consistencia.",
     accent: "neutral",
   },
   {
-    title: "Resultados medibles",
+    title: "Resultados claros",
     description:
-      "Cada playbook está diseñado para mejorar tiempos de respuesta, avance conversacional y citas agendadas.",
+      "Todo se piensa para responder antes, avanzar mejor y lograr más citas o visitas.",
     accent: "accent",
   },
 ];
 
 export const comparisonFlows = {
   manual: [
-    "El lead pregunta y entra en espera.",
-    "La respuesta depende del tiempo y del ancho de banda humano.",
+    "La persona escribe y queda esperando.",
+    "La respuesta depende de si alguien alcanza a contestar.",
     "La conversación se enfría o se va con la competencia.",
-    "El negocio pierde revenue sin verlo claramente.",
+    "El negocio pierde oportunidades sin notarlo a tiempo.",
   ],
   relevo: [
-    "La intención se captura al instante.",
-    "Relevo califica, ordena contexto y reduce fricción.",
-    "El playbook empuja a una acción concreta.",
-    "La conversación termina en un resultado medible.",
+    "La conversación recibe atención al momento.",
+    "Relevo entiende mejor qué busca esa persona.",
+    "La guía correcta la lleva a una cita, visita o llamada.",
+    "La conversación termina con un siguiente paso claro.",
   ],
 };
 
@@ -101,46 +101,46 @@ export const verticals = [
     vertical: "Salud",
     pain: "Consultas perdidas, pacientes sin respuesta y recepción saturada.",
     lead: "Pacientes que preguntan por disponibilidad, valoración o siguiente paso.",
-    action: "Consulta, triage comercial o cita agendada.",
+    action: "Consulta, orientación inicial o cita agendada.",
   },
   {
     vertical: "Belleza",
     pain: "Reservas que se enfrían por demora, cambios de horario y seguimiento irregular.",
     lead: "Clientes que buscan servicio, precio, agenda o recomendación.",
-    action: "Reserva confirmada o conversación reencaminada a agenda.",
+    action: "Reserva confirmada o siguiente paso claro.",
   },
   {
     vertical: "Inmobiliario",
-    pain: "Leads sin priorización, visitas mal filtradas y agentes reaccionando tarde.",
+    pain: "Mensajes sin prioridad, visitas mal filtradas y respuestas tardías.",
     lead: "Prospectos que preguntan por propiedad, presupuesto, zona o visita.",
-    action: "Visita, llamada de calificación o siguiente acción comercial.",
+    action: "Visita, llamada para entender el caso o siguiente paso claro.",
   },
 ];
 
 export const onboardingSteps = [
   {
     number: "01",
-    title: "Eliges industria",
+    title: "Nos dices a qué te dedicas",
     description:
-      "Salud, belleza o inmobiliario para activar el marco correcto de conversación y prioridad comercial.",
+      "Salud, belleza o inmobiliario para arrancar con el enfoque correcto.",
   },
   {
     number: "02",
-    title: "Compartes contexto",
+    title: "Nos compartes lo básico",
     description:
-      "Servicios, horarios, ubicación, precios y reglas operativas. Tú no diseñas la lógica; solo aportas datos del negocio.",
+      "Servicios, horarios, ubicación y precios. Tú pones la información; Boreas pone la estructura.",
   },
   {
     number: "03",
-    title: "Activamos el playbook",
+    title: "Lo dejamos listo",
     description:
-      "Relevo ajusta tono, contexto y objetivos sobre una estructura de conversión ya definida.",
+      "Relevo adapta el tono y la ruta de atención para tu negocio.",
   },
   {
     number: "04",
-    title: "Empiezas a medir",
+    title: "Empezamos a medir",
     description:
-      "El sistema se evalúa por tiempos de respuesta, avance de conversación y acciones cerradas.",
+      "Desde el inicio vemos qué tan rápido responde y cuántas conversaciones terminan en una acción real.",
   },
 ];
 
@@ -148,22 +148,22 @@ export const metricCards = [
   {
     label: "Tiempo de respuesta",
     description:
-      "Qué tan rápido entra el sistema a la conversación cuando aparece intención real.",
+      "Qué tan rápido se atiende una conversación cuando alguien de verdad quiere avanzar.",
   },
   {
-    label: "Tasa de respuesta",
+    label: "Conversaciones atendidas",
     description:
-      "Cuántos leads reciben atención efectiva antes de enfriarse o desaparecer.",
+      "Cuántas personas reciben respuesta antes de enfriarse o irse.",
   },
   {
-    label: "Tasa de avance",
+    label: "Conversaciones que avanzan",
     description:
-      "Cuántas conversaciones superan la etapa superficial y se mueven hacia una decisión.",
+      "Cuántas conversaciones pasan de una duda inicial a un siguiente paso.",
   },
   {
-    label: "Citas agendadas",
+    label: "Citas o visitas logradas",
     description:
-      "Cuántas interacciones terminan en una acción concreta y medible para el negocio.",
+      "Cuántas conversaciones terminan en una cita, visita o llamada concreta.",
   },
 ];
 
@@ -171,31 +171,31 @@ export const faqs = [
   {
     question: "¿Qué diferencia hay entre Boreas y Relevo?",
     answer:
-      "Boreas es la plataforma operativa de revenue. Relevo es el primer módulo activo dentro de ese sistema y se encarga específicamente de la conversión: responder, calificar y empujar leads a una acción concreta.",
+      "Boreas es la marca y la base completa. Relevo es lo que hoy ya puedes ver funcionando: responde, orienta y ayuda a cerrar más conversaciones.",
   },
   {
     question: "¿Por qué trabajan tres verticales al mismo tiempo?",
     answer:
-      "Porque Boreas no se adapta con un discurso genérico, sino con playbooks por industria. La estructura comercial es compartida, pero cada vertical activa preguntas, filtros y cierres distintos.",
+      "Porque salud, belleza e inmobiliario comparten el problema de responder tarde, pero cada uno necesita una forma distinta de orientar la conversación.",
   },
   {
     question: "¿El negocio tiene que diseñar la conversación?",
     answer:
-      "No. El negocio solo comparte información operativa como horarios, precios, ubicación y servicios. La lógica de conversión ya vive dentro del playbook que activa Relevo.",
+      "No. Solo compartes la información básica del negocio. Boreas se encarga de la forma en que Relevo atiende y guía la conversación.",
   },
   {
-    question: "¿Esto es un bot con prompts y respuestas sueltas?",
+    question: "¿Es un chatbot genérico?",
     answer:
-      "No. Relevo opera con una arquitectura de playbook, contexto y estilo. El prompt es solo una capa; la conversión depende de la estructura completa del sistema.",
+      "No. Relevo no responde al azar. Sigue una guía clara para entender, responder y ayudar a cerrar cada conversación.",
   },
   {
     question: "¿Qué se mide para saber si está funcionando?",
     answer:
-      "Tiempo de respuesta, tasa de respuesta, tasa de avance en conversación y acciones cerradas como citas agendadas, visitas o llamadas calificadas.",
+      "Cuánto tardas en responder, cuántas conversaciones sí reciben atención, cuántas avanzan y cuántas terminan en una cita, visita o llamada.",
   },
   {
-    question: "¿El CTA final ya está cerrado en v2.1?",
+    question: "¿Puedo ver si esto me serviría sin dejar mis datos?",
     answer:
-      "No del todo. En esta versión Boreas elimina la dependencia de mailto y prueba un flujo de diagnóstico de bajo roce para aprender qué formato convierte mejor sin aumentar fricción innecesaria.",
+      "Sí. El diagnóstico rápido te orienta con cuatro preguntas y no te pide correo ni conexión técnica para darte una primera recomendación.",
   },
 ];

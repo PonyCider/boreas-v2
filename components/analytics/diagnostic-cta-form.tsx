@@ -62,18 +62,19 @@ export function DiagnosticCtaForm() {
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
       <div className="max-w-xl">
-        <p className="text-[0.68rem] uppercase tracking-[0.38em] text-white/30">CTA de diagnóstico</p>
+        <p className="text-[0.68rem] uppercase tracking-[0.38em] text-white/30">Diagnóstico rápido</p>
         <h2 className="mt-6 text-balance text-[clamp(2.35rem,4.8vw,4.75rem)] font-medium leading-[1.04] tracking-[-0.05em] text-[#f7f1ea]">
-          Recibe una recomendación útil antes de hablar con nosotros.
+          Descubre qué te ayudaría más a cerrar mejor.
         </h2>
         <p className="mt-6 max-w-2xl text-base leading-7 text-white/56 sm:text-lg">
-          Responde cuatro preguntas y Boreas te devuelve cuál es el cuello de botella más urgente, qué tipo de playbook debería arrancar primero y qué ajustar para que Relevo convierta mejor.
+          Responde cuatro preguntas y Boreas te dirá qué deberías resolver primero para atender
+          mejor y llevar más conversaciones a una cita, visita o llamada.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3 text-sm text-white/45">
-          <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">Sin correo obligatorio</span>
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">Sin dejar correo</span>
           <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">Menos de 30 segundos</span>
-          <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">Recomendación inmediata</span>
+          <span className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2">Respuesta al momento</span>
         </div>
 
         <button
@@ -81,7 +82,7 @@ export function DiagnosticCtaForm() {
           onClick={handlePrimaryCtaClick}
           className="mt-10 inline-flex items-center justify-center rounded-full border border-white/14 bg-[linear-gradient(180deg,rgba(216,204,178,0.22)_0%,rgba(216,204,178,0.12)_100%)] px-8 py-4 text-[1rem] font-medium text-[#fbfcfd] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.08),0_18px_44px_rgba(0,0,0,0.25)] backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-[#d8ccb2]/30"
         >
-          Quiero mi diagnóstico express
+          Quiero verlo
         </button>
       </div>
 
@@ -96,7 +97,7 @@ export function DiagnosticCtaForm() {
           <input type="hidden" name="source" value={SOURCE} />
 
           <fieldset className="space-y-3">
-            <legend className="text-sm font-medium tracking-wide text-[#d8ccb2]">1. ¿En qué vertical vendes?</legend>
+            <legend className="text-sm font-medium tracking-wide text-[#d8ccb2]">1. ¿A qué te dedicas?</legend>
             <div className="grid gap-3 sm:grid-cols-3">
               {verticalOptions.map((option) => {
                 const checked = draft.vertical === option.value;
@@ -129,7 +130,7 @@ export function DiagnosticCtaForm() {
 
           <div className="grid gap-4 sm:grid-cols-3">
             <label className="space-y-2 text-sm text-white/64">
-              <span className="font-medium tracking-wide text-[#d8ccb2]">2. ¿Cuántos leads entran?</span>
+              <span className="font-medium tracking-wide text-[#d8ccb2]">2. ¿Cuántos contactos te llegan?</span>
               <select
                 name="leadVolume"
                 value={draft.leadVolume}
@@ -149,7 +150,7 @@ export function DiagnosticCtaForm() {
             </label>
 
             <label className="space-y-2 text-sm text-white/64">
-              <span className="font-medium tracking-wide text-[#d8ccb2]">3. ¿Qué tan rápido responden?</span>
+              <span className="font-medium tracking-wide text-[#d8ccb2]">3. ¿Cuánto tardan en contestar?</span>
               <select
                 name="responseTime"
                 value={draft.responseTime}
@@ -169,7 +170,7 @@ export function DiagnosticCtaForm() {
             </label>
 
             <label className="space-y-2 text-sm text-white/64">
-              <span className="font-medium tracking-wide text-[#d8ccb2]">4. ¿Cómo operan hoy?</span>
+              <span className="font-medium tracking-wide text-[#d8ccb2]">4. ¿Cómo cierran hoy una cita o visita?</span>
               <select
                 name="bookingFlow"
                 value={draft.bookingFlow}
@@ -191,7 +192,8 @@ export function DiagnosticCtaForm() {
 
           <div className="flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-xl text-sm leading-6 text-white/45">
-              Esta base no guarda datos ni dispara integraciones externas. Solo calcula una recomendación inicial y deja eventos listos para enganchar analytics después.
+              No te pedimos correo ni conectamos nada. Solo te damos una primera recomendación para
+              ver por dónde empezar.
             </p>
             <DiagnosticSubmitButton disabled={!isReadyToSubmit} />
           </div>
@@ -226,12 +228,14 @@ export function DiagnosticCtaForm() {
             <p className="mt-3 text-base leading-7 text-white/62">{state.recommendation.summary}</p>
 
             <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4">
-              <p className="text-[0.68rem] uppercase tracking-[0.3em] text-white/32">Playbook recomendado</p>
+              <p className="text-[0.68rem] uppercase tracking-[0.3em] text-white/32">
+                Lo primero que conviene activar
+              </p>
               <p className="mt-2 text-base font-medium text-[#f7f1ea]">{state.recommendation.playbookTitle}</p>
             </div>
 
             <div className="mt-5">
-              <p className="text-[0.68rem] uppercase tracking-[0.3em] text-white/32">Qué haría Boreas primero</p>
+              <p className="text-[0.68rem] uppercase tracking-[0.3em] text-white/32">Qué haríamos primero</p>
               <ul className="mt-3 space-y-3 text-sm leading-6 text-white/58">
                 {state.recommendation.nextSteps.map((step) => (
                   <li key={step} className="flex gap-3">

@@ -9,13 +9,13 @@ export function BentoGridSection() {
 
   return (
     <SectionFrame>
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-        <div data-reveal className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow>Sistema de decisión</SectionEyebrow>
+      <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
+        <div data-reveal className="mx-auto max-w-4xl text-center lg:mx-0 lg:max-w-[48rem] lg:text-left">
+          <SectionEyebrow>Qué hace diferente a Relevo</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.1rem,4.6vw,4rem)] font-medium leading-[1.06] tracking-[-0.052em] text-[#f7f1ea]">
-            La ventaja no es responder más.
+            La ventaja no es solo responder.
             <br className="hidden sm:block" />
-            Es responder con estructura.
+            Es responder con claridad y rumbo.
           </h2>
         </div>
 

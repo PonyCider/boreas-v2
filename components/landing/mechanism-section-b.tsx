@@ -10,17 +10,17 @@ export function MechanismSectionB() {
   return (
     <div className="relative bg-transparent">
       <SectionFrame className="border-b border-[#d8ccb2]/10 py-24 sm:py-36">
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-          <div data-reveal className="mx-auto max-w-4xl text-center">
-            <SectionEyebrow>Playbooks</SectionEyebrow>
+        <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
+          <div data-reveal className="mx-auto max-w-4xl text-center lg:mx-0 lg:max-w-[50rem] lg:text-left">
+            <SectionEyebrow>Cómo responde Relevo</SectionEyebrow>
             <h2 className="mt-8 text-balance text-[clamp(2.4rem,5vw,4.5rem)] font-medium leading-[1.04] tracking-[-0.05em] text-[#f7f1ea]">
-              Relevo no improvisa prompts.
+              Relevo no responde al azar.
               <br className="hidden sm:block" />
-              <span className="text-white/60">Ejecuta una lógica completa de conversación.</span>
+              <span className="text-white/60">Sigue una guía clara para ayudar a avanzar.</span>
             </h2>
-            <p className="mx-auto mt-6 max-w-3xl text-base leading-7 text-white/56 sm:text-lg">
-              Cada playbook define la secuencia exacta para abrir, calificar, reducir fricción,
-              empujar a una acción y cerrar con contexto. Eso es lo que hace consistente el sistema.
+            <p className="mt-6 max-w-3xl text-base leading-7 text-white/56 sm:text-lg lg:mx-0">
+              Detrás de cada respuesta hay una secuencia pensada para entender mejor, resolver dudas
+              y proponer el siguiente paso en el momento correcto.
             </p>
           </div>
 

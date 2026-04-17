@@ -14,7 +14,7 @@ type LogEntryStatus = "idle" | "running" | "done";
 const INCOMING_MESSAGE =
   "Quiero avanzar esta semana. ¿Qué opción me recomiendan?";
 const RELEVO_REPLY =
-  "Sí. Ya califiqué tu caso y el playbook sugiere una llamada inicial este domingo 21 de junio a las 4:30 PM. ¿Te la aparto ahora?";
+  "Sí. Ya vi lo que necesitas y te recomiendo una llamada inicial este domingo 21 de junio a las 4:30 PM. ¿Te la aparto ahora?";
 
 /* ─── Activity Log data (telemetry-style) ─── */
 interface LogEntry {
@@ -24,11 +24,11 @@ interface LogEntry {
 }
 
 const ENGINE_LOG: LogEntry[] = [
-  { tag: "QUALIFY", label: "Calificación de lead", output: "listo para avanzar · 0.94" },
-  { tag: "PLAYBOOK", label: "Playbook activo", output: "conversión · primer contacto" },
-  { tag: "SIGNALS", label: "Señales clave", output: "intención: cita · objeción: horario" },
-  { tag: "ADVANCE", label: "Próximo paso", output: "llamada inicial · 30 min" },
-  { tag: "PUSH", label: "Empuje a acción", output: "confirmar ahora" },
+  { tag: "NECES", label: "Qué busca", output: "quiere avanzar esta semana" },
+  { tag: "RUTA", label: "Ruta elegida", output: "llamada inicial" },
+  { tag: "DUDAS", label: "Punto a resolver", output: "horario" },
+  { tag: "PASO", label: "Siguiente paso", output: "domingo 4:30 PM" },
+  { tag: "CIERRE", label: "Acción", output: "apartar ahora" },
 ];
 
 function createInitialLogStates(): LogEntryStatus[] {
@@ -206,7 +206,7 @@ function StaticChatUI() {
           <MessageBubble align="right" sender="Cliente" text="Hola, quiero avanzar esta semana." />
           <MessageBubble
             sender="Relevo"
-            text="Perfecto. Relevo ya activó el playbook de conversión y te propongo los siguientes pasos disponibles."
+            text="Perfecto. Relevo ya entendió lo que buscas y te propone las mejores opciones para avanzar."
           />
 
           <div className="flex flex-wrap gap-2 pl-1">
@@ -218,7 +218,7 @@ function StaticChatUI() {
           <MessageBubble sender="Relevo">
             <p className="text-[0.68rem] uppercase tracking-[0.28em] text-white/35">Relevo</p>
             <p className="mt-2 text-sm leading-6">
-              El mejor siguiente paso es hoy a las 5:30 PM. Si me dices que sí, Relevo lo confirma y sigue el flujo automático.
+              El mejor siguiente paso es hoy a las 5:30 PM. Si me dices que sí, Relevo lo confirma y te acompaña hasta cerrar.
             </p>
             <AppointmentCard />
           </MessageBubble>
@@ -532,7 +532,7 @@ function InteractiveChatUI() {
       >
         {/* Chat panel */}
         <div ref={chatPanelRef} className="flex min-h-0 flex-col justify-end">
-          <p className="mb-2 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-[#d4c0a1]/60">Lo que ve el lead</p>
+          <p className="mb-2 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-[#d4c0a1]/60">Lo que ve la persona</p>
           <div
             className="relative flex max-w-[31rem] flex-col gap-1.5"
             style={{ maskImage: "linear-gradient(to bottom, transparent 0%, black 12%)", WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 12%)" }}
@@ -540,7 +540,7 @@ function InteractiveChatUI() {
 
             {/* Conversation history (pre-existing) */}
             <MessageBubble align="right" sender="Cliente" text="Vi su anuncio, pero no sé cuál sería el mejor siguiente paso." muted />
-            <MessageBubble sender="Relevo" text="No pasa nada. Relevo lo califica y te lleva a la acción más probable." muted />
+            <MessageBubble sender="Relevo" text="No pasa nada. Relevo entiende qué busca y lo lleva al siguiente paso más probable." muted />
 
             {/* Current demo flow */}
             <MessageBubble
@@ -581,11 +581,11 @@ function InteractiveChatUI() {
 
         {/* Engine Activity Log */}
         <div ref={enginePanelRef} className="flex min-w-0 flex-col gap-3 transition-opacity duration-500 lg:min-w-[20rem]">
-          <p className="mb-0 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-[#d4c0a1]/60">Lo que procesa Relevo</p>
+          <p className="mb-0 text-[0.7rem] font-medium uppercase tracking-[0.3em] text-[#d4c0a1]/60">Lo que revisa Relevo</p>
           <div className="flex flex-1 flex-col rounded-[1.65rem] border border-white/8 bg-white/[0.03] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.16)]">
             <div className="flex items-center justify-between">
               <p className="font-mono text-[0.62rem] uppercase tracking-[0.34em] text-white/28">
-                Conversion Log
+                Resumen
               </p>
               <span className={`flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-[0.56rem] uppercase tracking-wider ${
                 phase === "done"
@@ -600,7 +600,7 @@ function InteractiveChatUI() {
                     <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 )}
-                {phase === "done" ? "listo" : phase === "engine" || phase === "typing" ? "procesando" : "espera"}
+                {phase === "done" ? "listo" : phase === "engine" || phase === "typing" ? "revisando" : "espera"}
               </span>
             </div>
 
@@ -634,10 +634,10 @@ function InteractiveChatUI() {
               />
             </div>
             <p className="mt-1.5 font-mono text-[11px] leading-5 text-white/40">
-              {phase === "idle" && "Esperando lead entrante para activar Relevo…"}
-              {phase === "engine" && "Relevo califica el lead, activa playbook y define el siguiente paso."}
-              {phase === "typing" && "Relevo compone la respuesta y empuja a una acción concreta."}
-              {phase === "done" && "Lead calificado · playbook ejecutado · siguiente paso empujado"}
+              {phase === "idle" && "Esperando una nueva conversación para que Relevo entre en acción…"}
+              {phase === "engine" && "Relevo entiende qué busca la persona y decide cómo ayudarla a avanzar."}
+              {phase === "typing" && "Relevo prepara la respuesta y propone el mejor siguiente paso."}
+              {phase === "done" && "Conversación entendida · mejor siguiente paso listo"}
             </p>
           </div>
         </div>
@@ -648,7 +648,7 @@ function InteractiveChatUI() {
         <div className="flex items-center justify-between gap-3 rounded-[1.3rem] border border-white/8 bg-black/20 px-4 py-3">
           <div className="min-w-0">
             <p className="text-[0.62rem] uppercase tracking-[0.24em] text-white/28">
-              Lead entrante
+              Mensaje entrante
             </p>
             <div className="mt-1 flex min-h-6 items-center gap-1 overflow-hidden">
               <span
@@ -691,11 +691,11 @@ export function ChatUI({ mode = "static" }: { mode?: ChatUIMode }) {
       <div className="flex items-center justify-between border-b border-white/6 px-5 py-4 sm:px-6">
         <div>
           <p className="text-[0.62rem] uppercase tracking-[0.34em] text-white/28">
-            Boreas OS
+            Boreas
           </p>
           <div className="mt-2 flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#d4c0a1] shadow-[0_0_14px_rgba(212,192,161,0.5)]" />
-            <span className="text-sm text-[#f5f1ea]">Relevo · motor de conversión</span>
+            <span className="text-sm text-[#f5f1ea]">Relevo · atención que guía y convierte</span>
           </div>
         </div>
 

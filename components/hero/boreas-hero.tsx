@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRef } from "react";
 
 import { heroWords } from "@/content/boreas-home";
-import { Header } from "@/components/hero/header";
 import { MacbookShowcase } from "@/components/hero/macbook-showcase";
 import { RotatingHeadline } from "@/components/hero/rotating-headline";
 
@@ -131,7 +130,7 @@ export function BoreasHero() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[180svh] overflow-clip bg-[#0e1114] text-[#f5f1ea]"
+      className="relative min-h-[155svh] overflow-clip bg-[#0e1114] text-[#f5f1ea] lg:min-h-[165svh]"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.05),transparent_42%),linear-gradient(180deg,#0e1114_0%,#0f1318_46%,#0d1013_100%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.03)_0%,transparent_16%,transparent_84%,rgba(255,255,255,0.03)_100%)]" />
@@ -139,81 +138,84 @@ export function BoreasHero() {
       <TopographicBackdrop />
 
       <div className="sticky top-0 flex min-h-[100svh] flex-col">
-        <Header />
-
         <div className="relative flex flex-1 items-center">
-          <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center px-4 pb-12 pt-10 sm:px-6 lg:px-10 lg:pb-14">
-            <motion.div
-              initial={{ opacity: 0, y: reduceMotion ? 0 : 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-              style={{ y: copyY, opacity: copyOpacity }}
-              className="relative z-10 flex max-w-[860px] flex-col items-center text-center"
-            >
-              <p className="text-[0.72rem] uppercase tracking-[0.42em] text-white/34">
-                Boreas · Sistema operativo de revenue
-              </p>
+          <div className="mx-auto w-full max-w-[1460px] px-4 pb-12 pt-24 sm:px-6 lg:px-10 lg:pb-14 lg:pt-28">
+            <div className="relative z-10 grid items-center gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">
+              <motion.div
+                initial={{ opacity: 0, y: reduceMotion ? 0 : 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+                style={{ y: copyY, opacity: copyOpacity }}
+                className="flex flex-col items-center text-center lg:items-start lg:text-left"
+              >
+                <p className="text-[0.72rem] uppercase tracking-[0.42em] text-white/34">
+                  Responde más rápido. Cierra mejor.
+                </p>
 
-              <h1 className="mt-6 flex max-w-[14ch] flex-col items-center text-center text-[clamp(3.5rem,10vw,7.6rem)] font-medium leading-[0.98] tracking-[-0.075em] text-[#f7f1ea]">
-                <span className="block text-[#c5ccd2]">Revenue estructurado para</span>
-                <span className="mt-1 block min-h-[1.22em]">
-                  <RotatingHeadline words={heroWords} />
-                </span>
-              </h1>
+                <h1 className="mt-6 flex max-w-[13ch] flex-col items-center text-center text-[clamp(3.4rem,9vw,7rem)] font-medium leading-[0.98] tracking-[-0.075em] text-[#f7f1ea] lg:items-start lg:text-left">
+                  <span className="block text-[#c5ccd2]">Más conversaciones bien atendidas para</span>
+                  <span className="mt-1 block min-h-[1.22em]">
+                    <RotatingHeadline words={heroWords} />
+                  </span>
+                </h1>
 
-              <p className="mt-8 max-w-[46rem] text-base leading-8 text-white/58 sm:text-lg">
-                Boreas organiza adquisición, conversión y retención como un
-                sistema. Relevo es el módulo activo que hoy responde, califica y
-                empuja leads a acciones concretas con playbooks por industria.
-              </p>
+                <p className="mt-8 max-w-[34rem] text-base leading-8 text-white/58 sm:text-lg">
+                  Hoy Relevo ya contesta al momento, orienta cada conversación y la lleva a una
+                  cita, visita o siguiente paso claro sin dejar a la persona esperando.
+                </p>
 
-              <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
-                <a
-                  href="#diagnostico"
-                  className="inline-flex min-w-[13rem] items-center justify-center rounded-full border border-white/14 bg-[linear-gradient(180deg,rgba(216,204,178,0.18)_0%,rgba(216,204,178,0.11)_100%)] px-6 py-3.5 text-sm font-medium text-[#fbfcfd] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.08),0_14px_34px_rgba(0,0,0,0.18)] backdrop-blur-xl transition-all duration-500 hover:scale-[1.015] hover:border-white/22 hover:bg-[linear-gradient(180deg,rgba(216,204,178,0.24)_0%,rgba(216,204,178,0.16)_100%)] hover:brightness-105"
-                >
-                  Recibir diagnóstico inicial
-                </a>
+                <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row lg:items-start">
+                  <a
+                    href="#diagnostico"
+                    className="inline-flex min-w-[13rem] items-center justify-center rounded-full border border-white/14 bg-[linear-gradient(180deg,rgba(216,204,178,0.18)_0%,rgba(216,204,178,0.11)_100%)] px-6 py-3.5 text-sm font-medium text-[#fbfcfd] shadow-[inset_0_1px_0_rgba(255,255,255,0.14),inset_0_-1px_0_rgba(0,0,0,0.08),0_14px_34px_rgba(0,0,0,0.18)] backdrop-blur-xl transition-all duration-500 hover:scale-[1.015] hover:border-white/22 hover:bg-[linear-gradient(180deg,rgba(216,204,178,0.24)_0%,rgba(216,204,178,0.16)_100%)] hover:brightness-105"
+                  >
+                    Ver diagnóstico
+                  </a>
 
-                <Link
-                  href="#demo"
-                  className="inline-flex min-w-[13rem] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-6 py-3.5 text-sm font-medium text-[#f5f1ea] transition-all duration-300 hover:border-white/20 hover:bg-white/[0.06]"
-                >
-                  Ver Relevo en acción
-                </Link>
-              </div>
+                  <a
+                    href="https://relevo.chat"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-w-[13rem] items-center justify-center rounded-full border border-white/12 bg-white/[0.03] px-6 py-3.5 text-sm font-medium text-[#f5f1ea] transition-all duration-300 hover:border-white/20 hover:bg-white/[0.06]"
+                  >
+                    Abrir Relevo
+                  </a>
+                </div>
 
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-[0.68rem] uppercase tracking-[0.26em] text-white/34">
-                <span className="rounded-full border border-white/10 px-3 py-2">
-                  Playbooks por industria
-                </span>
-                <span className="rounded-full border border-white/10 px-3 py-2">
-                  Conversión activa ahora
-                </span>
-                <span className="rounded-full border border-white/10 px-3 py-2">
-                  Medición desde el día uno
-                </span>
-              </div>
-            </motion.div>
+                <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-white/46">
+                  <Link href="#demo-relevo" className="transition-colors duration-300 hover:text-white">
+                    Ver demo en la página
+                  </Link>
+                  <span className="h-1 w-1 rounded-full bg-white/18" />
+                  <span>Responde al instante</span>
+                  <span className="h-1 w-1 rounded-full bg-white/18" />
+                  <span>Guía cada contacto</span>
+                  <span className="h-1 w-1 rounded-full bg-white/18" />
+                  <span>Ayuda a cerrar citas y visitas</span>
+                </div>
+              </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: reduceMotion ? 0 : 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.85,
-                delay: 0.12,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              style={{
-                y: artifactY,
-                opacity: artifactOpacity,
-                scale: artifactScale,
-                filter: artifactFilter,
-              }}
-              className="relative z-10 mt-14 w-full lg:mt-16"
-            >
-              <MacbookShowcase />
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: reduceMotion ? 0 : 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.85,
+                  delay: 0.12,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                style={{
+                  y: artifactY,
+                  opacity: artifactOpacity,
+                  scale: artifactScale,
+                  filter: artifactFilter,
+                }}
+                className="mt-12 w-full lg:mt-0"
+              >
+                <div className="lg:pl-4">
+                  <MacbookShowcase id="demo-hero" />
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>

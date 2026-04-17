@@ -13,20 +13,20 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Boreas | Sistema operativo de revenue con IA",
+  title: "Boreas | IA para responder y cerrar mejor",
   description:
-    "Boreas organiza revenue con IA. Relevo, su módulo activo de conversión, responde, califica y empuja leads a acciones concretas para salud, belleza e inmobiliario.",
+    "Boreas ayuda a salud, belleza e inmobiliario a responder más rápido, atender mejor y llevar más conversaciones a citas, visitas y oportunidades.",
   openGraph: {
-    title: "Boreas | Sistema operativo de revenue con IA",
+    title: "Boreas | IA para responder y cerrar mejor",
     description:
-      "Relevo es el módulo de conversión de Boreas: playbooks por industria para responder, calificar y cerrar acciones medibles.",
+      "Relevo es la experiencia de Boreas que hoy ya responde, guía y ayuda a cerrar más conversaciones.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Boreas | Sistema operativo de revenue con IA",
+    title: "Boreas | IA para responder y cerrar mejor",
     description:
-      "Playbooks por industria para convertir conversaciones en acciones medibles en salud, belleza e inmobiliario.",
+      "Más respuestas a tiempo, mejor atención y más citas, visitas y oportunidades.",
   },
 };
 

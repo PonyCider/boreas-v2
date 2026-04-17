@@ -6,25 +6,24 @@ import { SectionEyebrow, SectionFrame } from "./boreas-landing-sections";
 
 export function PlatformSystemSection() {
   return (
-    <SectionFrame className="pt-8 sm:pt-14">
+    <SectionFrame id="como-funciona" className="pt-8 sm:pt-14">
       <div
         data-parallax
         data-depth="12"
         className="pointer-events-none absolute right-[10%] top-10 h-80 w-80 rounded-full bg-[radial-gradient(circle,rgba(216,204,178,0.08),transparent_70%)] blur-[120px]"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-        <div data-reveal className="mx-auto max-w-4xl text-center">
-          <SectionEyebrow>Arquitectura Boreas</SectionEyebrow>
+      <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
+        <div data-reveal className="mx-auto max-w-4xl text-center lg:mx-0 lg:max-w-[50rem] lg:text-left">
+          <SectionEyebrow>Cómo funciona Boreas</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.2rem,4.8vw,4.25rem)] font-medium leading-[1.06] tracking-[-0.055em] text-[#f7f1ea]">
-            Boreas organiza revenue como sistema.
+            Boreas está pensado para acompañar
             <br className="hidden sm:block" />
-            Relevo es la capa activa hoy.
+            todo el camino del cliente.
           </h2>
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-7 text-white/56 sm:text-lg">
-            No vendemos piezas sueltas. Boreas ordena adquisición, conversión y retención como un
-            sistema operativo. En v2.1 el foco absoluto está en conversión, porque esa es la capa
-            que hoy genera resultados medibles más rápido.
+          <p className="mt-6 max-w-3xl text-base leading-7 text-white/56 sm:text-lg lg:mx-0">
+            Hoy Relevo es la parte que ya está lista para responder, guiar y ayudar a cerrar más
+            conversaciones. Después, Boreas seguirá creciendo hacia el resto del recorrido.
           </p>
         </div>
 

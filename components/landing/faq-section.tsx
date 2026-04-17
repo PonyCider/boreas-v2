@@ -22,15 +22,15 @@ export function FaqSection() {
 
   return (
       <SectionFrame>
-        <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-10">
-          <div data-reveal className="mb-14 text-center">
+        <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
+          <div data-reveal className="mb-14 text-center lg:max-w-[48rem] lg:text-left">
             <SectionEyebrow>FAQ</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.1rem,4.6vw,4rem)] font-medium leading-[1.06] tracking-[-0.052em] text-[#f7f1ea]">
             Lo importante está claro desde el inicio.
           </h2>
         </div>
 
-        <div data-reveal className="mx-auto flex w-full flex-col gap-4">
+        <div data-reveal className="mx-auto flex w-full max-w-[52rem] flex-col gap-4 lg:mr-0 lg:ml-auto">
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (

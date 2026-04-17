@@ -31,14 +31,17 @@ export function SectionEyebrow({ children }: { children: React.ReactNode }) {
 export function SectionFrame({
   children,
   className = "",
+  id,
 }: {
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }) {
   return (
     <section
+      id={id}
       data-parallax-section
-      className={`relative overflow-hidden py-28 sm:py-36 ${className}`}
+      className={`relative scroll-mt-28 overflow-hidden py-28 sm:py-36 ${className}`}
     >
       {children}
     </section>
@@ -47,24 +50,24 @@ export function SectionFrame({
 
 function HowItWorksSection() {
   return (
-    <SectionFrame>
+    <SectionFrame id="implementacion">
       <div
         data-parallax
         data-depth="12"
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-        <div data-reveal className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow>Onboarding</SectionEyebrow>
+      <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
+        <div data-reveal className="mx-auto max-w-4xl text-center lg:mx-0 lg:max-w-[48rem] lg:text-left">
+          <SectionEyebrow>Puesta en marcha</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.1rem,4.6vw,4rem)] font-medium leading-[1.06] tracking-[-0.052em] text-[#f7f1ea]">
-            El negocio aporta contexto.
+            Tú compartes lo básico.
             <br className="hidden sm:block" />
-            Boreas pone la estructura.
+            Boreas organiza el resto.
           </h2>
           <p className="mt-6 text-lg text-white/50">
-            El onboarding está diseñado para generar confianza y velocidad. No hace falta construir
-            un flujo desde cero ni aprender a prompting.
+            La idea es que puedas empezar rápido, con claridad y sin diseñar flujos complejos desde
+            cero.
           </p>
         </div>
 
@@ -97,55 +100,30 @@ function HowItWorksSection() {
 }
 
 function VisualSection() {
-  const visualRef = useRef<HTMLDivElement>(null);
-
-  useGSAP(
-    () => {
-      const secondaryShowcase = visualRef.current?.querySelector<HTMLElement>("#demo");
-      const previousId = secondaryShowcase?.id;
-
-      if (secondaryShowcase) {
-        secondaryShowcase.id = "demo-visual";
-      }
-
-      return () => {
-        if (secondaryShowcase && previousId) {
-          secondaryShowcase.id = previousId;
-        }
-      };
-    },
-    { scope: visualRef },
-  );
-
   return (
-    <SectionFrame className="pb-20 sm:pb-28">
+    <SectionFrame id="demo-relevo" className="pb-20 sm:pb-28">
       <div
         data-parallax
         data-depth="18"
         className="pointer-events-none absolute left-1/2 top-20 h-96 w-[44rem] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(216,204,178,0.08),transparent_68%)] blur-[120px]"
       />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-          <div data-reveal className="mx-auto max-w-4xl text-center">
+        <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
+          <div data-reveal className="mx-auto max-w-4xl text-center lg:mx-0 lg:max-w-[48rem] lg:text-left">
           <SectionEyebrow>Relevo en acción</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.2rem,4.9vw,4.2rem)] font-medium leading-[1.06] tracking-[-0.055em] text-[#f7f1ea]">
-            Así se ve cuando la intención
+            Así se ve cuando una conversación
             <br className="hidden sm:block" />
-            se empuja a un siguiente paso real.
+            sí avanza a algo concreto.
           </h2>
           <p className="mt-6 text-lg text-white/50">
-            La demo no muestra un chat genérico. Muestra a Relevo calificando y llevando la
-            conversación a una acción concreta.
+            No es un chat decorativo. Es una muestra de cómo Relevo responde, orienta y propone el
+            siguiente paso.
           </p>
         </div>
 
-        <div
-          ref={visualRef}
-          data-reveal
-          data-visual-device
-          className="mt-16 sm:mt-20"
-        >
-          <MacbookShowcase mode="simulator" />
+        <div data-reveal data-visual-device className="mt-16 sm:mt-20">
+          <MacbookShowcase id="demo-visual" mode="simulator" />
         </div>
       </div>
     </SectionFrame>
@@ -154,24 +132,24 @@ function VisualSection() {
 
 function UseCasesSection() {
   return (
-    <SectionFrame>
+    <SectionFrame id="sectores">
       <div
         data-parallax
         data-depth="16"
         className="pointer-events-none absolute left-[8%] top-12 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.06),transparent_68%)] blur-[120px]"
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-        <div data-reveal className="mx-auto max-w-3xl text-center">
-          <SectionEyebrow>Verticales activas</SectionEyebrow>
+      <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
+        <div data-reveal className="mx-auto max-w-4xl text-center lg:mx-0 lg:max-w-[48rem] lg:text-left">
+          <SectionEyebrow>Sectores</SectionEyebrow>
           <h2 className="mt-6 text-balance text-[clamp(2.1rem,4.6vw,4rem)] font-medium leading-[1.06] tracking-[-0.052em] text-[#f7f1ea]">
-            Tres industrias, una tesis:
+            Tres sectores, el mismo problema:
             <br className="hidden sm:block" />
-            convertir intención con playbooks.
+            mensajes que se enfrían por falta de atención.
           </h2>
           <p className="mt-6 text-lg text-white/50">
-            Salud, belleza e inmobiliario comparten el problema de respuesta y seguimiento, pero
-            cada una necesita preguntas, filtros y cierres distintos.
+            Salud, belleza e inmobiliario necesitan rapidez y seguimiento, pero cada uno pide una
+            manera distinta de orientar la conversación.
           </p>
         </div>
 
@@ -191,15 +169,15 @@ function UseCasesSection() {
               </p>
               <div className="mt-8 flex flex-col gap-5">
                 <div>
-                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Fuga principal</h4>
+                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Lo que hoy se pierde</h4>
                   <p className="mt-1 text-base leading-snug text-[#f7f1ea]">{useCase.pain}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Lead típico</h4>
+                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Consulta típica</h4>
                   <p className="mt-1 text-base leading-snug text-white/56">{useCase.lead}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Acción objetivo</h4>
+                  <h4 className="text-sm font-medium tracking-wide text-[#d8ccb2]">Meta de la conversación</h4>
                   <p className="mt-1 text-base leading-snug text-white/56">{useCase.action}</p>
                 </div>
               </div>

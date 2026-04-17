@@ -17,10 +17,10 @@ import {
 } from "@/app/actions/diagnostic.shared";
 
 const focusLabels: Record<DiagnosticFocus, string> = {
-  "speed-to-lead": "Velocidad de respuesta",
-  qualification: "Calificación de intención",
-  "agenda-automation": "Agenda y hand-off operativo",
-  "follow-up": "Seguimiento consistente",
+  "speed-to-lead": "responder más rápido",
+  qualification: "entender mejor a cada contacto",
+  "agenda-automation": "hacer más fácil la cita o visita",
+  "follow-up": "dar seguimiento sin soltar conversaciones",
 };
 
 const leadVolumeScore: Record<LeadVolumeBand, number> = {
@@ -46,22 +46,22 @@ const bookingFlowScore: Record<BookingFlowBand, number> = {
 
 const playbookTitles: Record<DiagnosticVertical, Record<DiagnosticFocus, string>> = {
   salud: {
-    "speed-to-lead": "Playbook de triage inmediato y agenda clínica",
-    qualification: "Playbook de calificación clínica previa a la cita",
-    "agenda-automation": "Playbook de agenda, confirmación y pre-consulta",
-    "follow-up": "Playbook de recordatorios y reactivación de pacientes",
+    "speed-to-lead": "Responder rápido y proponer consulta",
+    qualification: "Entender el caso antes de agendar",
+    "agenda-automation": "Proponer horario y confirmar",
+    "follow-up": "Recordar y volver a contactar",
   },
   belleza: {
-    "speed-to-lead": "Playbook de respuesta inmediata y disponibilidad",
-    qualification: "Playbook de calificación de servicio ideal y ticket",
-    "agenda-automation": "Playbook de reserva, confirmación y no-shows",
-    "follow-up": "Playbook de seguimiento post-servicio y recompra",
+    "speed-to-lead": "Responder rápido y mostrar horarios",
+    qualification: "Entender el servicio ideal",
+    "agenda-automation": "Reservar y confirmar",
+    "follow-up": "Retomar y volver a vender",
   },
   inmobiliario: {
-    "speed-to-lead": "Playbook de respuesta inmediata y visita priorizada",
-    qualification: "Playbook de presupuesto, zona e intención de compra",
-    "agenda-automation": "Playbook de agenda de visitas y hand-off comercial",
-    "follow-up": "Playbook de seguimiento entre visita, objeciones y cierre",
+    "speed-to-lead": "Responder rápido y mover a visita",
+    qualification: "Entender presupuesto, zona e interés real",
+    "agenda-automation": "Proponer visita y ordenar agenda",
+    "follow-up": "Dar seguimiento después de la visita",
   },
 };
 
@@ -134,7 +134,7 @@ function buildRecommendation(submission: DiagnosticSubmission): DiagnosticRecomm
     focus,
     focusLabel,
     priority,
-    headline: `Tu palanca principal hoy es ${focusLabel.toLowerCase()}.`,
+    headline: `Hoy lo más importante es ${focusLabel}.`,
     summary: buildSummary(submission, verticalLabel, focus),
     playbookTitle: playbookTitles[submission.vertical][focus],
     nextSteps: buildNextSteps(submission, focus),
@@ -173,13 +173,13 @@ function buildSummary(
 ): string {
   const focusCopy: Record<DiagnosticFocus, string> = {
     "speed-to-lead":
-      "La intención ya existe, pero se enfría antes de que el equipo la convierta en acción.",
+      "La intención ya existe, pero se enfría antes de que alguien la atienda bien.",
     qualification:
-      "Responder rápido no basta: hace falta filtrar intención, urgencia y contexto antes de pasar al equipo.",
+      "Responder rápido ayuda, pero hace falta entender mejor qué busca cada persona.",
     "agenda-automation":
-      "La fuga está en los hand-offs, la disponibilidad y la coordinación operativa para cerrar la siguiente acción.",
+      "El problema está entre los mensajes, la agenda y todo lo que pasa antes de cerrar una cita o visita.",
     "follow-up":
-      "El problema no es solo la primera respuesta, sino la constancia para empujar al lead hasta una cita real.",
+      "No basta con contestar una vez; hace falta seguir la conversación hasta que avance.",
   };
 
   const verticalContext: Record<DiagnosticVertical, string> = {
@@ -191,7 +191,14 @@ function buildSummary(
       "En inmobiliario, la conversación necesita identificar intención y preparar la visita correcta sin desperdiciar tiempo comercial.",
   };
 
-  return `${focusCopy[focus]} ${verticalContext[submission.vertical]} Para ${verticalLabel}, el primer despliegue de Relevo debería enfocarse en ese cuello de botella antes de expandirse a otros módulos.`;
+  return `${focusCopy[focus]} ${verticalContext[submission.vertical]} Para ${verticalLabel}, esto sería lo primero que convendría ordenar con Relevo.`;
+}
+
+function getFirstStepLabel(
+  submission: DiagnosticSubmission,
+  focus: DiagnosticFocus,
+): string {
+  return `Empezar por ${playbookTitles[submission.vertical][focus].toLowerCase()}.`;
 }
 
 function buildNextSteps(
@@ -200,29 +207,29 @@ function buildNextSteps(
 ): [string, string, string] {
   const speedSla =
     submission.responseTime === "gt-2h" || submission.responseTime === "30-120m"
-      ? "Definir un SLA objetivo de respuesta menor a 5 minutos para nuevos leads."
-      : "Blindar el SLA actual para que no dependa de disponibilidad manual del equipo.";
+      ? "Buscar que las conversaciones nuevas reciban respuesta en menos de 5 minutos."
+      : "Cuidar el tiempo de respuesta para que no dependa de quién esté disponible.";
 
   const focusSteps: Record<DiagnosticFocus, [string, string, string]> = {
     "speed-to-lead": [
       speedSla,
-      `Diseñar primero el ${playbookTitles[submission.vertical]["speed-to-lead"].toLowerCase()}.`,
-      "Cerrar el hand-off con agenda o siguiente acción concreta antes de terminar la conversación.",
+      getFirstStepLabel(submission, "speed-to-lead"),
+      "Cerrar cada conversación con una cita, llamada o siguiente paso claro.",
     ],
     qualification: [
-      "Definir 3 a 5 datos obligatorios que separen curiosidad de intención real.",
-      `Diseñar primero el ${playbookTitles[submission.vertical].qualification.toLowerCase()}.`,
-      "Pasar al equipo solo leads con contexto suficiente para avanzar sin retrabajo.",
+      "Definir qué datos mínimos hacen falta para saber si la persona realmente quiere avanzar.",
+      getFirstStepLabel(submission, "qualification"),
+      "Pasar al equipo solo conversaciones con contexto suficiente para seguir sin perder tiempo.",
     ],
     "agenda-automation": [
-      "Centralizar disponibilidad, reglas de agenda y confirmaciones en un solo flujo.",
-      `Diseñar primero el ${playbookTitles[submission.vertical]["agenda-automation"].toLowerCase()}.`,
-      "Eliminar pasos manuales entre interés, propuesta de horario y confirmación final.",
+      "Tener disponibilidad, reglas de agenda y confirmaciones en un flujo mucho más claro.",
+      getFirstStepLabel(submission, "agenda-automation"),
+      "Quitar pasos manuales entre el interés inicial y la confirmación final.",
     ],
     "follow-up": [
-      "Definir cuándo insistir, cuándo reconectar y cuándo cerrar la conversación.",
-      `Diseñar primero el ${playbookTitles[submission.vertical]["follow-up"].toLowerCase()}.`,
-      "Asegurar que cada lead tenga una siguiente acción definida, no solo una primera respuesta.",
+      "Definir cuándo volver a escribir y cuándo dar la conversación por cerrada.",
+      getFirstStepLabel(submission, "follow-up"),
+      "Asegurar que cada conversación tenga un siguiente paso y no se quede en visto.",
     ],
   };
 
