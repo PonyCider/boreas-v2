@@ -1,14 +1,14 @@
-export const heroHeadline = "Consultorio digital 24/7";
+export const heroHeadline = "Tu clínica digital, abierta las 24 horas.";
 
-export const heroSubcopy = "Diseñamos un espacio profesional que refleja tu práctica, usa tus reseñas de Google Maps y lleva pacientes decididos a tu WhatsApp. Listo en 48 a 72 horas.";
+export const heroSubcopy = "Mientras consultas, tus pacientes ya están revisando reseñas, comparando opciones y decidiendo a quién escribir. Boreas convierte esa primera búsqueda en confianza y contacto directo por WhatsApp.";
 
-export const heroCredibility = "El 84% de tus pacientes te busca en línea antes de agendar.";
+export const heroCredibility = "Para médicos privados con pacientes buscando en línea";
 
 export const heroProofPoints = [
-  "Entrega en 48 a 72 horas",
-  "Solo un audio de 1 minuto",
-  "Reseñas reales integradas",
-  "WhatsApp en un toque",
+  "Reseñas de Google",
+  "Agenda por WhatsApp",
+  "Pacientes decididos",
+  "Sin trabajo técnico",
 ];
 
 // Problem section data points
@@ -112,3 +112,58 @@ export const faqs = [
     answer: "Sí. Incluimos un botón directo que conecta al paciente con tu WhatsApp Business en un solo toque, sin distracciones ni formularios largos.",
   },
 ];
+
+// Social proof section (Bloque: Esto pasa todos los días)
+export const socialProof = {
+  heading: "Esto pasa todos los días.",
+
+  frictions: [
+    {
+      body: "Tu paciente buscaba agendar a altas horas de la noche. Nadie contesta llamadas a esa hora.",
+      closer: "Agendó en línea con quien sí tenía página.",
+    },
+    {
+      body: "Tu asistente contesta lo mismo todos los días antes de cada primera cita: ¿cuánto cuesta?, ¿atienden mi caso?, ¿tienen lugar esta semana?",
+      closer: "Una página lo resuelve antes de que marquen.",
+    },
+    {
+      body: "Alguien leyó tus reseñas en Google Maps y quería ir contigo. Buscó más información. No encontró nada.",
+      closer: "\"Lo pienso\" casi siempre es \"lo descarto.\"",
+    },
+  ],
+
+  stats: [
+    {
+      connector: null,
+      value: "2 de cada 3",
+      label: "pacientes prefiere agendar en línea antes que llamar.",
+      closer: "El teléfono ya es el plan B.",
+    },
+    {
+      connector: "Y de los que sí llaman, el",
+      value: "84%",
+      label: "busca en línea antes de marcar.",
+      closer: "Si no encuentran nada, no marcan.",
+    },
+    {
+      connector: "Y el",
+      value: "40%",
+      label: "de esas búsquedas ocurren fuera de horario.",
+      closer: "Tu celular no contesta. Tu página sí.",
+    },
+  ],
+
+  statsSources: "Accenture Health Consumer Survey · Think with Google · Kyruus",
+
+  mockupCaption: "Tu paciente te buscó ayer a las 11 de la noche. Esto encontró.",
+
+  mockupDoctor: {
+    name: "Dr. Martínez",
+    specialty: "Medicina General",
+    rating: "4.8",
+    reviewCount: "127",
+    testimonial:
+      "Llegué con muchas dudas y salí con todo claro. Lo recomiendo ampliamente.",
+    reviewerName: "Paciente verificado · Google Maps",
+  },
+} as const;
