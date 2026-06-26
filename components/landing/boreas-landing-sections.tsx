@@ -1,6 +1,7 @@
  "use client";
 
 import { ProblemSection } from "./problem-section";
+import { SocialProofSection } from "./social-proof-section";
 import { TransformationSection } from "./transformation-section";
 import { ProcessSection } from "./process-section";
 import { GuaranteeSection } from "./guarantee-section";
@@ -31,6 +32,7 @@ export function BoreasLandingSections() {
   return (
     <div className="relative text-foreground">
       <ProblemSection />
+      <SocialProofSection />
       <TransformationSection />
       <ProcessSection />
       <GuaranteeSection />
