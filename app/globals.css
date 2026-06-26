@@ -1,25 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0e1114;
-  --foreground: #f5f1ea;
-  --muted: #96928a;
-  --panel: #13171c;
-  --panel-strong: #171c22;
-  --line: rgba(255, 255, 255, 0.08);
-  --accent: #d4c0a1;
+  --bg-deep: oklch(0.16 0.009 245);
+  --bg-surface: oklch(0.2 0.01 245);
+  --bg-elevated: oklch(0.25 0.012 245);
+  --ink: oklch(0.97 0.006 245);
+  --ink-muted: oklch(0.76 0.015 245);
+  --accent: oklch(0.75 0.13 174);
+  --accent-soft: oklch(0.75 0.13 174 / 0.18);
+  --danger: oklch(0.65 0.2 25);
+  --line: oklch(1 0 0 / 0.14);
+  --clinical: oklch(0.9 0.012 225);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-panel: var(--panel);
-  --color-panel-strong: var(--panel-strong);
-  --color-line: var(--line);
+  --color-background: var(--bg-deep);
+  --color-foreground: var(--ink);
+  --color-muted: var(--ink-muted);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
   --color-accent: var(--accent);
-  --font-sans: var(--font-manrope);
-  --font-mono: var(--font-jetbrains-mono);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+  --color-line: var(--line);
+  --color-clinical: var(--clinical);
+  --font-sans: var(--font-satoshi);
 }
 
 * {
@@ -27,20 +32,18 @@
 }
 
 html {
-  background: var(--background);
+  background: var(--bg-deep);
   scroll-behavior: smooth;
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-manrope), sans-serif;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
+  background:
+    linear-gradient(180deg, oklch(0.18 0.011 245), var(--bg-deep) 28rem),
+    var(--bg-deep);
+  color: var(--ink);
+  font-family: var(--font-satoshi), sans-serif;
+  min-height: 100%;
 }
 
 a {
@@ -50,4 +53,30 @@ a {
 
 button {
   font: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+::selection {
+  background-color: color-mix(in oklch, var(--accent) 20%, transparent);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+input,
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

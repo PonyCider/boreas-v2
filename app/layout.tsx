@@ -1,32 +1,28 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Manrope } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
-  subsets: ["latin"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
+const satoshi = localFont({
+  src: "./fonts/Satoshi-Variable.woff2",
+  variable: "--font-satoshi",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Boreas | IA para responder y cerrar mejor",
+  title: "Boreas | Consultorio digital 24/7 para médicos",
   description:
-    "Boreas ayuda a salud, belleza e inmobiliario a responder más rápido, atender mejor y llevar más conversaciones a citas, visitas y oportunidades.",
+    "Diseñamos tu consultorio digital profesional en 48 a 72 horas con reseñas de Google Maps, redacción médica y conexión directa a WhatsApp.",
   openGraph: {
-    title: "Boreas | IA para responder y cerrar mejor",
+    title: "Boreas | Consultorio digital 24/7 para médicos",
     description:
-      "Relevo es la experiencia de Boreas que hoy ya responde, guía y ayuda a cerrar más conversaciones.",
+      "Diseñamos tu consultorio digital profesional en 48 a 72 horas con reseñas de Google Maps, redacción médica y conexión directa a WhatsApp.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Boreas | IA para responder y cerrar mejor",
+    title: "Boreas | Consultorio digital 24/7 para médicos",
     description:
-      "Más respuestas a tiempo, mejor atención y más citas, visitas y oportunidades.",
+      "Diseñamos tu consultorio digital profesional en 48 a 72 horas con reseñas de Google Maps, redacción médica y conexión directa a WhatsApp.",
   },
 };
 
@@ -38,9 +34,9 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${satoshi.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-background text-foreground selection:bg-[#d4c0a1]/20 selection:text-[#f7f1ea]">
+      <body className="min-h-full bg-background text-foreground selection:bg-accent/20 selection:text-foreground">
         {children}
       </body>
     </html>

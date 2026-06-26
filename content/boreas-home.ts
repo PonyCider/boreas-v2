@@ -1,201 +1,114 @@
-export const heroWords = ["salud", "belleza", "inmobiliario"];
+export const heroHeadline = "Consultorio digital 24/7";
 
-export const platformLayers = [
+export const heroSubcopy = "Diseñamos un espacio profesional que refleja tu práctica, usa tus reseñas de Google Maps y lleva pacientes decididos a tu WhatsApp. Listo en 48 a 72 horas.";
+
+export const heroCredibility = "El 84% de tus pacientes te busca en línea antes de agendar.";
+
+export const heroProofPoints = [
+  "Entrega en 48 a 72 horas",
+  "Solo un audio de 1 minuto",
+  "Reseñas reales integradas",
+  "WhatsApp en un toque",
+];
+
+// Problem section data points
+export const problemStats = [
   {
-    title: "Atraer",
-    status: "Más adelante",
-    description:
-      "Más adelante Boreas también ayudará a atraer más interés y más conversaciones nuevas.",
+    value: "84%",
+    label: "de los pacientes busca y evalúa tu presencia en línea antes de agendar su primera cita.",
   },
   {
-    title: "Atender y convertir",
-    status: "Disponible hoy",
-    description:
-      "Hoy Relevo responde, entiende lo que busca cada persona y la lleva al siguiente paso.",
+    value: "3×",
+    label: "más contactos efectivos con un espacio digital propio vs redirigir a redes sociales.",
   },
   {
-    title: "Volver a activar",
-    status: "Próximo paso",
-    description:
-      "Después llegarán recordatorios, seguimiento y formas de hacer que más clientes regresen.",
+    value: "40%",
+    label: "de las citas y consultas ocurren fuera del horario de oficina. Tu web las captura 24/7.",
   },
 ];
 
-export const playbookPhases = [
+export const painPoints = [
+  "El paciente llega con intención, pero WhatsApp lo recibe como otro mensaje más.",
+  "Tu asistente filtra curiosos que solo preguntan precio mientras los pacientes decididos esperan.",
+  "Tus reseñas ya generan confianza, pero no siempre empujan al paciente al siguiente paso.",
+];
+
+// Transformation section (Bloque 3 - Benefit descriptions over technical labels)
+export const transformations = [
   {
-    number: "01",
-    title: "Primer mensaje",
-    description:
-      "Relevo responde rápido y con el tono correcto desde el primer momento.",
+    technical: "Diseño Web Responsivo / Landing Page",
+    benefit: "Tener tu consultorio, con tu tono y esencia, pero en línea. Abierto las 24 horas del día, sin descanso, adaptado para que se vea impecable en el celular de cualquier paciente.",
   },
   {
-    number: "02",
-    title: "Entender qué necesita",
-    description:
-      "Hace las preguntas justas para saber si la persona quiere una cita, una visita o más información.",
+    technical: "Filtro de Confianza / Autoridad de Marca",
+    benefit: "Hacer que el paciente que ya vio tus estrellas en Google Maps no se quede con la duda, sino que dé el paso firme y llegue contigo bien convencido de tu experiencia, listo para pagar tu consulta.",
   },
   {
-    number: "03",
-    title: "Resolver dudas",
-    description:
-      "Aclara lo importante y ayuda a que la conversación no se enfríe.",
+    technical: "Calificación de Leads / Filtro de Prospectos",
+    benefit: "Ahorrarle tiempo a tu asistente. Que en lugar de contestar 20 mensajes de curiosos que solo buscan 'precios baratos', le heredes mensajes de pacientes que ya saben qué haces y van directo a agendar.",
   },
   {
-    number: "04",
-    title: "Llevarlo al siguiente paso",
-    description:
-      "Propone una cita, visita, llamada o siguiente paso sin dejar la conversación abierta.",
-  },
-  {
-    number: "05",
-    title: "Cerrar bien",
-    description:
-      "Responde objeciones comunes y busca cerrar con una acción clara para el negocio.",
+    technical: "Call to Action Optimizado",
+    benefit: "Un botón claro y directo que conecta al paciente con tu WhatsApp Business en un solo toque, eliminando cualquier distracción en el camino.",
   },
 ];
 
-export const playbookCards = [
+// Process section (Bloque 4 - Onboarding steps, only 3)
+export const processSteps = [
   {
-    title: "Guía por industria",
-    description:
-      "Cada sector necesita una manera distinta de responder, orientar y cerrar.",
-    accent: "main",
+    title: "Nos envías un audio de 1 minuto",
+    description: "Cuáles son tus tratamientos más rentables, qué atmósfera visual prefieres y por qué te eligen tus pacientes actuales. Nada más.",
   },
   {
-    title: "Datos de tu negocio",
-    description:
-      "Relevo usa horarios, precios, ubicación y servicios para responder con contexto real.",
-    accent: "neutral",
+    title: "Diseñamos tu consultorio digital",
+    description: "En 48 a 72 horas tendrás tu espacio profesional en línea con redacción especializada, tus reseñas de Google Maps integradas y conexión directa a tu WhatsApp.",
   },
   {
-    title: "Tu forma de hablar",
-    description:
-      "El tono se adapta a tu marca sin perder claridad ni consistencia.",
-    accent: "neutral",
-  },
-  {
-    title: "Resultados claros",
-    description:
-      "Todo se piensa para responder antes, avanzar mejor y lograr más citas o visitas.",
-    accent: "accent",
+    title: "Lo conectamos y lo lanzamos",
+    description: "Enlazamos tu perfil de Google Maps a tu nuevo espacio digital. Un toque para que el paciente te contacte.",
   },
 ];
 
-export const comparisonFlows = {
-  manual: [
-    "La persona escribe y queda esperando.",
-    "La respuesta depende de si alguien alcanza a contestar.",
-    "La conversación se enfría o se va con la competencia.",
-    "El negocio pierde oportunidades sin notarlo a tiempo.",
-  ],
-  relevo: [
-    "La conversación recibe atención al momento.",
-    "Relevo entiende mejor qué busca esa persona.",
-    "La guía correcta la lleva a una cita, visita o llamada.",
-    "La conversación termina con un siguiente paso claro.",
-  ],
-};
-
-export const verticals = [
+// Guarantee section (Bloque 4 - Post-sale psychological shield)
+export const guarantees = [
   {
-    vertical: "Salud",
-    pain: "Consultas perdidas, pacientes sin respuesta y recepción saturada.",
-    lead: "Pacientes que preguntan por disponibilidad, valoración o siguiente paso.",
-    action: "Consulta, orientación inicial o cita agendada.",
+    title: "Documento de respaldo",
+    description: "Recibes un documento ejecutivo de inmediato que resume los beneficios reales en dinero y tiempo para tu consultorio, validando tu decisión.",
   },
   {
-    vertical: "Belleza",
-    pain: "Reservas que se enfrían por demora, cambios de horario y seguimiento irregular.",
-    lead: "Clientes que buscan servicio, precio, agenda o recomendación.",
-    action: "Reserva confirmada o siguiente paso claro.",
+    title: "Cero esfuerzo de tu parte",
+    description: "No llenas formularios ni redactas textos. Solo envías un audio de voz con lo básico y nosotros nos encargamos de todo.",
   },
   {
-    vertical: "Inmobiliario",
-    pain: "Mensajes sin prioridad, visitas mal filtradas y respuestas tardías.",
-    lead: "Prospectos que preguntan por propiedad, presupuesto, zona o visita.",
-    action: "Visita, llamada para entender el caso o siguiente paso claro.",
+    title: "Tus propias reseñas integradas",
+    description: "Extraemos las mejores reseñas reales de tus pacientes en Google Maps y las integramos en tu diseño. Ver sus palabras plasmadas genera confianza inmediata.",
   },
 ];
 
-export const onboardingSteps = [
-  {
-    number: "01",
-    title: "Nos dices a qué te dedicas",
-    description:
-      "Salud, belleza o inmobiliario para arrancar con el enfoque correcto.",
-  },
-  {
-    number: "02",
-    title: "Nos compartes lo básico",
-    description:
-      "Servicios, horarios, ubicación y precios. Tú pones la información; Boreas pone la estructura.",
-  },
-  {
-    number: "03",
-    title: "Lo dejamos listo",
-    description:
-      "Relevo adapta el tono y la ruta de atención para tu negocio.",
-  },
-  {
-    number: "04",
-    title: "Empezamos a medir",
-    description:
-      "Desde el inicio vemos qué tan rápido responde y cuántas conversaciones terminan en una acción real.",
-  },
-];
-
-export const metricCards = [
-  {
-    label: "Tiempo de respuesta",
-    description:
-      "Qué tan rápido se atiende una conversación cuando alguien de verdad quiere avanzar.",
-  },
-  {
-    label: "Conversaciones atendidas",
-    description:
-      "Cuántas personas reciben respuesta antes de enfriarse o irse.",
-  },
-  {
-    label: "Conversaciones que avanzan",
-    description:
-      "Cuántas conversaciones pasan de una duda inicial a un siguiente paso.",
-  },
-  {
-    label: "Citas o visitas logradas",
-    description:
-      "Cuántas conversaciones terminan en una cita, visita o llamada concreta.",
-  },
-];
-
+// FAQ section
 export const faqs = [
   {
-    question: "¿Qué diferencia hay entre Boreas y Relevo?",
-    answer:
-      "Boreas es la marca y la base completa. Relevo es lo que hoy ya puedes ver funcionando: responde, orienta y ayuda a cerrar más conversaciones.",
+    question: "¿Qué necesito para empezar?",
+    answer: "Solo un audio de un minuto por WhatsApp. Nos cuentas tus tratamientos principales, el ambiente visual que prefieres y por qué te eligen tus pacientes. Nosotros nos encargamos de todo lo demás.",
   },
   {
-    question: "¿Por qué trabajan tres verticales al mismo tiempo?",
-    answer:
-      "Porque salud, belleza e inmobiliario comparten el problema de responder tarde, pero cada uno necesita una forma distinta de orientar la conversación.",
+    question: "¿Cuánto tiempo tarda en estar lista mi página?",
+    answer: "Entre 48 y 72 horas. Trabajamos con plazos agresivos porque sabemos que cada día sin presencia digital es un paciente que se va con la competencia.",
   },
   {
-    question: "¿El negocio tiene que diseñar la conversación?",
-    answer:
-      "No. Solo compartes la información básica del negocio. Boreas se encarga de la forma en que Relevo atiende y guía la conversación.",
+    question: "¿Tengo que redactar los textos de mi página?",
+    answer: "No. Contamos con redacción médica especializada. A partir de tu audio, creamos todo el contenido profesional de tu consultorio digital.",
   },
   {
-    question: "¿Es un chatbot genérico?",
-    answer:
-      "No. Relevo no responde al azar. Sigue una guía clara para entender, responder y ayudar a cerrar cada conversación.",
+    question: "¿Qué incluye el servicio?",
+    answer: "Diseño profesional, redacción médica, hosting por un año, dominio (con costo adicional), mantenimiento mensual, optimización para Google y para búsquedas de inteligencia artificial.",
   },
   {
-    question: "¿Qué se mide para saber si está funcionando?",
-    answer:
-      "Cuánto tardas en responder, cuántas conversaciones sí reciben atención, cuántas avanzan y cuántas terminan en una cita, visita o llamada.",
+    question: "¿Funciona en celulares?",
+    answer: "Tu consultorio digital se adapta automáticamente a cualquier pantalla. El 84% de los pacientes te buscan desde su celular; tu página se verá impecable ahí.",
   },
   {
-    question: "¿Puedo ver si esto me serviría sin dejar mis datos?",
-    answer:
-      "Sí. El diagnóstico rápido te orienta con cuatro preguntas y no te pide correo ni conexión técnica para darte una primera recomendación.",
+    question: "¿Se puede conectar a mi WhatsApp Business?",
+    answer: "Sí. Incluimos un botón directo que conecta al paciente con tu WhatsApp Business en un solo toque, sin distracciones ni formularios largos.",
   },
 ];

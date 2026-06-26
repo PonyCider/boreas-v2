@@ -3,3 +3,14 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+## Active Add-ons
+
+Use these project-local instructions when they fit the task:
+
+- `caveman` in [`skills/caveman/SKILL.md`](./skills/caveman/SKILL.md) for terse, high-signal replies. Keep `caveman lite` as the default communication style in this repo.
+- `design-taste-frontend` in [`skills/design-taste-frontend/SKILL.md`](./skills/design-taste-frontend/SKILL.md) for landing pages, redesigns, and any work that needs a stronger visual point of view.
+- `frontend-design` in [`skills/frontend-design/SKILL.md`](./skills/frontend-design/SKILL.md) for distinctive UI direction, typography, motion, and layout choices.
+- `impeccable` via [`PRODUCT.md`](./PRODUCT.md) and [`DESIGN.md`](./DESIGN.md) for product context and design-system rules.
+
+For any UI or landing-page work, read [`PRODUCT.md`](./PRODUCT.md) and [`DESIGN.md`](./DESIGN.md) before editing code.
