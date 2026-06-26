@@ -190,7 +190,7 @@ function MockupContent({
           <p className="mt-0.5 text-sm text-clinical">{doctor.specialty}</p>
         </div>
         {!compact && (
-          <span className="rounded-md border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+          <span className="rounded-md border border-line bg-elevated px-3 py-1 text-xs font-medium text-muted">
             Disponible
           </span>
         )}

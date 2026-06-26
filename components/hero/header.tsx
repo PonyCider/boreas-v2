@@ -78,6 +78,7 @@ export function Header() {
             onClick={() => setIsOpen(!isOpen)}
             className="flex h-11 w-11 items-center justify-center rounded-md border border-white/[0.12] bg-white/[0.08] p-2 text-foreground transition-colors hover:bg-white/[0.12] lg:hidden"
             aria-expanded={isOpen}
+            aria-controls="mobile-nav"
             aria-label="Abrir menú"
           >
             <svg
@@ -106,7 +107,7 @@ export function Header() {
 
         {/* Mobile dropdown menu */}
         {isOpen && (
-          <div className="liquid-menu absolute left-0 right-0 top-[calc(100%+12px)] z-50 rounded-xl p-5 lg:hidden">
+          <div id="mobile-nav" className="liquid-menu absolute left-0 right-0 top-[calc(100%+12px)] z-50 rounded-xl p-5 lg:hidden">
             <nav className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <a
