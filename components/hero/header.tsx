@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 
 const navLinks = [
-  { label: "Prueba", href: "#problema" },
+  { label: "Prueba", href: "#prueba" },
   { label: "Proceso", href: "#proceso" },
   { label: "Confianza", href: "#garantia" },
   { label: "Contacto", href: "#contacto" },
@@ -12,18 +14,41 @@ const navLinks = [
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   return (
-    <div className="sticky top-0 z-50 px-4 pt-4 sm:px-6 lg:px-10">
-      <div className="relative mx-auto flex w-full max-w-[1460px] items-center justify-between gap-6 rounded-lg border border-line bg-background/88 px-4 py-3 shadow-[0_16px_48px_rgba(2,8,18,0.28)] backdrop-blur-xl sm:px-6">
+    <motion.div
+      initial={{ opacity: 0, y: reduceMotion ? 0 : -14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      className="sticky top-0 z-50 px-4 pt-4 sm:px-6 lg:px-10"
+    >
+      <div className="liquid-header relative mx-auto flex w-full max-w-[1460px] items-center justify-between gap-6 rounded-xl px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="flex h-11 items-center gap-3 text-sm font-semibold text-foreground transition-colors duration-300 hover:text-clinical"
+          className="flex h-11 min-w-0 items-center gap-3 text-sm font-semibold text-foreground transition-colors duration-300 hover:text-clinical"
         >
-          <span className="relative flex h-9 w-9 items-center justify-center rounded-md border border-accent/30 bg-accent-soft">
-            <span className="h-2.5 w-2.5 rounded-sm bg-accent" />
+          <span className="relative flex h-10 w-10 shrink-0 items-center justify-center lg:hidden">
+            <Image
+              src="/brand/boreas-logo-mark-header.png"
+              alt="Boreas"
+              width={40}
+              height={40}
+              priority
+              className="h-9 w-9 object-contain"
+            />
           </span>
-          Boreas
+          <span className="relative hidden h-11 w-44 shrink-0 items-center justify-center lg:flex">
+            <Image
+              src="/brand/boreas-header-lockup.png"
+              alt="Boreas"
+              width={177}
+              height={36}
+              priority
+              sizes="176px"
+              className="h-9 w-44 object-contain"
+            />
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -51,7 +76,7 @@ export function Header() {
           {/* Hamburger button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex h-11 w-11 items-center justify-center rounded-md border border-line bg-surface p-2 text-foreground lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-md border border-white/[0.12] bg-white/[0.08] p-2 text-foreground transition-colors hover:bg-white/[0.12] lg:hidden"
             aria-expanded={isOpen}
             aria-label="Abrir menú"
           >
@@ -81,7 +106,7 @@ export function Header() {
 
         {/* Mobile dropdown menu */}
         {isOpen && (
-          <div className="absolute left-0 right-0 top-[calc(100%+12px)] z-50 rounded-lg border border-line bg-surface p-5 shadow-2xl backdrop-blur-xl lg:hidden">
+          <div className="liquid-menu absolute left-0 right-0 top-[calc(100%+12px)] z-50 rounded-xl p-5 lg:hidden">
             <nav className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <a
@@ -106,6 +131,6 @@ export function Header() {
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
