@@ -1,14 +1,136 @@
 "use client";
 
 import { useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 
 /**
  * Decorative hero widget: colorful IDE-shaped bots assemble the doctor's
- * "consultorio digital" (agenda, reseñas, WhatsApp, pulse-line). Static here;
- * the gsap timeline is wired in clinic-builder.tsx Task 3. aria-hidden — no a11y content.
+ * "consultorio digital" (agenda, reseñas, WhatsApp, pulse-line). Static scene +
+ * an infinite gsap build loop (see the useGSAP block below). aria-hidden — no a11y content.
  */
 export function ClinicBuilder() {
   const root = useRef<SVGSVGElement>(null);
+
+  useGSAP(
+    () => {
+      const q = gsap.utils.selector(root);
+      const pieces = q("[data-piece]");
+      const bots = q("[data-bot]");
+      const bobs = q("[data-bob]");
+
+      const piece = (n: string) => q(`[data-piece="${n}"]`);
+      const bot = (n: string) => q(`[data-bot="${n}"]`);
+
+      const mm = gsap.matchMedia();
+
+      mm.add(
+        {
+          reduce: "(prefers-reduced-motion: reduce)",
+          isDesktop: "(min-width: 1024px)",
+        },
+        (ctx) => {
+          const { reduce, isDesktop } = ctx.conditions as {
+            reduce: boolean;
+            isDesktop: boolean;
+          };
+
+          // Reduced motion → completed static frame, no timeline.
+          if (reduce) {
+            gsap.set(pieces, { autoAlpha: 1, scale: 1 });
+            gsap.set(bots, { autoAlpha: 0.95 });
+            return;
+          }
+
+          // Crew selection: full desktop vs light mobile.
+          const fullCrew = ["bracket", "caret", "tag", "terminal", "semicolon", "hairline"];
+          const lightCrew = ["bracket", "terminal", "caret"];
+          const crew = isDesktop ? fullCrew : lightCrew;
+          bots.forEach((b) => {
+            const name = (b as unknown as SVGElement).dataset.bot ?? "";
+            gsap.set(b, { autoAlpha: crew.includes(name) ? 1 : 0 });
+          });
+
+          // Idle bob keeps the scene alive during holds (inner groups only — no
+          // conflict with the master timeline moving the outer bot groups).
+          const idle = gsap.to(bobs, {
+            y: "-=5",
+            duration: 1.8,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: -1,
+            stagger: { each: 0.25, from: "random" },
+          });
+
+          // Reset helper: the start state, also used to close the loop seamlessly.
+          const resetScene = () => {
+            gsap.set(pieces, { autoAlpha: 0, scale: 0.8, transformOrigin: "50% 50%" });
+            gsap.set(q('[data-piece="pulse"]'), { scaleX: 0, transformOrigin: "0% 50%" });
+            gsap.set(q('[data-piece="agenda"] [data-line]'), {
+              scaleX: 0,
+              transformOrigin: "0% 50%",
+            });
+            crew.forEach((n) => gsap.set(bot(n), { x: 0, y: 0 }));
+          };
+          resetScene();
+
+          const tl = gsap.timeline({ repeat: -1, defaults: { ease: "power2.out" } });
+
+          tl.addLabel("build")
+            // bracket-bot nudges in, agenda frame appears
+            .to(bot("bracket"), { x: 36, y: -4, duration: 0.6 }, "build")
+            .to(piece("agenda"), { autoAlpha: 1, scale: 1, duration: 0.5 }, "build+=0.2")
+            // caret-bot types the agenda lines
+            .to(bot("caret"), { x: -8, y: 6, duration: 0.45 }, "build+=0.5")
+            .to(
+              q('[data-piece="agenda"] [data-line]'),
+              { scaleX: 1, stagger: 0.1, duration: 0.35 },
+              "<"
+            )
+            // tag-bot raises the reviews card
+            .to(bot("tag"), { x: -70, y: -2, duration: 0.6 }, "build+=1.1")
+            .to(piece("reviews"), { autoAlpha: 1, scale: 1, duration: 0.5 }, "<0.15")
+            // terminal-bot drops the WhatsApp node, it pings
+            .to(bot("terminal"), { x: -56, y: 4, duration: 0.6 }, "build+=1.7")
+            .to(piece("whatsapp"), { autoAlpha: 1, scale: 1, duration: 0.5 }, "<0.15")
+            .to(piece("whatsapp"), { scale: 1.1, duration: 0.22, yoyo: true, repeat: 1 }, ">")
+            // hairline-bot draws the pulse-line; semicolon-bot sets the period
+            .to(bot("hairline"), { x: 30, y: -2, duration: 0.45 }, "build+=2.3")
+            .to(piece("pulse"), { scaleX: 1, duration: 0.6 }, "<")
+            .to(bot("semicolon"), { x: 4, y: -34, duration: 0.4 }, "build+=2.7")
+            .to(piece("period"), { autoAlpha: 1, scale: 1, duration: 0.3 }, "<0.1")
+            // hold the finished consultorio
+            .addLabel("hold")
+            .to({}, { duration: 2 })
+            // soft dissolve back to blueprint, then reset for a seamless loop
+            .to(pieces, { autoAlpha: 0, duration: 0.8, ease: "power1.inOut" }, "hold+=2")
+            .to(
+              crew.flatMap((n) => bot(n)),
+              { x: 0, y: 0, duration: 0.8, ease: "power1.inOut" },
+              "<"
+            )
+            .add(resetScene);
+
+          // Pause the loop when the hero is scrolled out of view.
+          const io = new IntersectionObserver(
+            ([entry]) => {
+              if (entry.isIntersecting) tl.play();
+              else tl.pause();
+            },
+            { threshold: 0.08 }
+          );
+          if (root.current) io.observe(root.current);
+
+          return () => {
+            io.disconnect();
+            idle.kill();
+            tl.kill();
+          };
+        }
+      );
+    },
+    { scope: root }
+  );
 
   return (
     <svg
