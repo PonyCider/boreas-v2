@@ -37,6 +37,13 @@
   --font-sans: var(--font-satoshi);
 }
 
+/* hero clinic-builder: pieces start hidden so the resting/failure state is the empty
+   blueprint, never the built scene (which contains a fabricated ★★★★★ card). gsap
+   reveals them during the build; the reduced-motion branch sets them visible. */
+.clinic-builder [data-piece] {
+  opacity: 0;
+}
+
 * {
   box-sizing: border-box;
 }

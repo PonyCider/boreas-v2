@@ -70,9 +70,14 @@ export function ClinicBuilder() {
           // Reset helper: the start state, also used to close the loop seamlessly.
           const resetScene = () => {
             gsap.set(pieces, { autoAlpha: 0, scale: 0.8, transformOrigin: "50% 50%" });
-            gsap.set(q('[data-piece="pulse"]'), { scaleX: 0, transformOrigin: "0% 50%" });
+            gsap.set(q('[data-piece="pulse"]'), {
+              scaleX: 0,
+              scaleY: 1,
+              transformOrigin: "0% 50%",
+            });
             gsap.set(q('[data-piece="agenda"] [data-line]'), {
               scaleX: 0,
+              scaleY: 1,
               transformOrigin: "0% 50%",
             });
             crew.forEach((n) => gsap.set(bot(n), { x: 0, y: 0 }));
@@ -101,7 +106,7 @@ export function ClinicBuilder() {
             .to(piece("whatsapp"), { scale: 1.1, duration: 0.22, yoyo: true, repeat: 1 }, ">")
             // hairline-bot draws the pulse-line; semicolon-bot sets the period
             .to(bot("hairline"), { x: 30, y: -2, duration: 0.45 }, "build+=2.3")
-            .to(piece("pulse"), { scaleX: 1, duration: 0.6 }, "<")
+            .to(piece("pulse"), { autoAlpha: 1, scaleX: 1, duration: 0.6 }, "<")
             .to(bot("semicolon"), { x: 4, y: -34, duration: 0.4 }, "build+=2.7")
             .to(piece("period"), { autoAlpha: 1, scale: 1, duration: 0.3 }, "<0.1")
             // hold the finished consultorio
@@ -137,13 +142,17 @@ export function ClinicBuilder() {
     { scope: root }
   );
 
+  // Pieces default to opacity-0 (via the svg className below) so the default/
+  // failure state is the empty blueprint, never the built scene (which shows a
+  // fabricated ★★★★★ card). gsap reveals them during the build; the
+  // reduced-motion branch sets them visible.
   return (
     <svg
       ref={root}
       viewBox="0 0 600 460"
       role="presentation"
       aria-hidden="true"
-      className="h-full w-full overflow-visible"
+      className="clinic-builder h-full w-full overflow-visible"
     >
       {/* ---------- blueprint slab ---------- */}
       <g data-blueprint>
