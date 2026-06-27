@@ -16,7 +16,7 @@ Dark medical editorial. The page should feel premium, calm, and legible at night
 ## Layout Rules
 
 - Mobile-first.
-- Hero uses a real medical image as full-bleed context with text over it.
+- Hero uses a fabricated "clinical light" glass composition (orbital glass, scanlines, glass proof cards) as full-bleed context, with text over it. This is a deliberate brand system, not decoration. A real medical image is an allowed alternative but not required.
 - First viewport must show the offer and hint at the next section.
 - Prefer editorial rows, dividers, and columns over repeated cards.
 - Cards are allowed only for true framed tools or repeated items, with radius 8px or less.
@@ -28,7 +28,10 @@ Dark medical editorial. The page should feel premium, calm, and legible at night
 - Motion is quiet: opacity and small translate only.
 - Respect `prefers-reduced-motion`.
 - No scroll effects that hide content from screenshots, crawlers, or impatient users.
-- No decorative glow/orb systems.
+- Glow/orb systems are allowed **only inside the hero/header** as the brand "clinical light" system, driven by tokens (`--accent`, `--glow-clinic`) and kept soft. Outside the hero/header the page is flat editorial — no decorative glow/orbs/glass.
+- Exception: the hero `clinic-builder` widget runs an infinite gsap construction loop (colorful
+  IDE-bots assembling the consultorio). This is a deliberate brand override of "quiet motion",
+  confined to that one hero widget; `prefers-reduced-motion` renders its completed frame statically.
 
 ## Conversion Rules
 
