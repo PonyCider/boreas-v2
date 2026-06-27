@@ -27,12 +27,17 @@ export function ClinicBuilder() {
       mm.add(
         {
           reduce: "(prefers-reduced-motion: reduce)",
+          // isDesktop / isMobile are complementary so exactly one always matches —
+          // gsap.matchMedia only runs the callback when a query matches, so without
+          // the isMobile companion the widget never animates below 1024px.
           isDesktop: "(min-width: 1024px)",
+          isMobile: "(max-width: 1023.98px)",
         },
         (ctx) => {
           const { reduce, isDesktop } = ctx.conditions as {
             reduce: boolean;
             isDesktop: boolean;
+            isMobile: boolean;
           };
 
           // Reduced motion → completed static frame, no timeline.
