@@ -309,6 +309,18 @@ export function ClinicBuilder() {
           <stop offset="0%" style={{ stopColor: "var(--bot-coral)", stopOpacity: 0.14 }} />
           <stop offset="75%" style={{ stopColor: "var(--bot-coral)", stopOpacity: 0 }} />
         </linearGradient>
+        {/* clip card inner content to card shape so accent bar doesn't overflow corners */}
+        <clipPath id="clipAgenda">
+          <rect x="80" y="88" width="200" height="168" rx="14" />
+        </clipPath>
+        <clipPath id="clipReviews">
+          <rect x="310" y="88" width="180" height="130" rx="14" />
+        </clipPath>
+        {/* WhatsApp circle — radial gradient for depth */}
+        <radialGradient id="waGrad" cx="38%" cy="32%" r="65%">
+          <stop offset="0%" style={{ stopColor: "oklch(0.78 0.13 154)", stopOpacity: 1 }} />
+          <stop offset="100%" style={{ stopColor: "oklch(0.5 0.1 154)", stopOpacity: 1 }} />
+        </radialGradient>
       </defs>
 
       {/* ── Blueprint slab ─────────────────────────────────────────── */}
@@ -338,15 +350,18 @@ export function ClinicBuilder() {
 
       {/* ── Agenda card ────────────────────────────────────────────── */}
       <g data-piece="agenda">
+        {/* border outside the clip so stroke isn't cut */}
         <rect
           x="80" y="88" width="200" height="168" rx="14"
           style={{ fill: "var(--bg-elevated)", stroke: "var(--bot-amber)" }}
           strokeWidth="1.5" strokeOpacity={0.4}
         />
+        {/* everything inside is clipped to the card shape */}
+        <g clipPath="url(#clipAgenda)">
         {/* amber color wash */}
-        <rect x="80" y="88" width="200" height="168" rx="14" fill="url(#gradAgenda)" />
-        {/* amber top accent */}
-        <rect x="80" y="88" width="200" height="4" rx="2"
+        <rect x="80" y="88" width="200" height="168" fill="url(#gradAgenda)" />
+        {/* amber top accent — now properly clipped to card corners */}
+        <rect x="80" y="88" width="200" height="5"
           style={{ fill: "var(--bot-amber)" }} />
         {/* calendar icon */}
         <g
@@ -410,19 +425,22 @@ export function ClinicBuilder() {
             </g>
           );
         })}
-      </g>
+        </g>{/* end clipAgenda */}
+      </g>{/* end data-piece="agenda" */}
 
       {/* ── Reviews card ───────────────────────────────────────────── */}
       <g data-piece="reviews">
+        {/* border outside clip */}
         <rect
           x="310" y="88" width="180" height="130" rx="14"
           style={{ fill: "var(--bg-elevated)", stroke: "var(--bot-coral)" }}
           strokeWidth="1.5" strokeOpacity={0.4}
         />
+        <g clipPath="url(#clipReviews)">
         {/* coral color wash */}
-        <rect x="310" y="88" width="180" height="130" rx="14" fill="url(#gradReviews)" />
-        {/* coral top accent */}
-        <rect x="310" y="88" width="180" height="4" rx="2"
+        <rect x="310" y="88" width="180" height="130" fill="url(#gradReviews)" />
+        {/* coral top accent — clipped to card corners */}
+        <rect x="310" y="88" width="180" height="5"
           style={{ fill: "var(--bot-coral)" }} />
         {/* star icon */}
         <g transform="translate(324 109)"
@@ -456,7 +474,8 @@ export function ClinicBuilder() {
           style={{ fill: "var(--ink-muted)" }} fillOpacity={0.2} />
         <rect x="326" y="200" width="139" height="5" rx="2.5"
           style={{ fill: "var(--bot-amber)" }} fillOpacity={0.65} />
-      </g>
+        </g>{/* end clipReviews */}
+      </g>{/* end data-piece="reviews" */}
 
       {/* ── Booking badge ──────────────────────────────────────────── */}
       <g data-piece="badge">
@@ -481,29 +500,62 @@ export function ClinicBuilder() {
 
       {/* ── WhatsApp node ──────────────────────────────────────────── */}
       <g data-piece="whatsapp">
-        <circle cx="430" cy="338" r="36" style={{ fill: "var(--glow-clinic)" }} />
+        {/* outer ambient glow ring */}
+        <circle cx="430" cy="338" r="43"
+          style={{ fill: "var(--glow-clinic)" }} fillOpacity={0.12} />
+        {/* middle ring — subtle border glow */}
+        <circle cx="430" cy="338" r="38"
+          style={{ fill: "var(--glow-clinic)" }} fillOpacity={0.08} />
+        {/* main circle with radial gradient for depth */}
+        <circle cx="430" cy="338" r="36" fill="url(#waGrad)" />
+        {/* inner highlight rim */}
         <circle cx="430" cy="338" r="36" fill="none"
-          style={{ stroke: "var(--ink)" }} strokeOpacity={0.15} />
+          style={{ stroke: "var(--ink)" }} strokeOpacity={0.18} strokeWidth="1" />
+        {/* speech bubble icon — rounded rect with lower-left tail */}
         <path
-          d="M418 350c-3-4-4-9-2-13 2-5 7-8 12-7 5 0 9 4 10 9 1 6-3 12-9 13-2 1-5 0-7-1l-6 2 2-5z"
+          d="M418,321 h22 q8,0 8,8 v10 q0,8-8,8 h-5 l-8,8 0,-8 h-9 q-8,0-8,-8 v-10 q0,-8 8,-8 z"
           style={{ fill: "var(--bg-deep)" }}
+          fillOpacity={0.82}
+        />
+        {/* phone receiver inside bubble — two arcs suggesting handset */}
+        <path
+          d="M422,332 c0,-3 2.5,-5 5,-4 l2,4.5 -2.5,1.5 c1,3 3.5,5.5 6.5,6.5 l1.5,-2.5 4.5,2 c0,3-2.5,5-5,4.5 -7.5,-1-13.5,-8.5-12,-12.5"
+          fill="none"
+          style={{ stroke: "var(--glow-clinic)" }}
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         {/* notification badge */}
-        <circle cx="457" cy="315" r="9" style={{ fill: "var(--bg-surface)" }} />
-        <circle cx="457" cy="315" r="7.5" style={{ fill: "var(--bot-coral)" }} />
-        <text x="457" y="319" textAnchor="middle"
+        <circle cx="457" cy="314" r="10" style={{ fill: "var(--bg-deep)" }} />
+        <circle cx="457" cy="314" r="8" style={{ fill: "var(--bot-coral)" }} />
+        <text x="457" y="318" textAnchor="middle"
           style={{ fill: "var(--ink)", fontSize: "8px", fontWeight: 700, fontFamily: "ui-sans-serif,sans-serif" }}>
           2
         </text>
       </g>
 
       {/* ── EKG pulse line — draws left→right via stroke-dashoffset ── */}
+      {/* glow layer — same data-piece so it animates together with main */}
       <path
         data-piece="pulse"
         d={EKG_D}
         fill="none"
         style={{ stroke: "var(--accent)" }}
-        strokeWidth="3"
+        strokeWidth="8"
+        strokeOpacity={0.22}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeDasharray={EKG_LEN}
+        strokeDashoffset={EKG_LEN}
+      />
+      {/* main line */}
+      <path
+        data-piece="pulse"
+        d={EKG_D}
+        fill="none"
+        style={{ stroke: "var(--accent)" }}
+        strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeDasharray={EKG_LEN}
