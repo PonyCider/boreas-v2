@@ -286,38 +286,44 @@ type BotProps = {
 /** One IDE-element bot: colored rounded body + glyph face + two eyes, in an idle-bob group. */
 function Bot({ name, x, y, color, glyph, w, h, terminal }: BotProps) {
   return (
-    <g data-bot={name} transform={`translate(${x} ${y})`}>
-      <g data-bob>
-        <rect
-          x={-w / 2}
-          y={-h / 2}
-          width={w}
-          height={h}
-          rx={8}
-          style={{ fill: `var(${color})` }}
-        />
-        {terminal && (
-          <g>
-            <circle cx={-w / 2 + 8} cy={-h / 2 + 7} r="2.5" style={{ fill: "var(--bg-deep)" }} />
-            <circle cx={-w / 2 + 16} cy={-h / 2 + 7} r="2.5" style={{ fill: "var(--bg-deep)" }} />
-            <circle cx={-w / 2 + 24} cy={-h / 2 + 7} r="2.5" style={{ fill: "var(--bg-deep)" }} />
-          </g>
-        )}
-        <text
-          x="0"
-          y={terminal ? 6 : 5}
-          textAnchor="middle"
-          style={{
-            fill: "var(--bg-deep)",
-            fontSize: `${Math.min(h - 8, 18)}px`,
-            fontWeight: 700,
-            fontFamily: "ui-monospace, monospace",
-          }}
-        >
-          {glyph}
-        </text>
-        {/* eyes / antenna nub */}
-        <circle cx="0" cy={-h / 2 - 4} r="2.5" style={{ fill: `var(${color})` }} />
+    // Static position wrapper — GSAP never targets this group.
+    // data-bot starts at (0,0) relative to the wrapper so resetScene's
+    // gsap.set({x:0, y:0}) returns bots to their SVG position instead
+    // of collapsing them all to the SVG origin.
+    <g transform={`translate(${x} ${y})`}>
+      <g data-bot={name}>
+        <g data-bob>
+          <rect
+            x={-w / 2}
+            y={-h / 2}
+            width={w}
+            height={h}
+            rx={8}
+            style={{ fill: `var(${color})` }}
+          />
+          {terminal && (
+            <g>
+              <circle cx={-w / 2 + 8} cy={-h / 2 + 7} r="2.5" style={{ fill: "var(--bg-deep)" }} />
+              <circle cx={-w / 2 + 16} cy={-h / 2 + 7} r="2.5" style={{ fill: "var(--bg-deep)" }} />
+              <circle cx={-w / 2 + 24} cy={-h / 2 + 7} r="2.5" style={{ fill: "var(--bg-deep)" }} />
+            </g>
+          )}
+          <text
+            x="0"
+            y={terminal ? 6 : 5}
+            textAnchor="middle"
+            style={{
+              fill: "var(--bg-deep)",
+              fontSize: `${Math.min(h - 8, 18)}px`,
+              fontWeight: 700,
+              fontFamily: "ui-monospace, monospace",
+            }}
+          >
+            {glyph}
+          </text>
+          {/* eyes / antenna nub */}
+          <circle cx="0" cy={-h / 2 - 4} r="2.5" style={{ fill: `var(${color})` }} />
+        </g>
       </g>
     </g>
   );
