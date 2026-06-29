@@ -300,6 +300,17 @@ export function ClinicBuilder() {
       aria-hidden="true"
       className="clinic-builder h-full w-full overflow-visible"
     >
+      <defs>
+        <linearGradient id="gradAgenda" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style={{ stopColor: "var(--bot-amber)", stopOpacity: 0.14 }} />
+          <stop offset="75%" style={{ stopColor: "var(--bot-amber)", stopOpacity: 0 }} />
+        </linearGradient>
+        <linearGradient id="gradReviews" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" style={{ stopColor: "var(--bot-coral)", stopOpacity: 0.14 }} />
+          <stop offset="75%" style={{ stopColor: "var(--bot-coral)", stopOpacity: 0 }} />
+        </linearGradient>
+      </defs>
+
       {/* ── Blueprint slab ─────────────────────────────────────────── */}
       <g data-blueprint>
         <rect
@@ -332,12 +343,14 @@ export function ClinicBuilder() {
           style={{ fill: "var(--bg-elevated)", stroke: "var(--bot-amber)" }}
           strokeWidth="1.5" strokeOpacity={0.4}
         />
+        {/* amber color wash */}
+        <rect x="80" y="88" width="200" height="168" rx="14" fill="url(#gradAgenda)" />
         {/* amber top accent */}
         <rect x="80" y="88" width="200" height="4" rx="2"
           style={{ fill: "var(--bot-amber)" }} />
         {/* calendar icon */}
         <g
-          transform="translate(98 112)"
+          transform="translate(96 112)"
           style={{ stroke: "var(--bot-amber)", strokeWidth: "1.5", fill: "none", strokeLinecap: "round" }}
         >
           <rect x="0" y="2" width="16" height="14" rx="2" />
@@ -345,27 +358,58 @@ export function ClinicBuilder() {
           <line x1="12" y1="0" x2="12" y2="5" />
           <line x1="0" y1="8" x2="16" y2="8" strokeOpacity={0.4} />
         </g>
-        <text x="122" y="127"
+        <text x="120" y="127"
           style={{ fill: "var(--bot-amber)", fontSize: "11px", fontWeight: 600, fontFamily: "ui-sans-serif,sans-serif" }}>
           Agenda hoy
         </text>
-        {/* appointment rows — data-line for scaleX animation */}
-        {[0, 1, 2, 3].map((i) => (
-          <g key={i}>
-            <circle cx="96" cy={154 + i * 26} r="3"
-              style={{ fill: i === 0 ? "var(--accent)" : "var(--ink-muted)" }}
-              fillOpacity={i === 0 ? 0.9 : 0.4}
-            />
-            <rect
-              data-line=""
-              x="108" y={148 + i * 26}
-              width={i % 2 === 0 ? 152 : 116}
-              height="8" rx="4"
-              style={{ fill: i === 0 ? "var(--accent)" : "var(--ink-muted)" }}
-              fillOpacity={i === 0 ? 0.65 : 0.3}
-            />
-          </g>
-        ))}
+        {/* "4 hoy" count chip */}
+        <rect x="228" y="114" width="38" height="16" rx="8"
+          style={{ fill: "var(--bot-amber)" }} fillOpacity={0.2} />
+        <text x="247" y="126" textAnchor="middle"
+          style={{ fill: "var(--bot-amber)", fontSize: "9px", fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>
+          4 hoy
+        </text>
+        {/* header separator */}
+        <line x1="88" y1="138" x2="272" y2="138"
+          style={{ stroke: "var(--bot-amber)" }} strokeOpacity={0.2} />
+        {/* appointment rows: time label + dot + bar (data-line) */}
+        {[
+          { time: "9:00",  accent: true,  w: 134 },
+          { time: "11:30", accent: false, w: 108 },
+          { time: "16:00", accent: false, w: 126 },
+          { time: "18:00", accent: false, w: 94  },
+        ].map(({ time, accent, w }, i) => {
+          const cy = 154 + i * 26;
+          return (
+            <g key={i}>
+              {accent && (
+                <rect x="88" y={cy - 9} width="184" height="20" rx="4"
+                  style={{ fill: "var(--accent)" }} fillOpacity={0.07} />
+              )}
+              <text x="92" y={cy + 4}
+                style={{
+                  fill: accent ? "var(--accent)" : "var(--ink-muted)",
+                  fontSize: "9px",
+                  fontFamily: "ui-monospace,monospace",
+                  fontWeight: accent ? 600 : 400,
+                }}>
+                {time}
+              </text>
+              <circle cx="124" cy={cy} r="3"
+                style={{ fill: accent ? "var(--accent)" : "var(--ink-muted)" }}
+                fillOpacity={accent ? 1 : 0.4}
+              />
+              <rect
+                data-line=""
+                x="132" y={cy - 4}
+                width={w}
+                height="8" rx="4"
+                style={{ fill: accent ? "var(--accent)" : "var(--ink-muted)" }}
+                fillOpacity={accent ? 0.65 : 0.28}
+              />
+            </g>
+          );
+        })}
       </g>
 
       {/* ── Reviews card ───────────────────────────────────────────── */}
@@ -375,50 +419,63 @@ export function ClinicBuilder() {
           style={{ fill: "var(--bg-elevated)", stroke: "var(--bot-coral)" }}
           strokeWidth="1.5" strokeOpacity={0.4}
         />
+        {/* coral color wash */}
+        <rect x="310" y="88" width="180" height="130" rx="14" fill="url(#gradReviews)" />
         {/* coral top accent */}
         <rect x="310" y="88" width="180" height="4" rx="2"
           style={{ fill: "var(--bot-coral)" }} />
         {/* star icon */}
-        <g transform="translate(326 109)"
+        <g transform="translate(324 109)"
           style={{ stroke: "var(--bot-coral)", strokeWidth: "1.3", fill: "none" }}>
           <polygon points="8,0 10,5.5 16,5.5 11,8.5 13,14 8,11 3,14 5,8.5 0,5.5 6,5.5" />
         </g>
-        <text x="348" y="127"
+        <text x="346" y="127"
           style={{ fill: "var(--bot-coral)", fontSize: "11px", fontWeight: 600, fontFamily: "ui-sans-serif,sans-serif" }}>
           Reseñas
         </text>
-        {/* large stars */}
-        <text x="326" y="166"
-          style={{ fill: "var(--bot-amber)", fontSize: "24px", letterSpacing: "4px" }}>
+        {/* ★★★★★ centered */}
+        <text x="400" y="158" textAnchor="middle"
+          style={{ fill: "var(--bot-amber)", fontSize: "18px", letterSpacing: "3px" }}>
           ★★★★★
         </text>
-        {/* rating + count */}
+        {/* large score */}
         <text x="326" y="188"
-          style={{ fill: "var(--ink)", fontSize: "14px", fontWeight: 700, fontFamily: "ui-sans-serif,sans-serif" }}>
+          style={{ fill: "var(--ink)", fontSize: "30px", fontWeight: 700, fontFamily: "ui-sans-serif,sans-serif" }}>
           4.9
         </text>
-        <text x="347" y="188"
-          style={{ fill: "var(--ink-muted)", fontSize: "11px", fontFamily: "ui-sans-serif,sans-serif" }}>
-          · 47 reseñas
+        <text x="380" y="185"
+          style={{ fill: "var(--ink-muted)", fontSize: "12px", fontFamily: "ui-sans-serif,sans-serif" }}>
+          / 5
         </text>
-        <rect x="326" y="199" width="140" height="7" rx="3.5"
-          style={{ fill: "var(--ink-muted)" }} fillOpacity={0.25} />
+        <text x="480" y="188" textAnchor="end"
+          style={{ fill: "var(--ink-muted)", fontSize: "10px", fontFamily: "ui-sans-serif,sans-serif" }}>
+          47 reseñas
+        </text>
+        {/* 4.9 / 5 rating bar */}
+        <rect x="326" y="200" width="142" height="5" rx="2.5"
+          style={{ fill: "var(--ink-muted)" }} fillOpacity={0.2} />
+        <rect x="326" y="200" width="139" height="5" rx="2.5"
+          style={{ fill: "var(--bot-amber)" }} fillOpacity={0.65} />
       </g>
 
       {/* ── Booking badge ──────────────────────────────────────────── */}
       <g data-piece="badge">
-        <rect x="310" y="232" width="148" height="28" rx="14"
+        <rect x="310" y="229" width="152" height="32" rx="16"
           style={{ fill: "var(--bot-cyan)" }} fillOpacity={0.1} />
-        <rect x="310" y="232" width="148" height="28" rx="14"
+        <rect x="310" y="229" width="152" height="32" rx="16"
           fill="none"
           style={{ stroke: "var(--bot-cyan)" }}
           strokeWidth="1.5" strokeOpacity={0.5}
         />
-        <circle data-badge-dot="" cx="328" cy="246" r="4"
+        <circle data-badge-dot="" cx="328" cy="245" r="4.5"
           style={{ fill: "var(--bot-cyan)" }} />
-        <text x="340" y="251"
-          style={{ fill: "var(--bot-cyan)", fontSize: "11px", fontWeight: 600, fontFamily: "ui-monospace,monospace" }}>
-          3 citas hoy
+        <text x="340" y="250"
+          style={{ fill: "var(--bot-cyan)", fontSize: "15px", fontWeight: 700, fontFamily: "ui-monospace,monospace" }}>
+          3
+        </text>
+        <text x="358" y="250"
+          style={{ fill: "var(--ink)", fontSize: "11px", fontFamily: "ui-sans-serif,sans-serif" }}>
+          citas hoy
         </text>
       </g>
 
@@ -431,6 +488,13 @@ export function ClinicBuilder() {
           d="M418 350c-3-4-4-9-2-13 2-5 7-8 12-7 5 0 9 4 10 9 1 6-3 12-9 13-2 1-5 0-7-1l-6 2 2-5z"
           style={{ fill: "var(--bg-deep)" }}
         />
+        {/* notification badge */}
+        <circle cx="457" cy="315" r="9" style={{ fill: "var(--bg-surface)" }} />
+        <circle cx="457" cy="315" r="7.5" style={{ fill: "var(--bot-coral)" }} />
+        <text x="457" y="319" textAnchor="middle"
+          style={{ fill: "var(--ink)", fontSize: "8px", fontWeight: 700, fontFamily: "ui-sans-serif,sans-serif" }}>
+          2
+        </text>
       </g>
 
       {/* ── EKG pulse line — draws left→right via stroke-dashoffset ── */}
@@ -439,7 +503,7 @@ export function ClinicBuilder() {
         d={EKG_D}
         fill="none"
         style={{ stroke: "var(--accent)" }}
-        strokeWidth="2.5"
+        strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeDasharray={EKG_LEN}
