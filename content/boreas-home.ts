@@ -1,4 +1,4 @@
-export const heroHeadline = "Tu clínica digital, abierta las 24 horas.";
+export const heroHeadline = "Tu consultorio digital, abierto las 24 horas.";
 
 export const heroSubcopy = "Mientras consultas, tus pacientes ya están revisando reseñas, comparando opciones y decidiendo a quién escribir. Boreas convierte esa primera búsqueda en confianza y contacto directo por WhatsApp.";
 
@@ -28,9 +28,18 @@ export const problemStats = [
 ];
 
 export const painPoints = [
-  "El paciente llega con intención, pero WhatsApp lo recibe como otro mensaje más.",
-  "Tu asistente filtra curiosos que solo preguntan precio mientras los pacientes decididos esperan.",
-  "Tus reseñas ya generan confianza, pero no siempre empujan al paciente al siguiente paso.",
+  {
+    text: "El paciente llega con intención, pero WhatsApp lo recibe como otro mensaje más.",
+    emphasis: "otro mensaje más",
+  },
+  {
+    text: "Tu asistente filtra curiosos que solo preguntan precio mientras los pacientes decididos esperan.",
+    emphasis: "los pacientes decididos esperan",
+  },
+  {
+    text: "Tus reseñas ya generan confianza, pero no siempre empujan al paciente al siguiente paso.",
+    emphasis: "no siempre empujan al paciente al siguiente paso",
+  },
 ];
 
 // Transformation section (Bloque 3 - Benefit descriptions over technical labels)
@@ -58,14 +67,17 @@ export const processSteps = [
   {
     title: "Nos envías un audio de 1 minuto",
     description: "Cuáles son tus tratamientos más rentables, qué atmósfera visual prefieres y por qué te eligen tus pacientes actuales. Nada más.",
+    badge: "1 audio de WhatsApp",
   },
   {
     title: "Diseñamos tu consultorio digital",
     description: "En 48 a 72 horas tendrás tu espacio profesional en línea con redacción especializada, tus reseñas de Google Maps integradas y conexión directa a tu WhatsApp.",
+    badge: "48–72 h de entrega",
   },
   {
     title: "Lo conectamos y lo lanzamos",
-    description: "Enlazamos tu perfil de Google Maps a tu nuevo espacio digital. Un toque para que el paciente te contacte.",
+    description: "Enlazamos tu perfil de Google Maps a tu nuevo consultorio digital. Un toque para que el paciente te contacte.",
+    badge: "Sin formularios",
   },
 ];
 
@@ -115,7 +127,7 @@ export const faqs = [
 
 // Social proof section (Bloque: Esto pasa todos los días)
 export const socialProof = {
-  heading: "Esto pasa todos los días.",
+  heading: "Tu paciente buscó anoche. No te encontró.",
 
   frictions: [
     {
@@ -149,7 +161,7 @@ export const socialProof = {
       connector: "Y el",
       value: "40%",
       label: "de esas búsquedas ocurren fuera de horario.",
-      closer: "Tu celular no contesta. Tu página sí.",
+      closer: "Tu celular no contesta. Tu consultorio sí.",
     },
   ],
 
@@ -158,8 +170,8 @@ export const socialProof = {
   mockupCaption: "Tu paciente te buscó ayer a las 11 de la noche. Esto encontró.",
 
   mockupDoctor: {
-    name: "Dr. Martínez",
-    specialty: "Medicina General",
+    name: "Dra. Sofía Ramírez",
+    specialty: "Cardiología Clínica",
     rating: "4.8",
     reviewCount: "127",
     testimonial:
