@@ -13,7 +13,7 @@ Use these project-local instructions when they fit the task:
 - `frontend-design` in [`skills/frontend-design/SKILL.md`](./skills/frontend-design/SKILL.md) for distinctive UI direction, typography, motion, and layout choices.
 - `impeccable` via [`PRODUCT.md`](./PRODUCT.md) and [`DESIGN.md`](./DESIGN.md) for product context and design-system rules.
 
-For any UI or landing-page work, read [`PRODUCT.md`](./PRODUCT.md) and [`DESIGN.md`](./DESIGN.md) before editing code.
+**Start with [`GUIDELINES.md`](./GUIDELINES.md) — it is the single source of truth** (business, voice, design system, conversion rules, tech architecture, do/don'ts, known backlog). It points to [`PRODUCT.md`](./PRODUCT.md) and [`DESIGN.md`](./DESIGN.md) for detail. If docs conflict, `GUIDELINES.md` wins. For any UI or landing-page work, read all three before editing code.
 
 ## gstack
 

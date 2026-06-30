@@ -36,8 +36,8 @@ export function BoreasLandingSections() {
       <TransformationSection />
       <ProcessSection />
       <GuaranteeSection />
-      <ContactFormSection />
       <FaqSection />
+      <ContactFormSection />
       <RelevoCuriositySection />
     </div>
   );

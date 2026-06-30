@@ -173,6 +173,7 @@ se guardan en ningún lado y no se notifica nada.** En fase 0→1 esto pierde el
 - ❌ Hex de color hardcodeado. ❌ Glass/glow fuera del hero. ❌ Side-stripe borders, gradient text.
 - ❌ Cards anidadas. ❌ Mezclar gsap+framer. ❌ Mandar tráfico con el form en modo mock.
 - ❌ Dejar leads sin persistir ni medir.
+- ❌ `divide-y + border-y` juntos en listas de texto — genera 4 líneas para 3 ítems. Listas de prosa usan espaciado (`gap`/`py-*`), no reglas. Regla en detalle: `DESIGN.md → Horizontal line discipline`.
 
 ---
 

@@ -4,7 +4,15 @@ export function SiteFooter() {
       <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1">
-            <span className="text-xl font-semibold tracking-tight text-foreground">
+            <span
+              style={{
+                fontFamily: "var(--font-newsreader), Georgia, serif",
+                fontStyle: "italic",
+                fontWeight: 500,
+                fontSize: "22px",
+                color: "var(--ink)",
+              }}
+            >
               Boreas
             </span>
             <span className="text-sm text-muted">

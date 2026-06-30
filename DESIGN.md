@@ -23,6 +23,13 @@ Dark medical editorial. The page should feel premium, calm, and legible at night
 - Avoid cards inside cards.
 - Use generous section spacing but keep mobile scan distance reasonable.
 
+### Horizontal line discipline
+
+- `SectionFrame` carries one `border-t border-line` per section. That is the structural separator. Do not add more borders at the same level.
+- Within a section: one anchor divider per content block maximum. Never combine `divide-y` + `border-y` on the same element — that produces 4 lines for 3 items.
+- Prose lists (pain points, bullets, short paragraphs): use spacing (`gap`, `space-y`, `py-*`) not rules. Lines are for structured rows with two or more columns (transformation table, guarantee rows), not for separated paragraphs.
+- If a block has `border-t` as its anchor, omit `border-b`. The closing line is noise.
+
 ## Motion Rules
 
 - Motion is quiet: opacity and small translate only.

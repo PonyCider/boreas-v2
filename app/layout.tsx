@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Newsreader, Figtree } from "next/font/google";
 import "./globals.css";
 
-const satoshi = localFont({
-  src: "./fonts/Satoshi-Variable.woff2",
-  variable: "--font-satoshi",
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-figtree",
   display: "swap",
 });
 
@@ -34,9 +43,9 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${satoshi.variable} h-full antialiased`}
+      className={`${newsreader.variable} ${figtree.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-background text-foreground selection:bg-accent/20 selection:text-foreground">
+      <body className="min-h-full bg-background text-foreground selection:bg-[var(--accent-soft)] selection:text-foreground">
         {children}
       </body>
     </html>
