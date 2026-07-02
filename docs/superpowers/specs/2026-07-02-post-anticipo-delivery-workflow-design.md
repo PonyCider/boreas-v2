@@ -14,7 +14,7 @@ Restricción de fondo: equipo de 2 developers + 1 closer, sin nadie de operacion
 - Anticipo mínimo: $2,000. Resto ($8,000 o $13,000) al entregar.
 - Dominio: siempre lo compra y administra el cliente (Boreas solo ofrece opciones/precios).
 - Se transfieren GitHub repo + proyecto Vercel a la cuenta del cliente. Boreas no conserva administración.
-- Add-on opcional: garantía + mantenimiento 1 año, $1,000/mes × 12 vía suscripción recurrente de Mercado Pago (no MSI — ver §2.1).
+- Add-on opcional: garantía + mantenimiento 1 año, $500/mes × 12 vía suscripción recurrente de Mercado Pago (no MSI — ver §2.1).
 
 **Plan B — Pago reducido + mensualidad forzosa** ($5,000 u $8,000 según complejidad)
 - Anticipo mínimo: $2,000. Resto ($3,000 o $6,000) al entregar + suscripción de $1,000/mes × 12 (garantía + mantenimiento incluidos).
