@@ -1,6 +1,6 @@
 # Flujo de entrega post-anticipo — diseño
 
-> **Confidencial — uso interno.** Contiene esquemas de precio y márgenes. No exponer en el sitio público ni en commits fuera de este repo privado. Complementa `assets/Boreas_Documento_Maestro_Uso_Interno` (resuelve el hueco marcado en su §4.1 y §8.1: "el proceso de handoff closer → developer no está definido").
+> **Confidencial — uso interno.** Contiene esquemas de precio y márgenes. No exponer en el sitio público ni en commits fuera de este repo privado. Complementa [`docs/internal/boreas-master.md`](../../internal/boreas-master.md) (resuelve el hueco marcado en su §5.1: "el proceso de handoff closer → developer no está definido").
 
 ## 1. Objetivo
 

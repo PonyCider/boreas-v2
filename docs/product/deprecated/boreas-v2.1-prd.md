@@ -1,3 +1,9 @@
+> **⚠️ OBSOLETO — no vigente.** Este PRD describe un pivote de estrategia (multi-vertical
+> salud/belleza/inmobiliario, Boreas como plataforma y Relevo como módulo principal) que fue
+> abandonado. La estrategia vigente es single-vertical salud, "consultorio digital", con Relevo
+> como upsell discreto — ver [`GUIDELINES.md`](../../GUIDELINES.md), fuente única de verdad
+> actual. Se conserva aquí como referencia histórica de por qué se pivoteó.
+
 # Boreas v2.1 PRD
 
 ## Contexto

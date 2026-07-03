@@ -1,3 +1,6 @@
+> **⚠️ OBSOLETO — no vigente.** Backlog derivado del PRD v2.1 (ver nota en
+> `boreas-v2.1-prd.md`), estrategia abandonada. Se conserva como referencia histórica.
+
 # Boreas v2.1 - EPICs y Subtasks
 
 ## Overview
