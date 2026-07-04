@@ -29,7 +29,7 @@ Los pagos a plazo (mensualidad, garantía) se cobran como **suscripción recurre
 
 **Política de cobro fallido (definida por el usuario, ya operativa en MP):** 3 intentos de cobro a los 2, 5 y 7 días después de la fecha de facturación. Al día 10 sin cobro exitoso, la suscripción se pausa automáticamente. Boreas pausa en paralelo el proyecto en Vercel del cliente. Se le da a elegir: reactivar (se reanuda cobro y sitio), o recibir sus credenciales de una vez y cancelar garantía/mantenimiento a cambio del equivalente de lo que le restaba por pagar.
 
-**Decisión abierta, no bloqueante:** quién absorbe el costo anual del dominio en Plan B (mensualidad) — revisar si ya está contemplado en el margen del plan mensual.
+**Resuelto:** el dominio siempre lo paga el cliente, en ambos planes, sin excepción — no hay escenario donde Boreas absorbe ese costo.
 
 ## 3. Onboarding (closer → developer)
 
@@ -113,6 +113,6 @@ Anticipo cobrado
 
 ## 9. Decisiones abiertas (no bloquean implementación)
 
-- Herramienta exacta para el formulario interno de onboarding y de revisión (Sheets vs Notion).
-- Quién absorbe el costo anual del dominio en Plan B.
 - Política formal para una tercera ronda de revisión si el cliente insiste más allá de la escalación a Zoom.
+
+**Resuelto (2026-07-04):** el formulario interno usa **Google Forms → Google Sheets** (Forms para que el closer llene datos con campos guiados; Sheets como tabla viva, ya en uso para el pipeline de leads). Costo cero, sin herramienta nueva que adoptar. Notion queda descartado por ahora — se revisita en la migración a CRM de Fase 3 (10+ clientes).

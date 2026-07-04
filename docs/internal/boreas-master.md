@@ -257,7 +257,9 @@ Flujo:
 5. Cae directo al developer builder asignado — listo para empezar sin volver a tocar al cliente
    hasta la primera preview.
 
-*Decisión abierta, no bloqueante: herramienta exacta del formulario interno (Sheets vs Notion).*
+**Herramienta:** Google Forms (closer llena datos con campos guiados) → Google Sheets (tabla viva,
+misma hoja donde ya vive el pipeline de leads). Costo cero, sin herramienta nueva que adoptar.
+Notion se descarta por ahora — se revisita en la migración a CRM de Fase 3 (10+ clientes, ver §10.1).
 
 ### 6.5 Refuerzo psicológico post-depósito
 
