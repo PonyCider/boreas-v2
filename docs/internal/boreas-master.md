@@ -320,6 +320,11 @@ detalle en el spec de flujo de entrega (§6.1 punto 7 arriba). Resumen:
   dependa).
 - **Leads propios de Boreas** (Boreas.com): ya persisten en Supabase + notifican por WhatsApp vía
   CallMeBot (`app/actions/submit-contact.ts`) — implementado, no es mock.
+- **Contexto operativo en cada repo de cliente:** una versión condensada de este documento
+  (esquemas de pago, regla de dominio, resumen del flujo de entrega — sin scripts de venta ni
+  KPIs de pipeline) vive gitignoreada en `docs/internal/boreas-internal-context.md` dentro de
+  `boreas-template` y de cada `boreas-<cliente>` clonado de él. Es una copia derivada, no una
+  segunda fuente de verdad — si hay discrepancia, gana este documento.
 
 ## 10. KPIs y métricas
 
