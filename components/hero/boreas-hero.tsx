@@ -199,7 +199,7 @@ function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
         style={reduceMotion ? undefined : { animation: "float 5.2s ease-in-out infinite" }}
       >
         <ExampleBadge />
-        <DoctorCard trigger={{ mode: "delay", ms: 800 }} reduceMotion={reduceMotion} />
+        <DoctorCard trigger={{ mode: "delay", ms: 800 }} testimonialDelayMs={1300} reduceMotion={reduceMotion} />
       </motion.div>
 
       <motion.div
@@ -236,7 +236,7 @@ function HeroCardMobile({ reduceMotion }: { reduceMotion: boolean }) {
       className="relative mt-10 block rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)] lg:hidden"
     >
       <ExampleBadge />
-      <DoctorCard trigger={{ mode: "delay", ms: 400 }} reduceMotion={reduceMotion} />
+      <DoctorCard trigger={{ mode: "delay", ms: 400 }} testimonialDelayMs={900} reduceMotion={reduceMotion} />
       <div className="mt-4 flex gap-3">
         <AppointmentsChip trigger={{ mode: "delay", ms: 700 }} reduceMotion={reduceMotion} compact />
         <SearchPercentChip trigger={{ mode: "delay", ms: 900 }} reduceMotion={reduceMotion} compact />
