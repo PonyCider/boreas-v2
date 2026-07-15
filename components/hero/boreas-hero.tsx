@@ -15,7 +15,7 @@ import {
 } from "@/content/boreas-home";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number";
-import { useHeroScrollPhases } from "@/lib/use-hero-scroll-phases";
+import { useHeroScrollPhases, type HeroScrollPhases } from "@/lib/use-hero-scroll-phases";
 import { useMotionValueState } from "@/lib/use-motion-value-state";
 
 const doctor = socialProof.mockupDoctor;
@@ -504,8 +504,7 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
   );
 }
 
-function HeroCardMobilePinned() {
-  const { containerRef, scrollYProgress } = useHeroScrollPhases();
+function HeroCardMobilePinned({ containerRef, scrollYProgress }: HeroScrollPhases) {
   const problemOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [1, 0]));
   const solutionOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [0, 1]));
   const appointmentsOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END, MOBILE_PHASE_END + 0.08], [0, 1]));
@@ -547,19 +546,20 @@ function HeroCardMobilePinned() {
 }
 
 function HeroCinematic() {
-  const { containerRef, scrollYProgress } = useHeroScrollPhases();
+  const { containerRef: desktopContainerRef, scrollYProgress: desktopScrollYProgress } = useHeroScrollPhases();
+  const { containerRef: mobileContainerRef, scrollYProgress: mobileScrollYProgress } = useHeroScrollPhases();
 
   return (
     <section className="relative bg-hero-glow transition-[background,colors] duration-[280ms]">
       <div className="mx-auto w-full max-w-[1460px] px-4 pt-20 sm:px-6 lg:hidden">
-        <HeroCinematicLeftColumn scrollYProgress={scrollYProgress} ctaId="hero-primary-cta-mobile" />
-        <HeroCardMobilePinned />
+        <HeroCinematicLeftColumn scrollYProgress={mobileScrollYProgress} ctaId="hero-primary-cta-mobile" />
+        <HeroCardMobilePinned containerRef={mobileContainerRef} scrollYProgress={mobileScrollYProgress} />
       </div>
-      <div ref={containerRef} className="relative hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
+      <div ref={desktopContainerRef} className="relative hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">
           <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10">
-            <HeroCinematicLeftColumn scrollYProgress={scrollYProgress} ctaId="hero-primary-cta" />
-            <HeroCardClusterCinematic scrollYProgress={scrollYProgress} />
+            <HeroCinematicLeftColumn scrollYProgress={desktopScrollYProgress} ctaId="hero-primary-cta" />
+            <HeroCardClusterCinematic scrollYProgress={desktopScrollYProgress} />
           </div>
         </div>
       </div>
