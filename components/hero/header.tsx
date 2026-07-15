@@ -12,10 +12,6 @@ const navLinks = [
   { label: "Contacto", href: "#contacto" },
 ];
 
-// Below this scroll offset, the hero's own CTA is out of view — the header
-// CTA can appear without competing for the same first viewport (GUIDELINES §3).
-const HEADER_CTA_SCROLL_THRESHOLD = 600;
-
 function MoonIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -62,19 +58,14 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    // Scroll-restored pages can mount already past the threshold; a rAF-deferred
-    // check (rather than a synchronous call) avoids setState-in-effect-body.
-    const raf = requestAnimationFrame(() => {
-      setShowHeaderCta(window.scrollY > HEADER_CTA_SCROLL_THRESHOLD);
-    });
-    function onScroll() {
-      setShowHeaderCta(window.scrollY > HEADER_CTA_SCROLL_THRESHOLD);
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", onScroll);
-    };
+    const heroCta = document.getElementById("hero-primary-cta");
+    if (!heroCta) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowHeaderCta(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(heroCta);
+    return () => observer.disconnect();
   }, []);
 
   function toggleTheme() {
