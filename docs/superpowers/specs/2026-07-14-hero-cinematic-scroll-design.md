@@ -69,7 +69,7 @@ Este diseño parte de dos documentos previos que no se re-litigaron:
 
 - Doctor card entra/se traslada al centro del cluster (translate con `EASE` del proyecto, sin bounce): rating 4.8 (exacto, no "4.x" — fuente: `socialProof.mockupDoctor`), 127 reseñas, testimonial con fade-in.
 - Rating cuenta de 0 a 4.8 **una sola vez** (no se re-dispara si el usuario scrollea hacia atrás y adelante dentro del rango de fase — a resolver en implementación con `useMotionValueEvent` o guard similar).
-- Proof points (`heroProofPoints`, 4 items) entran como **un solo beat**, no goteados 2+2 entre fases — evita el patrón de relleno mecánico señalado en la review.
+- Proof points (`heroProofPoints`, 4 items): **corrección post-aprobación** — quedan en la columna izquierda estática, visibles desde scroll 0 igual que hoy (T3/T4, stagger de montaje). La redacción original de esta fase decía que entraban "como un solo beat" en fase 2, heredado del esqueleto de 5 fases pre-simplificación; eso contradecía la regla fija de "columna izquierda estática, nunca gateada" más abajo. Esa regla gana — no se tocan en esta spec.
 
 ### Fase 3 — Te escribe y agenda (65–100%)
 

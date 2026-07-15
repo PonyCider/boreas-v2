@@ -8,5 +8,8 @@
       "Bash(git diff *)",
       "Bash(git log *)"
     ]
+  },
+  "worktree": {
+    "baseRef": "head"
   }
 }
