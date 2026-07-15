@@ -12,7 +12,7 @@ import {
   socialProof,
 } from "@/content/boreas-home";
 import { trackAnalyticsEvent } from "@/lib/analytics";
-import { useAnimatedNumber } from "@/lib/use-animated-number";
+import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number";
 
 const doctor = socialProof.mockupDoctor;
 const doctorInitials = initials(doctor.name);
@@ -31,13 +31,13 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-function RatingBlock({ delay, reduceMotion, size = "md" }: { delay: number; reduceMotion: boolean; size?: "md" | "sm" }) {
+function RatingBlock({ trigger, reduceMotion, size = "md" }: { trigger: NumberTrigger; reduceMotion: boolean; size?: "md" | "sm" }) {
   const { ref, value } = useAnimatedNumber(doctorRating, {
     reduceMotion,
     decimals: 1,
     duration: 0.9,
     ease: EASE,
-    trigger: { mode: "delay", ms: delay },
+    trigger,
   });
   // Stars reflect the real rating (static) — only the number counts up.
   const starSize = size === "md" ? "text-[15px]" : "text-[13px]";
@@ -62,7 +62,17 @@ function RatingBlock({ delay, reduceMotion, size = "md" }: { delay: number; redu
   );
 }
 
-function DoctorCard({ delay, reduceMotion }: { delay: number; reduceMotion: boolean }) {
+function DoctorCard({
+  trigger,
+  reduceMotion,
+  testimonialDelayMs = 500,
+  instant = false,
+}: {
+  trigger: NumberTrigger;
+  reduceMotion: boolean;
+  testimonialDelayMs?: number;
+  instant?: boolean;
+}) {
   return (
     <>
       <div className="mb-4 flex items-center gap-3">
@@ -76,13 +86,13 @@ function DoctorCard({ delay, reduceMotion }: { delay: number; reduceMotion: bool
       </div>
 
       <div className="mb-3.5">
-        <RatingBlock delay={delay} reduceMotion={reduceMotion} />
+        <RatingBlock trigger={trigger} reduceMotion={reduceMotion} />
       </div>
 
       <motion.div
-        initial={reduceMotion ? undefined : { opacity: 0 }}
+        initial={reduceMotion || instant ? undefined : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5, delay: reduceMotion ? 0 : delay / 1000 + 0.5 }}
+        transition={{ duration: instant ? 0 : 0.5, delay: reduceMotion || instant ? 0 : testimonialDelayMs / 1000 }}
         className="mb-3.5 rounded-[var(--radius-md)] bg-elevated px-3.5 py-3"
       >
         <p className="text-[13px] italic leading-[1.55] text-muted">&ldquo;{doctor.testimonial}&rdquo;</p>
@@ -102,12 +112,12 @@ function DoctorCard({ delay, reduceMotion }: { delay: number; reduceMotion: bool
   );
 }
 
-function AppointmentsChip({ delay, reduceMotion, compact = false }: { delay: number; reduceMotion: boolean; compact?: boolean }) {
+function AppointmentsChip({ trigger, reduceMotion, compact = false }: { trigger: NumberTrigger; reduceMotion: boolean; compact?: boolean }) {
   const { ref, value } = useAnimatedNumber(heroCardStats.appointmentsToday, {
     reduceMotion,
     duration: 0.7,
     ease: EASE,
-    trigger: { mode: "delay", ms: delay },
+    trigger,
   });
   return (
     <div
@@ -134,12 +144,12 @@ function AppointmentsChip({ delay, reduceMotion, compact = false }: { delay: num
   );
 }
 
-function SearchPercentChip({ delay, reduceMotion, compact = false }: { delay: number; reduceMotion: boolean; compact?: boolean }) {
+function SearchPercentChip({ trigger, reduceMotion, compact = false }: { trigger: NumberTrigger; reduceMotion: boolean; compact?: boolean }) {
   const { ref, value } = useAnimatedNumber(searchPercentValue, {
     reduceMotion,
     duration: 0.9,
     ease: EASE,
-    trigger: { mode: "delay", ms: delay },
+    trigger,
   });
   const percentValue = (
     <motion.span className="tabular-nums">{value}</motion.span>
@@ -178,7 +188,7 @@ function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
         transition={{ duration: 0.5, delay: reduceMotion ? 0 : 1.4 }}
         className="absolute right-0 top-0 z-[2]"
       >
-        <AppointmentsChip delay={1400} reduceMotion={reduceMotion} />
+        <AppointmentsChip trigger={{ mode: "delay", ms: 1400 }} reduceMotion={reduceMotion} />
       </motion.div>
 
       <motion.div
@@ -189,7 +199,7 @@ function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
         style={reduceMotion ? undefined : { animation: "float 5.2s ease-in-out infinite" }}
       >
         <ExampleBadge />
-        <DoctorCard delay={800} reduceMotion={reduceMotion} />
+        <DoctorCard trigger={{ mode: "delay", ms: 800 }} reduceMotion={reduceMotion} />
       </motion.div>
 
       <motion.div
@@ -199,7 +209,7 @@ function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
         className="absolute bottom-5 right-0 z-[2]"
         style={reduceMotion ? undefined : { animation: "float 4.6s ease-in-out 0.7s infinite" }}
       >
-        <SearchPercentChip delay={2000} reduceMotion={reduceMotion} />
+        <SearchPercentChip trigger={{ mode: "delay", ms: 2000 }} reduceMotion={reduceMotion} />
       </motion.div>
 
       <motion.div
@@ -226,10 +236,10 @@ function HeroCardMobile({ reduceMotion }: { reduceMotion: boolean }) {
       className="relative mt-10 block rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)] lg:hidden"
     >
       <ExampleBadge />
-      <DoctorCard delay={400} reduceMotion={reduceMotion} />
+      <DoctorCard trigger={{ mode: "delay", ms: 400 }} reduceMotion={reduceMotion} />
       <div className="mt-4 flex gap-3">
-        <AppointmentsChip delay={700} reduceMotion={reduceMotion} compact />
-        <SearchPercentChip delay={900} reduceMotion={reduceMotion} compact />
+        <AppointmentsChip trigger={{ mode: "delay", ms: 700 }} reduceMotion={reduceMotion} compact />
+        <SearchPercentChip trigger={{ mode: "delay", ms: 900 }} reduceMotion={reduceMotion} compact />
       </div>
     </motion.div>
   );
