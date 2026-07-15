@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, type MotionValue } from "framer-motion";
 import {
   exampleBadgeLabel,
   heroCardStats,
@@ -13,6 +13,7 @@ import {
 } from "@/content/boreas-home";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number";
+import { useHeroScrollPhases } from "@/lib/use-hero-scroll-phases";
 
 const doctor = socialProof.mockupDoctor;
 const doctorInitials = initials(doctor.name);
@@ -20,6 +21,9 @@ const doctorRating = parseFloat(doctor.rating);
 const doctorFilledStars = Math.round(doctorRating);
 const searchPercentValue = parseInt(heroCardStats.searchPercent, 10);
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const HERO_PIN_VH_DESKTOP = 280;
+const PHASE_1_END = 0.3; // "Te busca" → "Te encuentra"
+const PHASE_2_END = 0.65; // "Te encuentra" → "Te escribe y agenda"
 
 function initials(name: string) {
   return name
@@ -245,7 +249,7 @@ function HeroCardMobile({ reduceMotion }: { reduceMotion: boolean }) {
   );
 }
 
-export function BoreasHero() {
+function HeroStatic() {
   const reduceMotion = !!useReducedMotion();
   const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -308,6 +312,7 @@ export function BoreasHero() {
             className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center"
           >
             <a
+              id="hero-primary-cta"
               href="#contacto"
               className="btn btn-p w-full sm:w-auto"
               onClick={() => trackAnalyticsEvent({ name: "cta_click", surface: "hero" })}
@@ -341,4 +346,131 @@ export function BoreasHero() {
       </div>
     </section>
   );
+}
+
+function HeroCinematicLeftColumn() {
+  const reveal = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } };
+  const ease = EASE;
+
+  return (
+    <motion.div
+      initial="hidden"
+      animate="show"
+      transition={{ staggerChildren: 0.09, delayChildren: 0.12 }}
+    >
+      <motion.p
+        variants={reveal}
+        transition={{ duration: 0.6, ease }}
+        className="mb-5 text-sm font-semibold text-mint"
+      >
+        {heroCredibility}
+      </motion.p>
+
+      <motion.p
+        variants={reveal}
+        transition={{ duration: 0.65, ease }}
+        className="font-display italic font-medium leading-[0.88] tracking-[-0.03em] text-foreground"
+        style={{ fontSize: "clamp(5rem, 13vw, 10.5rem)" }}
+      >
+        Boreas
+      </motion.p>
+
+      <motion.h1
+        variants={reveal}
+        transition={{ duration: 0.7, ease }}
+        className="mt-[22px] text-balance font-display font-normal leading-[1.08] tracking-[-0.012em] text-foreground"
+        style={{ fontSize: "clamp(1.85rem, 4vw, 3.8rem)" }}
+      >
+        {heroHeadline}
+      </motion.h1>
+
+      <motion.p
+        variants={reveal}
+        transition={{ duration: 0.65, ease }}
+        className="mt-6 max-w-[50ch] text-[17px] leading-[1.7] text-muted"
+      >
+        {heroSubcopy}
+      </motion.p>
+
+      <motion.div
+        variants={reveal}
+        transition={{ duration: 0.65, ease }}
+        className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center"
+      >
+        <a
+          id="hero-primary-cta"
+          href="#contacto"
+          className="btn btn-p w-full sm:w-auto"
+          onClick={() => trackAnalyticsEvent({ name: "cta_click", surface: "hero" })}
+        >
+          Quiero mi consultorio digital
+        </a>
+        <a href="#proceso" className="btn btn-s w-full sm:w-auto">
+          Ver cómo funciona
+        </a>
+      </motion.div>
+
+      <motion.ul
+        variants={reveal}
+        transition={{ duration: 0.65, ease }}
+        className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        {heroProofPoints.map((point) => (
+          <li key={point} className="border-t border-line pt-3 text-[13px] text-muted">
+            {point}
+          </li>
+        ))}
+      </motion.ul>
+    </motion.div>
+  );
+}
+
+function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+  // Scaffold only — every element renders in its final ("phase 3 complete")
+  // state so the pin mechanic can be verified before Tasks 6-7 wire in
+  // scroll-driven opacity/position per phase.
+  return (
+    <div className="relative hidden lg:block" style={{ height: "460px" }}>
+      <div className="absolute right-0 top-0 z-[2]">
+        <AppointmentsChip trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_2_END }} reduceMotion={false} />
+      </div>
+
+      <div className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]">
+        <ExampleBadge />
+        <DoctorCard trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_1_END }} reduceMotion={false} instant />
+      </div>
+
+      <div className="absolute bottom-5 right-0 z-[2]">
+        <SearchPercentChip trigger={{ mode: "progress", value: scrollYProgress, threshold: 0 }} reduceMotion={false} />
+      </div>
+
+      <div className="absolute bottom-4 left-0 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2">
+        <span className="text-xs text-muted">
+          {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function HeroCinematic() {
+  const { containerRef, scrollYProgress } = useHeroScrollPhases();
+
+  return (
+    <section className="relative bg-hero-glow transition-[background,colors] duration-[280ms]">
+      <div ref={containerRef} className="hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
+        <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+          <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10">
+            <HeroCinematicLeftColumn />
+            <HeroCardClusterCinematic scrollYProgress={scrollYProgress} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function BoreasHero() {
+  const reduceMotion = !!useReducedMotion();
+  return reduceMotion ? <HeroStatic /> : <HeroCinematic />;
 }
