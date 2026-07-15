@@ -58,13 +58,21 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    const heroCta = document.getElementById("hero-primary-cta");
-    if (!heroCta) return;
+    const ids = ["hero-primary-cta", "hero-primary-cta-mobile"];
+    const heroCtas = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => el !== null);
+    if (heroCtas.length === 0) return;
+    const visible = new Set<Element>();
     const observer = new IntersectionObserver(
-      ([entry]) => setShowHeaderCta(!entry.isIntersecting),
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) visible.add(entry.target);
+          else visible.delete(entry.target);
+        }
+        setShowHeaderCta(visible.size === 0);
+      },
       { threshold: 0 }
     );
-    observer.observe(heroCta);
+    heroCtas.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 

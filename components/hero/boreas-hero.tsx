@@ -25,6 +25,8 @@ const doctorFilledStars = Math.round(doctorRating);
 const searchPercentValue = parseInt(heroCardStats.searchPercent, 10);
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const HERO_PIN_VH_DESKTOP = 280;
+const HERO_PIN_VH_MOBILE = 150;
+const MOBILE_PHASE_END = 0.5; // "busca+encuentra" → "responde+agenda"
 const PHASE_1_END = 0.3; // "Te busca" → "Te encuentra"
 const PHASE_2_END = 0.65; // "Te encuentra" → "Te escribe y agenda"
 
@@ -351,7 +353,7 @@ function HeroStatic() {
   );
 }
 
-function HeroCinematicLeftColumn({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: MotionValue<number>; ctaId: string }) {
   const reveal = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } };
   const ease = EASE;
   const problemEyebrowOpacity = useMotionValueState(
@@ -406,7 +408,7 @@ function HeroCinematicLeftColumn({ scrollYProgress }: { scrollYProgress: MotionV
         className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center"
       >
         <a
-          id="hero-primary-cta"
+          id={ctaId}
           href="#contacto"
           className="btn btn-p w-full sm:w-auto"
           onClick={() => trackAnalyticsEvent({ name: "cta_click", surface: "hero" })}
@@ -502,15 +504,61 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
   );
 }
 
+function HeroCardMobilePinned() {
+  const { containerRef, scrollYProgress } = useHeroScrollPhases();
+  const problemOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [1, 0]));
+  const solutionOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [0, 1]));
+  const appointmentsOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END, MOBILE_PHASE_END + 0.08], [0, 1]));
+
+  return (
+    <div ref={containerRef} className="relative mt-10 block lg:hidden" style={{ height: `${HERO_PIN_VH_MOBILE}vh` }}>
+      <div className="sticky top-[88px] rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)]">
+        <ExampleBadge />
+        <DoctorCard
+          trigger={{ mode: "progress", value: scrollYProgress, threshold: 0.1 }}
+          reduceMotion={false}
+          instant
+        />
+        <div className="relative mt-3 h-[16px] text-[13px]">
+          <span style={{ opacity: problemOpacity }} className="absolute inset-0 text-muted">
+            {heroCardStats.lastReplyTime} · {lastReplyProblemLabel}
+          </span>
+          <span style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-muted">
+            {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
+          </span>
+        </div>
+        <div className="mt-4 flex gap-3">
+          <div style={{ opacity: appointmentsOpacity }} className="flex flex-1">
+            <AppointmentsChip
+              trigger={{ mode: "progress", value: scrollYProgress, threshold: MOBILE_PHASE_END }}
+              reduceMotion={false}
+              compact
+            />
+          </div>
+          <SearchPercentChip
+            trigger={{ mode: "progress", value: scrollYProgress, threshold: 0 }}
+            reduceMotion={false}
+            compact
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function HeroCinematic() {
   const { containerRef, scrollYProgress } = useHeroScrollPhases();
 
   return (
     <section className="relative bg-hero-glow transition-[background,colors] duration-[280ms]">
+      <div className="mx-auto w-full max-w-[1460px] px-4 pt-20 sm:px-6 lg:hidden">
+        <HeroCinematicLeftColumn scrollYProgress={scrollYProgress} ctaId="hero-primary-cta-mobile" />
+        <HeroCardMobilePinned />
+      </div>
       <div ref={containerRef} className="relative hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">
           <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10">
-            <HeroCinematicLeftColumn scrollYProgress={scrollYProgress} />
+            <HeroCinematicLeftColumn scrollYProgress={scrollYProgress} ctaId="hero-primary-cta" />
             <HeroCardClusterCinematic scrollYProgress={scrollYProgress} />
           </div>
         </div>
