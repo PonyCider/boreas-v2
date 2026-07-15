@@ -452,6 +452,24 @@ function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> })
   );
 }
 
+function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+  const opacity = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]));
+  const y = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]));
+  return (
+    <div
+      style={{ opacity, transform: `translateY(${y}px)` }}
+      className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]"
+    >
+      <ExampleBadge />
+      <DoctorCard
+        trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_1_END }}
+        reduceMotion={false}
+        instant
+      />
+    </div>
+  );
+}
+
 function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   // Scaffold only — every element renders in its final ("phase 3 complete")
   // state so the pin mechanic can be verified before Tasks 6-7 wire in
@@ -462,10 +480,7 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
         <AppointmentsChip trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_2_END }} reduceMotion={false} />
       </div>
 
-      <div className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]">
-        <ExampleBadge />
-        <DoctorCard trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_1_END }} reduceMotion={false} instant />
-      </div>
+      <DoctorCardEntrance scrollYProgress={scrollYProgress} />
 
       <div className="absolute bottom-5 right-0 z-[2]">
         <SearchPercentChip trigger={{ mode: "progress", value: scrollYProgress, threshold: 0 }} reduceMotion={false} />
