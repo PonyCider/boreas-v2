@@ -25,6 +25,18 @@ export const heroCardStats = {
   lastReplyLabel: "tu consultorio respondió",
 };
 
+// Cinematic hero sequence (docs/superpowers/specs/2026-07-14-hero-cinematic-scroll-design.md):
+// the 11:47 PM chip starts in this "problem" state and flips to `lastReplyLabel`
+// (above) partway through the scroll-linked sequence — same object, same
+// timestamp, inverted meaning.
+export const lastReplyProblemLabel = "tu paciente sigue esperando";
+
+// Eyebrow shown only during the cinematic sequence's first phase, before it
+// crossfades to `heroCredibility`. Sourced stat (40%, fuera de horario) is
+// the same one already used in `problemStats` and `socialProof` — repeated
+// here by deliberate choice, not oversight (see spec, "Fase 1").
+export const heroEyebrowProblem = "El 40% de las búsquedas ocurre fuera de horario laboral.";
+
 export const exampleBadgeLabel = "Ejemplo ilustrativo";
 
 // Problem section data points
