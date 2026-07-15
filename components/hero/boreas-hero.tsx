@@ -455,9 +455,10 @@ function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> })
 function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   const opacity = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]));
   const y = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]));
+  const settleScale = useMotionValueState(useTransform(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]));
   return (
     <div
-      style={{ opacity, transform: `translateY(${y}px)` }}
+      style={{ opacity, transform: `translateY(${y}px) scale(${settleScale})` }}
       className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]"
     >
       <ExampleBadge />
@@ -470,15 +471,25 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
   );
 }
 
+function AppointmentsChipEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+  const opacity = useMotionValueState(useTransform(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [0, 1]));
+  return (
+    <div style={{ opacity }} className="absolute right-0 top-0 z-[2]">
+      <AppointmentsChip
+        trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_2_END }}
+        reduceMotion={false}
+      />
+    </div>
+  );
+}
+
 function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   // Scaffold only — every element renders in its final ("phase 3 complete")
   // state so the pin mechanic can be verified before Tasks 6-7 wire in
   // scroll-driven opacity/position per phase.
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
-      <div className="absolute right-0 top-0 z-[2]">
-        <AppointmentsChip trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_2_END }} reduceMotion={false} />
-      </div>
+      <AppointmentsChipEntrance scrollYProgress={scrollYProgress} />
 
       <DoctorCardEntrance scrollYProgress={scrollYProgress} />
 
