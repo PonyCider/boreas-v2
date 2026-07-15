@@ -1,13 +1,16 @@
 "use client";
 
-import { motion, useReducedMotion, type MotionValue } from "framer-motion";
+import { motion, useMotionValueEvent, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
+import { useState } from "react";
 import {
   exampleBadgeLabel,
   heroCardStats,
   heroCredibility,
+  heroEyebrowProblem,
   heroHeadline,
   heroProofPoints,
   heroSubcopy,
+  lastReplyProblemLabel,
   problemStatsSources,
   socialProof,
 } from "@/content/boreas-home";
@@ -348,9 +351,13 @@ function HeroStatic() {
   );
 }
 
-function HeroCinematicLeftColumn() {
+function HeroCinematicLeftColumn({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   const reveal = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } };
   const ease = EASE;
+  const problemEyebrowOpacityMv = useTransform(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0]);
+  const [problemEyebrowOpacity, setProblemEyebrowOpacity] = useState(problemEyebrowOpacityMv.get());
+  useMotionValueEvent(problemEyebrowOpacityMv, "change", setProblemEyebrowOpacity);
+  const solutionEyebrowOpacity = 1 - problemEyebrowOpacity;
 
   return (
     <motion.div
@@ -358,13 +365,14 @@ function HeroCinematicLeftColumn() {
       animate="show"
       transition={{ staggerChildren: 0.09, delayChildren: 0.12 }}
     >
-      <motion.p
-        variants={reveal}
-        transition={{ duration: 0.6, ease }}
-        className="mb-5 text-sm font-semibold text-mint"
-      >
-        {heroCredibility}
-      </motion.p>
+      <motion.div variants={reveal} transition={{ duration: 0.6, ease }} className="relative mb-5 h-[20px]">
+        <p style={{ opacity: problemEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-amber">
+          {heroEyebrowProblem}
+        </p>
+        <p style={{ opacity: solutionEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-mint">
+          {heroCredibility}
+        </p>
+      </motion.div>
 
       <motion.p
         variants={reveal}
@@ -425,6 +433,25 @@ function HeroCinematicLeftColumn() {
   );
 }
 
+function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+  const problemOpacityMv = useTransform(scrollYProgress, [PHASE_2_END - 0.04, PHASE_2_END], [1, 0]);
+  const [problemOpacity, setProblemOpacity] = useState(problemOpacityMv.get());
+  useMotionValueEvent(problemOpacityMv, "change", setProblemOpacity);
+  const solutionOpacity = 1 - problemOpacity;
+  return (
+    <div className="absolute bottom-4 left-0 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2">
+      <div className="relative">
+        <span style={{ opacity: problemOpacity }} className="text-xs text-muted">
+          {heroCardStats.lastReplyTime} · {lastReplyProblemLabel}
+        </span>
+        <span style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-xs text-muted">
+          {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   // Scaffold only — every element renders in its final ("phase 3 complete")
   // state so the pin mechanic can be verified before Tasks 6-7 wire in
@@ -444,11 +471,7 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
         <SearchPercentChip trigger={{ mode: "progress", value: scrollYProgress, threshold: 0 }} reduceMotion={false} />
       </div>
 
-      <div className="absolute bottom-4 left-0 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2">
-        <span className="text-xs text-muted">
-          {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
-        </span>
-      </div>
+      <TimeChip scrollYProgress={scrollYProgress} />
     </div>
   );
 }
@@ -458,10 +481,10 @@ function HeroCinematic() {
 
   return (
     <section className="relative bg-hero-glow transition-[background,colors] duration-[280ms]">
-      <div ref={containerRef} className="hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
+      <div ref={containerRef} className="relative hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">
           <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10">
-            <HeroCinematicLeftColumn />
+            <HeroCinematicLeftColumn scrollYProgress={scrollYProgress} />
             <HeroCardClusterCinematic scrollYProgress={scrollYProgress} />
           </div>
         </div>
