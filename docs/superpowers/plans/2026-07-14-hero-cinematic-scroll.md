@@ -852,7 +852,9 @@ git commit -m "feat: phase 1 — problem-framing eyebrow and time-chip crossfade
 - Modify: `components/hero/boreas-hero.tsx` (`HeroCardClusterCinematic`)
 
 **Interfaces:**
-- Consumes: `PHASE_1_END`, `PHASE_2_END` (Task 4), `NumberTrigger` progress mode (Task 2).
+- Consumes: `PHASE_1_END`, `PHASE_2_END` (Task 4), `NumberTrigger` progress mode (Task 2), `useMotionValueState` (Task 6 — added `lib/use-motion-value-state.ts` and used it for the eyebrow/time-chip crossfades after discovering that `useTransform(...)` bound directly via `style={{opacity: mv}}` on a `motion.*` element silently fails to write to the DOM in this stack; see that commit's message for the full investigation).
+
+**IMPORTANT — do not use `motion.div style={{ opacity, y }}` for this task.** That was this task's original approach and it does not work in this codebase's stack (React 19 / Next 16 / framer-motion 12.38.0) for the same reason Task 6 hit: the derived `useTransform` MotionValue updates correctly but framer-motion's own DOM-write subscription for `style`-bound values on `motion.*` elements doesn't fire. Use `useMotionValueState` (mirrors a MotionValue into React state) and bind the resulting **plain numbers** to a regular (non-motion) `div`'s `style`, exactly as below.
 
 - [ ] **Step 1: Make the doctor card enter at `PHASE_1_END` instead of rendering statically**
 
@@ -860,11 +862,11 @@ Replace the doctor card block in `HeroCardClusterCinematic`:
 
 ```tsx
 function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const opacity = useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]);
-  const y = useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]);
+  const opacity = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]));
+  const y = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]));
   return (
-    <motion.div
-      style={{ opacity, y }}
+    <div
+      style={{ opacity, transform: `translateY(${y}px)` }}
       className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]"
     >
       <ExampleBadge />
@@ -873,10 +875,12 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
         reduceMotion={false}
         instant
       />
-    </motion.div>
+    </div>
   );
 }
 ```
+
+Import `useMotionValueState` from `@/lib/use-motion-value-state` at the top of the file (if not already imported by Task 6's work — check first).
 
 In `HeroCardClusterCinematic`, replace the doctor-card `<div>` (the one with `top-[30px]`) with `<DoctorCardEntrance scrollYProgress={scrollYProgress} />`.
 
@@ -908,7 +912,7 @@ git commit -m "feat: phase 2 — doctor card scroll-linked entrance, single-fire
 - Modify: `components/hero/boreas-hero.tsx` (`HeroCardClusterCinematic`)
 
 **Interfaces:**
-- Consumes: `PHASE_2_END` (Task 4), `TimeChip` (Task 6, already flips at `PHASE_2_END` — no change needed here).
+- Consumes: `PHASE_2_END` (Task 4), `TimeChip` (Task 6, already flips at `PHASE_2_END` — no change needed here), `useMotionValueState` (Task 6/7 — see the note in Task 7: do not bind `useTransform(...)` directly via `style` on a `motion.*` element in this codebase, it silently fails to write to the DOM; mirror through `useMotionValueState` and bind plain numbers to a regular element instead).
 
 - [ ] **Step 1: Make the appointments chip appear and count at `PHASE_2_END`**
 
@@ -916,14 +920,14 @@ Replace the appointments chip block in `HeroCardClusterCinematic`:
 
 ```tsx
 function AppointmentsChipEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const opacity = useTransform(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [0, 1]);
+  const opacity = useMotionValueState(useTransform(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [0, 1]));
   return (
-    <motion.div style={{ opacity }} className="absolute right-0 top-0 z-[2]">
+    <div style={{ opacity }} className="absolute right-0 top-0 z-[2]">
       <AppointmentsChip
         trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_2_END }}
         reduceMotion={false}
       />
-    </motion.div>
+    </div>
   );
 }
 ```
@@ -932,16 +936,16 @@ Replace the appointments chip `<div>` at the top of `HeroCardClusterCinematic` w
 
 - [ ] **Step 2: Give the WhatsApp button a subtle settle treatment (no glow, no pulse)**
 
-`DoctorCard`'s WhatsApp button is decorative (`tabIndex={-1} aria-hidden="true"`, not the real CTA). Add a small scale-up as the cluster settles, applied from the parent so `DoctorCard` itself doesn't need a new prop. In `DoctorCardEntrance` (Task 7), wrap the WhatsApp affordance with a settle transform — since `DoctorCard` renders the button internally, apply the settle to the whole card via a second `useTransform` on the same wrapping `motion.div`:
+`DoctorCard`'s WhatsApp button is decorative (`tabIndex={-1} aria-hidden="true"`, not the real CTA). Add a small scale-up as the cluster settles, applied from the parent so `DoctorCard` itself doesn't need a new prop. In `DoctorCardEntrance` (Task 7), wrap the WhatsApp affordance with a settle transform — since `DoctorCard` renders the button internally, apply the settle to the whole card via a third `useMotionValueState(useTransform(...))` pair on the same wrapping `div`, combined into one `transform` string alongside the existing `translateY`:
 
 ```tsx
 function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const opacity = useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]);
-  const y = useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]);
-  const settleScale = useTransform(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]);
+  const opacity = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]));
+  const y = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]));
+  const settleScale = useMotionValueState(useTransform(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]));
   return (
-    <motion.div
-      style={{ opacity, y, scale: settleScale }}
+    <div
+      style={{ opacity, transform: `translateY(${y}px) scale(${settleScale})` }}
       className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]"
     >
       <ExampleBadge />
@@ -950,7 +954,7 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
         reduceMotion={false}
         instant
       />
-    </motion.div>
+    </div>
   );
 }
 ```
@@ -979,7 +983,7 @@ git commit -m "feat: phase 3 — appointments chip entrance, doctor card settle 
 - Modify: `components/hero/boreas-hero.tsx` (`HeroCinematic`, new `HeroCardMobilePinned`)
 
 **Interfaces:**
-- Consumes: `useHeroScrollPhases` (a second, independent instance — mobile gets its own container/progress, not shared with desktop), `NumberTrigger` progress mode.
+- Consumes: `useHeroScrollPhases` (a second, independent instance — mobile gets its own container/progress, not shared with desktop), `NumberTrigger` progress mode, `useMotionValueState` (see Task 7's note — do not bind `useTransform(...)` directly via `style` on a `motion.*` element in this codebase, mirror through `useMotionValueState` and bind plain numbers to a regular element).
 
 - [ ] **Step 1: Add the mobile pin constant**
 
@@ -995,12 +999,12 @@ const MOBILE_PHASE_END = 0.5; // "busca+encuentra" → "responde+agenda"
 ```tsx
 function HeroCardMobilePinned() {
   const { containerRef, scrollYProgress } = useHeroScrollPhases();
-  const problemOpacity = useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [1, 0]);
-  const solutionOpacity = useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [0, 1]);
-  const appointmentsOpacity = useTransform(scrollYProgress, [MOBILE_PHASE_END, MOBILE_PHASE_END + 0.08], [0, 1]);
+  const problemOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [1, 0]));
+  const solutionOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [0, 1]));
+  const appointmentsOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END, MOBILE_PHASE_END + 0.08], [0, 1]));
 
   return (
-    <div ref={containerRef} className="mt-10 block lg:hidden" style={{ height: `${HERO_PIN_VH_MOBILE}vh` }}>
+    <div ref={containerRef} className="relative mt-10 block lg:hidden" style={{ height: `${HERO_PIN_VH_MOBILE}vh` }}>
       <div className="sticky top-[88px] rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)]">
         <ExampleBadge />
         <DoctorCard
@@ -1009,21 +1013,21 @@ function HeroCardMobilePinned() {
           instant
         />
         <div className="relative mt-3 h-[16px] text-[13px]">
-          <motion.span style={{ opacity: problemOpacity }} className="absolute inset-0 text-muted">
+          <span style={{ opacity: problemOpacity }} className="absolute inset-0 text-muted">
             {heroCardStats.lastReplyTime} · {lastReplyProblemLabel}
-          </motion.span>
-          <motion.span style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-muted">
+          </span>
+          <span style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-muted">
             {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
-          </motion.span>
+          </span>
         </div>
         <div className="mt-4 flex gap-3">
-          <motion.div style={{ opacity: appointmentsOpacity }} className="flex flex-1">
+          <div style={{ opacity: appointmentsOpacity }} className="flex flex-1">
             <AppointmentsChip
               trigger={{ mode: "progress", value: scrollYProgress, threshold: MOBILE_PHASE_END }}
               reduceMotion={false}
               compact
             />
-          </motion.div>
+          </div>
           <SearchPercentChip
             trigger={{ mode: "progress", value: scrollYProgress, threshold: 0 }}
             reduceMotion={false}
@@ -1035,6 +1039,8 @@ function HeroCardMobilePinned() {
   );
 }
 ```
+
+Note: `relative` added to the mobile pin's `containerRef` div for the same reason Task 6 added it to the desktop one — `useScroll({ target: containerRef })` warns on a non-static-position target.
 
 - [ ] **Step 3: Wire it into `HeroCinematic`**
 
@@ -1048,7 +1054,7 @@ function HeroCinematic() {
         <HeroCinematicLeftColumn scrollYProgress={scrollYProgress} />
         <HeroCardMobilePinned />
       </div>
-      <div ref={containerRef} className="hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
+      <div ref={containerRef} className="relative hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">
           <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10">
             <HeroCinematicLeftColumn scrollYProgress={scrollYProgress} />
@@ -1060,6 +1066,8 @@ function HeroCinematic() {
   );
 }
 ```
+
+(`className="relative hidden lg:block"` here already reflects Task 6's bundled fix — if you're reading `HeroCinematic`'s current code, don't re-add `relative`, it's already there.)
 
 Note: `HeroCinematicLeftColumn` now renders twice in the DOM (once for the `lg:hidden` mobile block, once for the `lg:block` desktop block) — each visible only at its breakpoint via CSS, matching the pattern `HeroStatic` already uses today for its own left column vs. `HeroCardMobile`/`HeroCardCluster` split. This means `id="hero-primary-cta"` would exist twice simultaneously. Fix: only the desktop instance keeps the id; give the mobile-block instance's CTA a different id and no observer target, OR — simpler and consistent with "only one hero variant's primary CTA should be the one the header watches at a time" — since the two blocks are mutually exclusive via `lg:hidden`/`lg:block` (only one is ever laid out and visible, but **both exist in the DOM and both have non-zero size in Tailwind's default responsive model — `lg:hidden` sets `display: none` above the breakpoint, not real exclusivity below it**), duplicate ids are invalid HTML regardless. Change `HeroCinematicLeftColumn` to accept an `id` prop:
 
