@@ -57,6 +57,11 @@ export async function submitContact(
       return { success: false, error: "Por favor, completa los campos requeridos." };
     }
 
+    const whatsappDigits = whatsapp.replace(/\D/g, "");
+    if (whatsappDigits.length < 10) {
+      return { success: false, error: "Revisa tu número de WhatsApp — debe tener al menos 10 dígitos." };
+    }
+
     const { error } = await supabase
       .from("leads")
       .insert({ nombre, especialidad, whatsapp, google_maps });

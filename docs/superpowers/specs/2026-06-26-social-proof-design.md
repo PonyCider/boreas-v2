@@ -1,7 +1,7 @@
 # Social proof section — Boreas V3
 
 **Date:** 2026-06-26
-**Status:** Approved, ready for implementation
+**Status:** Implemented — shipped as `components/landing/social-proof-section.tsx`, composed in `boreas-landing-sections.tsx`. Historical document; the code is the truth.
 
 ---
 

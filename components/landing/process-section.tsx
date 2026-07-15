@@ -1,7 +1,13 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { SectionFrame } from "./boreas-landing-sections";
 import { processSteps } from "@/content/boreas-home";
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const STEP_DURATION = 0.5;
+// Steps chain: each one waits for roughly the previous to finish before starting.
+const STEP_GAP = 0.42;
 
 const stepStyles = [
   {
@@ -28,11 +34,19 @@ const stepStyles = [
 ];
 
 export function ProcessSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <SectionFrame id="proceso" className="border-t border-line">
       <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-          <div className="max-w-md">
+          <motion.div
+            className="max-w-md"
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55, ease: EASE }}
+          >
             <h2
               className="leading-tight text-foreground"
               style={{
@@ -65,36 +79,50 @@ export function ProcessSection() {
                 </span>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           <div className="flex flex-col" style={{ borderTop: "1px solid var(--border)" }}>
-            {processSteps.map((step, index) => (
-              <div
-                key={index}
-                className="grid gap-5 py-7 sm:grid-cols-[44px_1fr]"
-                style={{ borderBottom: "1px solid var(--border)" }}
-              >
-                {/* Step marker */}
+            {processSteps.map((step, index) => {
+              const baseDelay = reduceMotion ? 0 : index * STEP_GAP;
+              return (
                 <div
-                  className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] font-mono text-sm font-bold shrink-0"
-                  style={{
-                    background: stepStyles[index].bg,
-                    color: stepStyles[index].color,
-                  }}
+                  key={index}
+                  className="grid gap-5 py-7 sm:grid-cols-[44px_1fr]"
+                  style={{ borderBottom: "1px solid var(--border)" }}
                 >
-                  0{index + 1}
-                </div>
+                  {/* Step marker — pops in first */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: reduceMotion ? 1 : 0.75 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.35, ease: EASE, delay: baseDelay }}
+                    className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] font-mono text-sm font-bold shrink-0"
+                    style={{
+                      background: stepStyles[index].bg,
+                      color: stepStyles[index].color,
+                    }}
+                  >
+                    0{index + 1}
+                  </motion.div>
 
-                <div className="pt-1">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-muted">
-                    {step.description}
-                  </p>
+                  {/* Text follows right after the marker settles */}
+                  <motion.div
+                    initial={{ opacity: 0, y: reduceMotion ? 0 : 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: STEP_DURATION, ease: EASE, delay: baseDelay + (reduceMotion ? 0 : 0.15) }}
+                    className="pt-1"
+                  >
+                    <h3 className="text-lg font-semibold text-foreground">
+                      {step.title}
+                    </h3>
+                    <p className="mt-2 text-[15px] leading-relaxed text-muted">
+                      {step.description}
+                    </p>
+                  </motion.div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

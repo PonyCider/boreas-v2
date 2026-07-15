@@ -1,15 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 
 const navLinks = [
-  { label: "Prueba", href: "#prueba" },
+  { label: "Resultados", href: "#prueba" },
   { label: "Proceso", href: "#proceso" },
-  { label: "Confianza", href: "#garantia" },
+  { label: "Garantía", href: "#garantia" },
   { label: "Contacto", href: "#contacto" },
 ];
+
+// Below this scroll offset, the hero's own CTA is out of view — the header
+// CTA can appear without competing for the same first viewport (GUIDELINES §3).
+const HEADER_CTA_SCROLL_THRESHOLD = 600;
 
 function MoonIcon() {
   return (
@@ -38,13 +43,38 @@ function SunIcon() {
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [showHeaderCta, setShowHeaderCta] = useState(false);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    const stored = localStorage.getItem("theme") as "light" | "dark" | null;
-    const initial = stored ?? "light";
-    setTheme(initial);
-    document.documentElement.setAttribute("data-theme", initial === "dark" ? "dark" : "");
+    // Reading localStorage can't happen during the initial (server-matching)
+    // render, so it's deferred here — but the actual setTheme call is wrapped
+    // in a rAF callback (not called synchronously in the effect body) to
+    // satisfy react-hooks/set-state-in-effect, same pattern used below and in
+    // the Relevo carousel's initial-index effect.
+    const raf = requestAnimationFrame(() => {
+      const stored = localStorage.getItem("theme") as "light" | "dark" | null;
+      const initial = stored ?? "light";
+      setTheme(initial);
+      document.documentElement.setAttribute("data-theme", initial === "dark" ? "dark" : "");
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  useEffect(() => {
+    // Scroll-restored pages can mount already past the threshold; a rAF-deferred
+    // check (rather than a synchronous call) avoids setState-in-effect-body.
+    const raf = requestAnimationFrame(() => {
+      setShowHeaderCta(window.scrollY > HEADER_CTA_SCROLL_THRESHOLD);
+    });
+    function onScroll() {
+      setShowHeaderCta(window.scrollY > HEADER_CTA_SCROLL_THRESHOLD);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   function toggleTheme() {
@@ -123,20 +153,31 @@ export function Header() {
             {theme === "light" ? <MoonIcon /> : <SunIcon />}
           </button>
 
-          {/* CTA */}
-          <a
-            href="#contacto"
-            className="hidden items-center justify-center rounded-md font-semibold transition-all duration-150 hover:brightness-95 active:translate-y-px lg:inline-flex"
-            style={{
-              background: "var(--accent)",
-              color: "var(--bg-deep)",
-              height: "40px",
-              padding: "0 18px",
-              fontSize: "14px",
-            }}
-          >
-            Quiero mi consultorio
-          </a>
+          {/* CTA — appears once the hero's own CTA has scrolled out of view */}
+          <div className="hidden lg:block">
+            <AnimatePresence>
+              {showHeaderCta && (
+                <motion.a
+                  href="#contacto"
+                  initial={reduceMotion ? undefined : { opacity: 0, scale: 0.94 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={reduceMotion ? undefined : { opacity: 0, scale: 0.94 }}
+                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                  onClick={() => trackAnalyticsEvent({ name: "cta_click", surface: "header_desktop" })}
+                  className="inline-flex items-center justify-center rounded-md font-semibold transition-all duration-150 hover:brightness-95 active:translate-y-px"
+                  style={{
+                    background: "var(--accent)",
+                    color: "var(--bg-deep)",
+                    height: "40px",
+                    padding: "0 18px",
+                    fontSize: "14px",
+                  }}
+                >
+                  Quiero mi consultorio digital
+                </motion.a>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Hamburger */}
           <button
@@ -186,7 +227,10 @@ export function Header() {
               <div className="mt-3 border-t pt-3" style={{ borderColor: "var(--border)" }}>
                 <a
                   href="#contacto"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    setIsOpen(false);
+                    trackAnalyticsEvent({ name: "cta_click", surface: "header_mobile" });
+                  }}
                   className="flex min-h-11 w-full items-center justify-center rounded-md font-semibold transition-all"
                   style={{
                     background: "var(--accent)",
@@ -194,7 +238,7 @@ export function Header() {
                     fontSize: "15px",
                   }}
                 >
-                  Quiero mi consultorio
+                  Quiero mi consultorio digital
                 </a>
               </div>
             </nav>

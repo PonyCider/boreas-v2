@@ -1,16 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import {
-  motion,
-  useReducedMotion,
-  useInView,
-  useMotionValue,
-  useTransform,
-  animate as fmAnimate,
-  type Variants,
-} from "framer-motion";
-import { socialProof } from "@/content/boreas-home";
+import { useState } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { exampleBadgeLabel, socialProof } from "@/content/boreas-home";
+import { useAnimatedNumber } from "@/lib/use-animated-number";
 import { SectionFrame } from "./boreas-landing-sections";
 
 // Decorative timestamps — purely visual chrome, aria-hidden
@@ -19,30 +12,6 @@ const APPOINTMENT_SLOTS = ["10:00", "11:30", "14:00"] as const;
 
 const EASE_EXPO: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const EASE_QUINT: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
-// ─── Counter hook ─────────────────────────────────────────────────────────────
-
-function useCounter(target: number, reduceMotion: boolean | null) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const count = useMotionValue(reduceMotion ? target : 0);
-  const rounded = useTransform(count, Math.round);
-
-  useEffect(() => {
-    if (reduceMotion) {
-      count.set(target);
-      return;
-    }
-    if (!inView) return;
-    const ctrl = fmAnimate(count, target, {
-      duration: 1.5,
-      ease: EASE_EXPO,
-    });
-    return ctrl.stop;
-  }, [inView, reduceMotion, target, count]);
-
-  return { ref, rounded };
-}
 
 // ─── Animated percent stat value ───────────────────────────────────────────────
 
@@ -55,10 +24,15 @@ function AnimatedPercent({
   suffix: string;
   reduceMotion: boolean | null;
 }) {
-  const { ref, rounded } = useCounter(num, reduceMotion);
+  const { ref, value } = useAnimatedNumber<HTMLSpanElement>(num, {
+    reduceMotion,
+    duration: 1.5,
+    ease: EASE_EXPO,
+    trigger: { mode: "inView", margin: "-80px" },
+  });
   return (
     <span ref={ref}>
-      <motion.span className="tabular-nums">{rounded}</motion.span>
+      <motion.span className="tabular-nums">{value}</motion.span>
       {suffix}
     </span>
   );
@@ -111,7 +85,7 @@ export function SocialProofSection() {
           viewport={{ once: true, margin: "-80px" }}
           variants={fadeUp}
           transition={{ duration: 0.65, ease }}
-          className="text-[clamp(2.5rem,5.5vw,5rem)] font-semibold leading-[1.05] tracking-tight text-foreground [text-wrap:balance]"
+          className="text-[clamp(2.5rem,5.5vw,5rem)] font-display font-normal leading-[1.05] tracking-[-0.016em] text-foreground [text-wrap:balance]"
         >
           {socialProof.heading}
         </motion.h2>
@@ -269,27 +243,37 @@ function MockupBlock({
       </p>
 
       {/* Desktop: browser frame */}
-      <div className="hidden overflow-hidden rounded-2xl border border-line shadow-[0_32px_100px_oklch(0.06_0.018_245/0.5)] lg:block">
-        <div className="browser-frame-chrome relative flex h-10 items-center border-b border-line bg-surface">
-          <div className="absolute left-16 right-4 h-6 rounded-full border border-line bg-elevated/60">
-            <span className="flex h-full items-center px-3 text-[0.65rem] text-muted/50">
-              boreas.com/{urlSlug}
-            </span>
+      <div className="relative hidden overflow-visible lg:block">
+        <span className="absolute -top-2.5 left-4 z-10 rounded-[var(--radius-pill)] border border-border bg-surface px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-clinical">
+          {exampleBadgeLabel}
+        </span>
+        <div className="overflow-hidden rounded-2xl border border-line shadow-[0_32px_100px_oklch(0.06_0.018_245/0.5)]">
+          <div className="browser-frame-chrome relative flex h-10 items-center border-b border-line bg-surface">
+            <div className="absolute left-16 right-4 h-6 rounded-full border border-line bg-elevated/60">
+              <span className="flex h-full items-center px-3 text-[0.65rem] text-muted/50">
+                boreas.com/{urlSlug}
+              </span>
+            </div>
           </div>
+          <MockupContent doctor={mockupDoctor} />
         </div>
-        <MockupContent doctor={mockupDoctor} />
       </div>
 
       {/* Mobile: phone frame */}
-      <div className="mx-auto max-w-sm overflow-hidden rounded-[2.5rem] border border-line shadow-[0_20px_70px_oklch(0.06_0.018_245/0.4)] lg:hidden">
-        <div className="flex h-8 items-center justify-between bg-surface px-6">
-          <span className="text-[0.6rem] font-medium text-muted/50">9:41</span>
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-4 rounded-full bg-muted/30" />
-            <span className="h-1.5 w-1.5 rounded-full bg-muted/30" />
+      <div className="relative mx-auto max-w-sm overflow-visible lg:hidden">
+        <span className="absolute -top-2.5 left-4 z-10 rounded-[var(--radius-pill)] border border-border bg-surface px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-clinical">
+          {exampleBadgeLabel}
+        </span>
+        <div className="overflow-hidden rounded-[2.5rem] border border-line shadow-[0_20px_70px_oklch(0.06_0.018_245/0.4)]">
+          <div className="flex h-8 items-center justify-between bg-surface px-6">
+            <span className="text-[0.6rem] font-medium text-muted/50">9:41</span>
+            <div className="flex items-center gap-1.5">
+              <span className="h-1.5 w-4 rounded-full bg-muted/30" />
+              <span className="h-1.5 w-1.5 rounded-full bg-muted/30" />
+            </div>
           </div>
+          <MockupContent doctor={mockupDoctor} compact />
         </div>
-        <MockupContent doctor={mockupDoctor} compact />
       </div>
     </motion.div>
   );

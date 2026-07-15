@@ -2,206 +2,241 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import {
+  exampleBadgeLabel,
+  heroCardStats,
   heroCredibility,
   heroHeadline,
   heroProofPoints,
   heroSubcopy,
+  problemStatsSources,
+  socialProof,
 } from "@/content/boreas-home";
+import { trackAnalyticsEvent } from "@/lib/analytics";
+import { useAnimatedNumber } from "@/lib/use-animated-number";
 
-function HeroCardCluster() {
+const doctor = socialProof.mockupDoctor;
+const doctorInitials = initials(doctor.name);
+const doctorRating = parseFloat(doctor.rating);
+const doctorFilledStars = Math.round(doctorRating);
+const searchPercentValue = parseInt(heroCardStats.searchPercent, 10);
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+function initials(name: string) {
+  return name
+    .replace(/^Dra?\.\s*/i, "")
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+}
+
+function RatingBlock({ delay, reduceMotion, size = "md" }: { delay: number; reduceMotion: boolean; size?: "md" | "sm" }) {
+  const { ref, value } = useAnimatedNumber(doctorRating, {
+    reduceMotion,
+    decimals: 1,
+    duration: 0.9,
+    ease: EASE,
+    trigger: { mode: "delay", ms: delay },
+  });
+  // Stars reflect the real rating (static) — only the number counts up.
+  const starSize = size === "md" ? "text-[15px]" : "text-[13px]";
+  const numberSize = size === "md" ? "text-[22px]" : "text-lg";
+
   return (
-    <div className="relative hidden lg:block" style={{ height: "460px" }}>
-      {/* Chip "3 citas hoy" — top right, above main card */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          top: "0",
-          right: "0",
-          zIndex: 2,
-          background: "rgba(79,179,154,.12)",
-          border: "1px solid rgba(79,179,154,.25)",
-          borderRadius: "999px",
-          padding: "9px 16px",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          animation: "float 6s ease-in-out 1.4s infinite",
-        }}
-      >
-        <span
-          style={{
-            width: "8px",
-            height: "8px",
-            borderRadius: "50%",
-            background: "var(--c-mint)",
-            flexShrink: 0,
-            animation: "pulse-dot 1.8s ease-in-out infinite",
-          }}
-        />
-        <span style={{ fontSize: "13px", fontWeight: 600, color: "#2a8068" }}>
-          3 citas hoy
-        </span>
-      </div>
-
-      {/* Main card */}
-      <div
-        style={{
-          position: "absolute",
-          top: "30px",
-          left: "0",
-          right: "50px",
-          zIndex: 1,
-          background: "var(--bg-surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "var(--radius-xl)",
-          boxShadow: "var(--shadow)",
-          padding: "22px",
-          animation: "float 5.2s ease-in-out infinite",
-        }}
-      >
-        {/* Avatar + name */}
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
-          <div
-            style={{
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
-              background: "var(--accent-soft)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "var(--font-newsreader), Georgia, serif",
-              fontStyle: "italic",
-              fontWeight: 500,
-              color: "var(--accent)",
-              fontSize: "17px",
-              flexShrink: 0,
-            }}
-          >
-            SR
-          </div>
-          <div>
-            <p style={{ fontSize: "15.5px", fontWeight: 600, color: "var(--ink)", margin: 0, lineHeight: 1.3 }}>
-              Dra. Sofía Ramírez
-            </p>
-            <p style={{ fontSize: "13px", color: "var(--ink-muted)", margin: 0, marginTop: "2px" }}>
-              Cardiología Clínica
-            </p>
-          </div>
-        </div>
-
-        {/* Rating */}
-        <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "14px" }}>
-          <span style={{ color: "var(--rating-gold)", fontSize: "15px" }} aria-hidden="true">★★★★★</span>
-          <span
-            style={{
-              fontFamily: "var(--font-newsreader), Georgia, serif",
-              fontSize: "22px",
-              fontWeight: 500,
-              color: "var(--ink)",
-              lineHeight: 1,
-            }}
-          >
-            4.9
+    <div ref={ref} className="flex items-baseline gap-2">
+      <span className={`${starSize} tracking-tight`} aria-hidden="true">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span key={i} className={i < doctorFilledStars ? "text-rating-gold" : "text-border"}>
+            ★
           </span>
-          <span style={{ fontSize: "13px", color: "var(--ink-muted)" }}>127 reseñas</span>
-        </div>
-
-        {/* Quote */}
-        <div
-          style={{
-            background: "var(--bg-elevated)",
-            borderRadius: "var(--radius-md)",
-            padding: "12px 14px",
-            marginBottom: "14px",
-          }}
-        >
-          <p style={{ fontSize: "13px", fontStyle: "italic", color: "var(--ink-muted)", margin: 0, lineHeight: 1.55 }}>
-            &ldquo;Llegué con muchas dudas y salí con todo claro. Lo recomiendo ampliamente.&rdquo;
-          </p>
-        </div>
-
-        {/* WhatsApp button */}
-        <button
-          tabIndex={-1}
-          aria-hidden="true"
-          style={{
-            background: "var(--c-mint)",
-            color: "#fff",
-            width: "100%",
-            height: "42px",
-            borderRadius: "var(--radius-md)",
-            fontSize: "14px",
-            fontWeight: 600,
-            fontFamily: "var(--font-figtree), sans-serif",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-          </svg>
-          Agendar por WhatsApp
-        </button>
-      </div>
-
-      {/* Chip stat "84%" — bottom right */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          bottom: "20px",
-          right: "0",
-          zIndex: 2,
-          background: "var(--bg-surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "12px",
-          padding: "14px 18px",
-          boxShadow: "var(--shadow-sm)",
-          animation: "float 4.6s ease-in-out 0.7s infinite",
-        }}
-      >
-        <p style={{ fontSize: "11px", fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--ink-muted)", margin: "0 0 4px" }}>
-          Pacientes digitales
-        </p>
-        <p style={{ fontFamily: "var(--font-newsreader), Georgia, serif", fontSize: "34px", fontWeight: 500, color: "var(--c-amber)", lineHeight: 1, margin: 0 }}>
-          84%
-        </p>
-        <p style={{ fontSize: "11px", color: "var(--ink-muted)", margin: "4px 0 0" }}>
-          busca en línea antes de agendar
-        </p>
-      </div>
-
-      {/* Chip tiempo — bottom left */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          bottom: "16px",
-          left: "0",
-          zIndex: 2,
-          background: "var(--bg-surface)",
-          border: "1px solid var(--border)",
-          borderRadius: "999px",
-          padding: "8px 14px",
-          animation: "float 5s ease-in-out 0.3s infinite",
-        }}
-      >
-        <span style={{ fontSize: "12px", color: "var(--ink-muted)" }}>
-          11:47 PM · tu consultorio respondió
-        </span>
-      </div>
+        ))}
+      </span>
+      <motion.span className={`${numberSize} tabular-nums font-display font-medium leading-none text-foreground`}>
+        {value}
+      </motion.span>
+      <span className="text-[13px] text-muted">
+        {doctor.reviewCount} {heroCardStats.reviewCountLabel}
+      </span>
     </div>
   );
 }
 
+function DoctorCard({ delay, reduceMotion }: { delay: number; reduceMotion: boolean }) {
+  return (
+    <>
+      <div className="mb-4 flex items-center gap-3">
+        <div className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full bg-accent-soft font-display text-[17px] italic font-medium text-accent">
+          {doctorInitials}
+        </div>
+        <div>
+          <p className="text-[15.5px] font-semibold leading-tight text-foreground">{doctor.name}</p>
+          <p className="mt-0.5 text-[13px] text-muted">{doctor.specialty}</p>
+        </div>
+      </div>
+
+      <div className="mb-3.5">
+        <RatingBlock delay={delay} reduceMotion={reduceMotion} />
+      </div>
+
+      <motion.div
+        initial={reduceMotion ? undefined : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: reduceMotion ? 0 : delay / 1000 + 0.5 }}
+        className="mb-3.5 rounded-[var(--radius-md)] bg-elevated px-3.5 py-3"
+      >
+        <p className="text-[13px] italic leading-[1.55] text-muted">&ldquo;{doctor.testimonial}&rdquo;</p>
+      </motion.div>
+
+      <button
+        tabIndex={-1}
+        aria-hidden="true"
+        className="flex h-[42px] w-full cursor-default items-center justify-center gap-2 rounded-[var(--radius-md)] bg-whatsapp text-[14px] font-semibold text-white"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+        Agendar por WhatsApp
+      </button>
+    </>
+  );
+}
+
+function AppointmentsChip({ delay, reduceMotion, compact = false }: { delay: number; reduceMotion: boolean; compact?: boolean }) {
+  const { ref, value } = useAnimatedNumber(heroCardStats.appointmentsToday, {
+    reduceMotion,
+    duration: 0.7,
+    ease: EASE,
+    trigger: { mode: "delay", ms: delay },
+  });
+  return (
+    <div
+      ref={ref}
+      className={
+        compact
+          ? "flex flex-1 items-center gap-2 rounded-[var(--radius-md)] border border-mint/25 bg-mint/10 px-3.5 py-3"
+          : "flex items-center gap-2 rounded-[var(--radius-pill)] border border-mint/25 bg-mint/10 px-4 py-[9px]"
+      }
+    >
+      <span
+        className="h-2 w-2 shrink-0 rounded-full bg-mint"
+        style={reduceMotion ? undefined : { animation: "pulse-dot 1.8s ease-in-out infinite" }}
+      />
+      <motion.span className="tabular-nums text-[13px] font-semibold text-mint">
+        {value}
+      </motion.span>
+      <span className="text-[13px] font-semibold text-mint">
+        {heroCardStats.appointmentsToday === 1
+          ? heroCardStats.appointmentsTodayLabelSingular
+          : heroCardStats.appointmentsTodayLabelPlural}
+      </span>
+    </div>
+  );
+}
+
+function SearchPercentChip({ delay, reduceMotion, compact = false }: { delay: number; reduceMotion: boolean; compact?: boolean }) {
+  const { ref, value } = useAnimatedNumber(searchPercentValue, {
+    reduceMotion,
+    duration: 0.9,
+    ease: EASE,
+    trigger: { mode: "delay", ms: delay },
+  });
+  const percentValue = (
+    <motion.span className="tabular-nums">{value}</motion.span>
+  );
+  if (compact) {
+    return (
+      <div ref={ref} title={problemStatsSources} className="flex flex-1 flex-col justify-center rounded-[var(--radius-md)] border border-border bg-surface px-4 py-3">
+        <p className="font-display text-2xl font-medium leading-none text-amber">{percentValue}%</p>
+        <p className="mt-1 text-[11px] leading-tight text-muted">{heroCardStats.searchLabel}</p>
+      </div>
+    );
+  }
+  return (
+    <div ref={ref} title={problemStatsSources} className="rounded-xl border border-border bg-surface px-[18px] py-3.5 shadow-[var(--shadow-sm)]">
+      <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.1em] text-muted">{heroCardStats.searchStatTitle}</p>
+      <p className="font-display text-[34px] font-medium leading-none text-amber">{percentValue}%</p>
+      <p className="mt-1 text-[11px] text-muted">{heroCardStats.searchLabel}</p>
+    </div>
+  );
+}
+
+function ExampleBadge() {
+  return (
+    <span className="absolute -top-2.5 left-4 rounded-[var(--radius-pill)] border border-border bg-surface px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-clinical">
+      {exampleBadgeLabel}
+    </span>
+  );
+}
+
+function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
+  return (
+    <div className="relative hidden lg:block" style={{ height: "460px" }}>
+      <motion.div
+        initial={reduceMotion ? undefined : { opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: reduceMotion ? 0 : 1.4 }}
+        className="absolute right-0 top-0 z-[2]"
+      >
+        <AppointmentsChip delay={1400} reduceMotion={reduceMotion} />
+      </motion.div>
+
+      <motion.div
+        initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]"
+        style={reduceMotion ? undefined : { animation: "float 5.2s ease-in-out infinite" }}
+      >
+        <ExampleBadge />
+        <DoctorCard delay={800} reduceMotion={reduceMotion} />
+      </motion.div>
+
+      <motion.div
+        initial={reduceMotion ? undefined : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: reduceMotion ? 0 : 2 }}
+        className="absolute bottom-5 right-0 z-[2]"
+        style={reduceMotion ? undefined : { animation: "float 4.6s ease-in-out 0.7s infinite" }}
+      >
+        <SearchPercentChip delay={2000} reduceMotion={reduceMotion} />
+      </motion.div>
+
+      <motion.div
+        initial={reduceMotion ? undefined : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: reduceMotion ? 0 : 2.4 }}
+        className="absolute bottom-4 left-0 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2"
+        style={reduceMotion ? undefined : { animation: "float 5s ease-in-out 0.3s infinite" }}
+      >
+        <span className="text-xs text-muted">
+          {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
+        </span>
+      </motion.div>
+    </div>
+  );
+}
+
+function HeroCardMobile({ reduceMotion }: { reduceMotion: boolean }) {
+  return (
+    <motion.div
+      initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="relative mt-10 block rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)] lg:hidden"
+    >
+      <ExampleBadge />
+      <DoctorCard delay={400} reduceMotion={reduceMotion} />
+      <div className="mt-4 flex gap-3">
+        <AppointmentsChip delay={700} reduceMotion={reduceMotion} compact />
+        <SearchPercentChip delay={900} reduceMotion={reduceMotion} compact />
+      </div>
+    </motion.div>
+  );
+}
+
 export function BoreasHero() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = !!useReducedMotion();
   const ease = [0.22, 1, 0.36, 1] as const;
 
   const reveal = {
@@ -210,7 +245,7 @@ export function BoreasHero() {
   };
 
   return (
-    <section className="min-h-[calc(100vh-64px)] py-20 bg-background">
+    <section className="min-h-[calc(100vh-64px)] py-20 bg-hero-glow transition-[background,colors] duration-[280ms]">
       <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10">
         {/* Left column */}
         <motion.div
@@ -222,8 +257,7 @@ export function BoreasHero() {
           <motion.p
             variants={reveal}
             transition={{ duration: 0.6, ease }}
-            className="mb-5 text-sm font-semibold"
-            style={{ color: "var(--c-mint)" }}
+            className="mb-5 text-sm font-semibold text-mint"
           >
             {heroCredibility}
           </motion.p>
@@ -232,15 +266,8 @@ export function BoreasHero() {
           <motion.p
             variants={reveal}
             transition={{ duration: 0.65, ease }}
-            style={{
-              fontFamily: "var(--font-newsreader), Georgia, serif",
-              fontStyle: "italic",
-              fontWeight: 500,
-              fontSize: "clamp(5rem, 13vw, 10.5rem)",
-              lineHeight: 0.88,
-              letterSpacing: "-0.03em",
-              color: "var(--ink)",
-            }}
+            className="font-display italic font-medium leading-[0.88] tracking-[-0.03em] text-foreground"
+            style={{ fontSize: "clamp(5rem, 13vw, 10.5rem)" }}
           >
             Boreas
           </motion.p>
@@ -249,15 +276,8 @@ export function BoreasHero() {
           <motion.h1
             variants={reveal}
             transition={{ duration: 0.7, ease }}
-            className="mt-[22px] text-balance"
-            style={{
-              fontFamily: "var(--font-newsreader), Georgia, serif",
-              fontWeight: 400,
-              fontSize: "clamp(1.85rem, 4vw, 3.8rem)",
-              lineHeight: 1.08,
-              letterSpacing: "-0.012em",
-              color: "var(--ink)",
-            }}
+            className="mt-[22px] text-balance font-display font-normal leading-[1.08] tracking-[-0.012em] text-foreground"
+            style={{ fontSize: "clamp(1.85rem, 4vw, 3.8rem)" }}
           >
             {heroHeadline}
           </motion.h1>
@@ -266,12 +286,7 @@ export function BoreasHero() {
           <motion.p
             variants={reveal}
             transition={{ duration: 0.65, ease }}
-            className="mt-6 max-w-[50ch]"
-            style={{
-              fontSize: "17px",
-              lineHeight: 1.7,
-              color: "var(--ink-muted)",
-            }}
+            className="mt-6 max-w-[50ch] text-[17px] leading-[1.7] text-muted"
           >
             {heroSubcopy}
           </motion.p>
@@ -282,7 +297,11 @@ export function BoreasHero() {
             transition={{ duration: 0.65, ease }}
             className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center"
           >
-            <a href="#contacto" className="btn btn-p w-full sm:w-auto">
+            <a
+              href="#contacto"
+              className="btn btn-p w-full sm:w-auto"
+              onClick={() => trackAnalyticsEvent({ name: "cta_click", surface: "hero" })}
+            >
               Quiero mi consultorio digital
             </a>
             <a href="#proceso" className="btn btn-s w-full sm:w-auto">
@@ -296,24 +315,19 @@ export function BoreasHero() {
             transition={{ duration: 0.65, ease }}
             className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
           >
-            {heroProofPoints.map((point, index) => (
-              <li
-                key={point}
-                className="border-t pt-3 text-[13px]"
-                style={{
-                  borderColor: "var(--border)",
-                  color: "var(--ink-muted)",
-                  transitionDelay: `${index * 70}ms`,
-                }}
-              >
+            {heroProofPoints.map((point) => (
+              <li key={point} className="border-t border-line pt-3 text-[13px] text-muted">
                 {point}
               </li>
             ))}
           </motion.ul>
+
+          {/* Mobile card (in-flow, replaces the desktop floating cluster) */}
+          <HeroCardMobile reduceMotion={reduceMotion} />
         </motion.div>
 
         {/* Right column — card cluster (desktop only) */}
-        <HeroCardCluster />
+        <HeroCardCluster reduceMotion={reduceMotion} />
       </div>
     </section>
   );

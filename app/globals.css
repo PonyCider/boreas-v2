@@ -104,11 +104,20 @@ html {
 }
 
 body {
-  background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 70%, #FFF8EC) 0%, var(--bg-deep) 45%);
+  background: var(--bg-deep);
   color: var(--ink);
   font-family: var(--font-figtree), sans-serif;
   min-height: 100%;
   transition: background .28s, color .28s;
+}
+
+.bg-hero-glow {
+  background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 70%, #FFF8EC) 0%, var(--bg-deep) 50%);
+}
+
+[data-theme="dark"] .bg-hero-glow,
+.dark .bg-hero-glow {
+  background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 48%, #FFF8EC) 0%, var(--bg-deep) 60%);
 }
 
 a {

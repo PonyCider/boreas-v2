@@ -1,24 +1,41 @@
 "use client";
 
 import { useActionState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { ContactFormState, submitContact } from "@/app/actions/submit-contact";
+import { trackAnalyticsEvent } from "@/lib/analytics";
 import { SectionFrame } from "./boreas-landing-sections";
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export function ContactFormSection() {
   const [state, formAction, isPending] = useActionState<ContactFormState, FormData>(
     async (prevState, formData) => {
+      trackAnalyticsEvent({ name: "diagnostic_submit", surface: "contact_form" });
       const response = await submitContact(prevState, formData);
+      trackAnalyticsEvent({
+        name: "diagnostic_result",
+        surface: "contact_form",
+        meta: { success: response.success ?? false },
+      });
       return response;
     },
     {}
   );
+  const reduceMotion = useReducedMotion();
 
   return (
     <SectionFrame id="contacto" className="border-t border-line">
-      <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
+      <motion.div
+        className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10"
+        initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.55, ease: EASE }}
+      >
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
           <div className="max-w-md">
-            <h2 className="text-[clamp(2rem,4.5vw,3.8rem)] font-semibold leading-tight text-foreground">
+            <h2 className="text-balance text-[clamp(2rem,4.5vw,3.8rem)] font-display font-normal leading-[1.12] tracking-[-0.010em] text-foreground">
               Empezamos con lo mínimo.
             </h2>
             <p className="mt-6 text-base sm:text-lg text-muted leading-relaxed">
@@ -28,14 +45,19 @@ export function ContactFormSection() {
 
           <div className="w-full max-w-2xl lg:ml-auto">
             {state?.success ? (
-              <div className="border-y border-accent/40 py-8">
+              <motion.div
+                initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: EASE }}
+                className="border-y border-accent/40 py-8"
+              >
                 <h3 className="text-2xl font-semibold text-foreground">
                   Listo. Te escribimos por WhatsApp en las próximas 2 horas.
                 </h3>
                 <p className="mt-4 text-base leading-relaxed text-muted">
                   Revisaremos tu especialidad y tu perfil para decirte qué tendría más peso en tu consultorio digital.
                 </p>
-              </div>
+              </motion.div>
             ) : (
               <form action={formAction} className="grid gap-6 border-y border-line py-7 sm:grid-cols-2">
                 <div className="flex flex-col gap-2">
@@ -49,7 +71,7 @@ export function ContactFormSection() {
                     required
                     autoComplete="name"
                     placeholder="Ej: Dr. Alejandro Ríos"
-                    className="h-12 w-full rounded-md border border-line bg-surface px-4 text-base text-foreground transition-all placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="h-12 w-full rounded-md border border-line bg-surface px-4 text-base text-foreground transition-all placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
 
@@ -63,7 +85,7 @@ export function ContactFormSection() {
                     name="especialidad"
                     required
                     placeholder="Ej: Cardiología, Dermatología"
-                    className="h-12 w-full rounded-md border border-line bg-surface px-4 text-base text-foreground transition-all placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="h-12 w-full rounded-md border border-line bg-surface px-4 text-base text-foreground transition-all placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
 
@@ -76,8 +98,10 @@ export function ContactFormSection() {
                     id="whatsapp"
                     name="whatsapp"
                     required
+                    inputMode="tel"
+                    autoComplete="tel"
                     placeholder="Ej: +52 55 1234 5678"
-                    className="h-12 w-full rounded-md border border-line bg-surface px-4 text-base text-foreground transition-all placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="h-12 w-full rounded-md border border-line bg-surface px-4 text-base text-foreground transition-all placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
 
@@ -93,7 +117,7 @@ export function ContactFormSection() {
                     id="google_maps"
                     name="google_maps"
                     placeholder="Link a tu perfil de Google Maps"
-                    className="h-12 w-full rounded-md border border-line bg-surface px-4 text-base text-foreground transition-all placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                    className="h-12 w-full rounded-md border border-line bg-surface px-4 text-base text-foreground transition-all placeholder:text-muted focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   />
                 </div>
 
@@ -120,11 +144,15 @@ export function ContactFormSection() {
                     "Quiero mi consultorio digital"
                   )}
                 </button>
+
+                <p className="text-xs text-muted sm:col-span-2">
+                  Solo usamos tus datos para contactarte por WhatsApp sobre tu consultorio digital.
+                </p>
               </form>
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </SectionFrame>
   );
 }

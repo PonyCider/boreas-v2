@@ -29,7 +29,7 @@ Consultorio particular (no hospitales/IMSS/ISSSTE), Google Maps ≥4.3★ con ac
 sin web o con web rota, en zona metropolitana o capital.
 
 > **Confidencial — no público:** precios, anticipos, "modelo mensualidad", scraping/Apify, KPIs
-> internos, scripts de cold call. Eso vive en `assets/Boreas_Documento_Maestro_Uso_Interno`, **nunca**
+> internos, scripts de cold call. Eso vive en [`docs/internal/boreas-master.md`](docs/internal/boreas-master.md), **nunca**
 > en la página ni en commits públicos.
 
 ---
@@ -44,7 +44,8 @@ sin web o con web rota, en zona metropolitana o capital.
 
 ### Reglas de copy duras
 - ✅ Usar **"consultorio digital"** en todo el sitio. ❌ **No mezclar con "clínica digital"**
-  (hoy el hero dice "clínica" — corregir; es la única excepción y debe unificarse a "consultorio").
+  (ya unificado — el hero dice "consultorio digital"; verificar con grep antes de dar por hecho
+  que no hay regresiones si se toca copy).
 - ❌ No mostrar precio público, escasez semanal, ni "último lugar".
 - ✅ Urgencia atada a comportamiento del paciente: noches, fines de semana, búsqueda previa.
 - ✅ Toda estadística mostrada (84%, 3×, 40%) **debe tener fuente citable** o se quita.
@@ -62,85 +63,88 @@ sin web o con web rota, en zona metropolitana o capital.
   ancla de navegación, no una segunda oferta — mantenerlo discreto.
 - **Orden objetivo de secciones:** Hero → Problema → Transformación → Proceso → Garantía →
   **FAQ → Form/CTA final** → Relevo.
-  > Estado actual del código: el Form va **antes** que la FAQ y no hay CTA tras la FAQ
-  > (`final-cta-section.tsx` existe pero está huérfano). Pendiente reordenar — ver §7 backlog.
+  > Estado actual del código: orden ya correcto (FAQ antes que Form). `final-cta-section.tsx`
+  > sigue existiendo pero huérfano (no se importa en `boreas-landing-sections.tsx`) — ver §7.
 - **Prueba antes del pedido:** el visitante debe ver prueba real (reseña/testimonio/demo) **antes**
   de llegar al form. Hoy no hay ninguna — es el hueco #1 de conversión.
-- **El form es sagrado:** cada lead debe persistir y disparar notificación. Hoy es mock (§6).
+- **El form es sagrado:** cada lead debe persistir y disparar notificación. Ya cumplido — ver §6.
 
 ---
 
 ## 4. Sistema de diseño
 
-Dark medical editorial: premium, calmado, legible de noche, con luz clínica suficiente para no
-parecer un dark-SaaS genérico. Mobile-first.
+> **Fuente canónica dentro de este repo:** [`DESIGN.md`](./DESIGN.md) (rediseño "1c Vivo", junio
+> 2026). `DESIGN.md` referencia un handoff externo (`design_handoff_boreas_redesign/README.md`)
+> que **no vive en este repo** — si se necesita el detalle pixel-perfect completo, pedirlo aparte;
+> no asumir que existe en el checkout. El sistema "dark medical editorial" (teal sobre negro,
+> Satoshi, glass/glow en hero) queda **retirado**. Lo que sigue es el sistema vigente.
+
+**Papel cálido + arcilla:** premium, editorial, plano y mate. Light mode por defecto, dark mode
+vía toggle (`data-theme="dark"` / clase `.dark`, persistido en `localStorage`). Mobile-first.
 
 ### Color (tokens en `app/globals.css` — única fuente)
-| Rol | Token | Uso |
-|-----|-------|-----|
-| Fondo | `--bg-deep` / `--bg-surface` / `--bg-elevated` | Off-black con tinte frío. Nunca negro puro. |
-| Texto | `--ink` (alto contraste) / `--clinical` / `--ink-muted` | Cuerpo en `--ink`/`--clinical`. |
-| **Acción/prueba** | `--accent` (teal, hue ~174) | CTA, foco, señales de prueba. **Un solo teal.** |
-| **Glow decorativo** | `--glow-clinic` (verde salvia, hue ~154) | Glow/orbes del hero. **Decorativo, no acción.** |
-| Error | `--danger` | Mensajes de error. |
-| Líneas/glass | `--line`, `--glass-*` | Dividers, superficies glass. |
+| Rol | Token | Light | Dark | Uso |
+|-----|-------|-------|------|-----|
+| Fondo | `--bg-deep`/`--bg-surface`/`--bg-elevated`/`--bg-void` | `#FBF8F3`/`#FFF`/`#F4F1EA`/`#EDE9DF` | `#1B1916`/`#252119`/`#201E1A`/`#131210` | Papel cálido. Nunca blanco/negro puro. |
+| Texto | `--ink`/`--ink-muted`/`--clinical` | `#1E1B18`/`#6C675E`/`#9C978F` | `#F5F1E8`/`#A8A192`/`#706A5F` | Cuerpo en `--ink`/`--ink-muted`. |
+| **Acción** | `--accent` (arcilla) | `#D2674A` | `#E27F62` | CTA, foco. Único color de acción. |
+| **Acentos vivos** | `--c-amber`/`--c-mint`/`--c-lav`/`--c-rose` | ámbar/menta/lavanda/rosa | tonos claros equivalentes | Stats, badges, elementos dinámicos. Sistema deliberado multi-color — **ya no aplica "un solo color" fuera de acción**. |
+| WhatsApp | `--whatsapp-green` | igual ambos modos | | Identidad de marca de terceros. Reservado para UI de WhatsApp, nunca acento genérico. |
+| Error | `--danger` | `#C0392B` | | Mensajes de error. |
+| Líneas | `--line` (sutil) / `--border` (definida) | | | `--line` dividers discretos; `--border` contornos de cards/inputs. |
 
-> **Regla de los dos verdes:** `--accent` (teal) y `--glow-clinic` (salvia) son roles distintos
-> y **deben venir de tokens**, nunca hardcodeados. Hoy el hero riega `rgba(119,168,139)` y
-> `oklch(0.68 0.08 154)` en hex sueltos — migrarlos a `--glow-clinic`. Acción nunca usa el salvia;
-> decoración nunca usa el teal como si fuera CTA.
-
-- **Contraste:** cuerpo ≥4.5:1, texto grande ≥3:1. **Placeholders también ≥4.5:1**
-  (hoy `placeholder:text-muted/70` probablemente falla — subir).
+- **Contraste:** cuerpo ≥4.5:1, texto grande ≥3:1. Placeholders también ≥4.5:1.
+- Glass está **desactivado** (`--glass-*` quedan transparentes para compatibilidad, no se usan).
 
 ### Tipografía
-- **Satoshi local** (`app/fonts`), una familia, jerarquía por peso/escala/spacing.
+- **Newsreader** (serif editorial, display: h1–h3, wordmarks, cifras grandes) + **Figtree** (sans, body/UI). Cargadas vía `next/font/google` en `app/layout.tsx`. **Satoshi quedó retirado** — no reintroducir.
 - `text-wrap: balance` en h1–h3; `pretty` en prosa larga. Línea de cuerpo 65–75ch.
-- **Límites:** display clamp max ≤ 6rem; letter-spacing piso ≥ -0.04em.
-  > El wordmark "Boreas" del hero hoy usa max 13.5rem y tracking -0.055em (fuera de límite) y
-  > además duplica el logo del header + el h1 → triple branding. Pendiente acotar — ver §7.
+- Wordmark "Boreas" en Newsreader italic 500 es una excepción deliberada a cualquier límite de tracking/tamaño — es marca, no headline de contenido.
+- Escala completa por sección: ver `DESIGN.md` o el handoff.
 
 ### Layout
 - Mobile-first. Primer viewport muestra la oferta y sugiere la siguiente sección.
 - **Filas editoriales, dividers y columnas** sobre cards repetidas.
-- Cards solo para herramientas enmarcadas reales o ítems repetidos, radius ≤ 8px. **Nunca card dentro de card.**
+- Radio por escala (`--radius-xl` 16px solo cluster del hero, `--radius-md` 10px cards secundarias, `--radius-sm` 8px botones/inputs/mockups de contenido, `--radius-pill` 999px badges). **Nunca card dentro de card.**
 - Espaciado de sección generoso; distancia de scan razonable en móvil.
+- **Disciplina de líneas horizontales:** un `border-t` de `SectionFrame` por sección, un divider de anclaje por bloque. Nunca combinar `divide-y` + `border-y`, ni `border-bottom` por ítem sobre un contenedor con `border-top` — eso genera N+1 líneas para N ítems. Listas de prosa (pain points, bullets) usan espaciado (`gap`/`py-*`), no reglas; las reglas son para filas estructuradas de 2+ columnas (transformación, garantía, FAQ). Detalle en `DESIGN.md → Horizontal line discipline`.
 
-### Glass / motion — **decisión Boreas (anula el default de impeccable)**
-> Impeccable prohíbe glassmorphism y glow/orbes por defecto. **Boreas los permite como sistema
-> de marca deliberado en el hero** — es la identidad "clinical light", no decoración accidental.
-- ✅ Permitido: `liquid-header`, glow blobs — **confinados al hero/header**, derivados de tokens, suaves.
-- ❌ Fuera del hero/header: nada de glass/glow decorativo. El resto del sitio es editorial plano.
-- **Motion quieto:** opacity + translate pequeños; ease-out exponencial, sin bounce.
-- **`prefers-reduced-motion` obligatorio** en toda animación (ya implementado en `globals.css`).
+### Glass / motion
+- **Glass y glow quedan retirados de todo el sitio, incluido el hero.** `.liquid-header`/`.liquid-menu` ya no existen en `globals.css` — no reintroducir.
+- **Motion (actualizado 2026-07-13, directiva del dueño):** la landing es el portafolio visual de
+  Boreas — debe demostrar la misma capacidad que la empresa vende. Cada sección lleva motion
+  coreografiado y específico a su contenido (set pieces tipo demo), no el mismo fade+translate
+  repetido. Esto reemplaza la regla anterior de "motion quieto" como default. Ver detalle y
+  ejemplos en `DESIGN.md → Motion Rules` y `docs/handoff/2026-07-13-landing-audit-handoff.md`.
+  Siguen vigentes sin excepción: ease-out exponencial (sin bounce/elastic), sin glass/glow
+  decorativo, contenido nunca gateado por animación (visible por defecto, la animación realza).
+- **`prefers-reduced-motion` obligatorio** en toda animación — no solo saltar el keyframe, dar
+  un equivalente estático/instantáneo.
 - Ningún efecto de scroll que oculte contenido a crawlers/screenshots.
-- ✅ **Hero clinic-builder widget** (`components/hero/clinic-builder.tsx`): override deliberado del
-  "motion quieto" — loop animado infinito de bots IDE que construyen el consultorio. Permitido SOLO
-  en este widget del hero. Bots usan paleta decorativa (`--bot-amber/-coral/-violet/-cyan`); el teal
-  `--accent` sigue reservado a acción/prueba. Animación con **gsap** (única excepción a framer-motion,
-  confinada aquí). `prefers-reduced-motion` → frame final estático.
+- **gsap queda retirado.** El widget `clinic-builder.tsx` (loop de bots IDE) está superado por el nuevo card cluster del hero y ya no se importa en `boreas-hero.tsx` — el archivo quedó huérfano, pendiente eliminarlo (ver §7).
+- Toggle de dark mode: transición `background .28s, color .28s` en `body`.
 
 ### Prohibiciones (cross-register)
 Side-stripe borders (`border-left/right` de color como acento), gradient text, hero-metric template,
-grids de cards idénticas, eyebrow tracked en uppercase sobre cada sección, marcadores 01/02/03 por reflejo.
-> Hoy presente: `relevo-curiosity-section.tsx` usa `border-l border-accent/40` (side-stripe) — corregir.
+grids de cards idénticas, eyebrow tracked en uppercase sobre cada sección, marcadores 01/02/03 por reflejo,
+glass/glow decorativo en cualquier parte del sitio (incluido el hero).
 
 ---
 
 ## 5. Arquitectura técnica
 
-- **Stack:** Next.js 16 (App Router) · React 19 · Tailwind v4 (`@theme inline`) · Satoshi local
-  (`next/font/local`) · framer-motion. Server Actions para el form.
+- **Stack:** Next.js 16 (App Router) · React 19 · Tailwind v4 (`@theme inline`) · Newsreader + Figtree
+  (`next/font/google`) · framer-motion. Server Actions para el form.
 - ⚠️ **Next 16 NO es el Next que conoces.** APIs/convenciones pueden diferir del entrenamiento.
   Lee `node_modules/next/dist/docs/` antes de escribir código nuevo (regla de AGENTS.md).
-- **Animación:** framer-motion por defecto. **gsap** se usa SOLO en `clinic-builder.tsx` (timeline
-  del loop del hero) — justificado, confinado, sin solaparse con framer en un mismo componente.
+- **Animación:** framer-motion únicamente. **gsap quedó retirado** — `clinic-builder.tsx` ya no
+  se importa desde `boreas-hero.tsx`; el archivo es código muerto pendiente de eliminar (§7).
 
 ### Estructura
 ```
 app/            layout, page, globals.css, fonts/, actions/ (server actions)
 components/
-  hero/         header.tsx, boreas-hero.tsx   (único lugar con glass/glow)
+  hero/         header.tsx, boreas-hero.tsx   (sin glass/glow — retirados del rediseño)
   landing/      una sección = un archivo; SectionFrame en boreas-landing-sections.tsx
   layout/       site-footer.tsx
 content/        boreas-home.ts   ← TODO el copy vive aquí, no en JSX
@@ -151,12 +155,11 @@ public/brand/   logos/lockups
 - **Una sección = un archivo** dentro de `components/landing/`, compuesto en `BoreasLandingSections`.
 - **Tokens solo en `globals.css`.** Componentes consumen tokens vía clases Tailwind, no hex sueltos.
 
-### Estado de captura de leads — **PENDIENTE CRÍTICO**
-`app/actions/submit-contact.ts` es un **mock**: solo `console.log` + latencia falsa. **Los leads no
-se guardan en ningún lado y no se notifica nada.** En fase 0→1 esto pierde el activo #1 del negocio.
-- `lib/analytics.ts` existe pero **nunca se invoca** → KPIs (CTR, leads, cierres) inmedibles hoy.
-- Antes de mandar tráfico real: wire persistencia (Supabase/Sheets/webhook) + notificación WhatsApp
-  + llamar `trackAnalyticsEvent` en CTA-click y submit. (No tocado en esta sesión por decisión.)
+### Estado de captura de leads
+`app/actions/submit-contact.ts` **ya persiste leads en Supabase y notifica por WhatsApp** (CallMeBot)
+— no es mock. Este dato estaba desactualizado en versiones previas de este documento.
+- `lib/analytics.ts` existe pero **nunca se invoca** → KPIs (CTR, leads, cierres) siguen inmedibles hoy.
+- Pendiente antes de mandar tráfico real: llamar `trackAnalyticsEvent` en CTA-click y submit.
 
 ---
 
@@ -165,28 +168,25 @@ se guardan en ningún lado y no se notifica nada.** En fase 0→1 esto pierde el
 **DO**
 - Vender resultados, no características. Español claro. "Consultorio digital".
 - Prueba real antes del form. Stats con fuente. Un CTA primario por viewport.
-- Tokens para color. Glass/glow solo en hero/header. `reduced-motion` siempre.
+- Tokens para color (incluido el sistema de acentos vivos). `reduced-motion` siempre.
 - Copy en `content/`. Una sección = un archivo. Leer docs de Next 16 antes de codear.
 
 **DON'T**
-- ❌ Precio/escasez públicos. ❌ Jerga técnica como gancho. ❌ "Clínica" (usar "consultorio").
-- ❌ Hex de color hardcodeado. ❌ Glass/glow fuera del hero. ❌ Side-stripe borders, gradient text.
-- ❌ Cards anidadas. ❌ Mezclar gsap+framer. ❌ Mandar tráfico con el form en modo mock.
-- ❌ Dejar leads sin persistir ni medir.
-- ❌ `divide-y + border-y` juntos en listas de texto — genera 4 líneas para 3 ítems. Listas de prosa usan espaciado (`gap`/`py-*`), no reglas. Regla en detalle: `DESIGN.md → Horizontal line discipline`.
+- ❌ Precio/escasez públicos. ❌ Jerga técnica como gancho.
+- ❌ Hex de color hardcodeado. ❌ Glass/glow en cualquier parte del sitio, incluido el hero. ❌ Side-stripe borders, gradient text.
+- ❌ Cards anidadas. ❌ gsap (retirado del proyecto).
+- ❌ Dejar leads sin medir (analytics sigue sin invocarse — ver §7).
+- ❌ `divide-y + border-y` juntos en listas de texto, o `border-bottom` por ítem sobre un contenedor con `border-top` — genera N+1 líneas para N ítems. Listas de prosa usan espaciado (`gap`/`py-*`), no reglas. Regla en detalle: `DESIGN.md → Horizontal line discipline`.
 
 ---
 
-## 7. Backlog conocido (del critique impeccable, 26/40)
+## 7. Backlog conocido
 
 | Prio | Item | Dónde |
 |------|------|-------|
-| **P0** | Form mock — leads se pierden; analytics nunca se llama | `app/actions/submit-contact.ts`, `lib/analytics.ts` |
-| **P1** | Cero prueba social (testimonios/demo/fuente de stats) | nueva sección + `content/boreas-home.ts` |
-| **P1** | Hero contradecía DESIGN.md → resuelto a favor de glass (este doc + DESIGN.md actualizado) | `boreas-hero.tsx`, `DESIGN.md` |
-| **P1** | Dos verdes hardcodeados → migrar a `--accent` / `--glow-clinic` (hero visual migrado a `--glow-clinic`; resto de `globals.css` pendiente) | `globals.css`, `boreas-hero.tsx` |
-| **P1** | Orden: Form antes que FAQ; sin CTA final; `final-cta-section` huérfano | `boreas-landing-sections.tsx` |
-| **P2** | Wordmark fuera de límites tipográficos + triple branding | `boreas-hero.tsx` |
-| **P2** | Side-stripe border | `relevo-curiosity-section.tsx:33` |
-| **P2** | "clínica" vs "consultorio" en hero | `content/boreas-home.ts:1` |
-| **P3** | Contraste de placeholder; validación de WhatsApp; deps gsap sin usar (gsap ahora justificado en clinic-builder); `package.json` name=`boreas-v2` | varios |
+| **P0** | Analytics nunca se llama (`trackAnalyticsEvent` no se invoca en CTA-click/submit) — KPIs inmedibles | `lib/analytics.ts` |
+| **P1** | Cero prueba social independiente del mockup de problem-section (testimonios/demo/fuente de stats) | nueva sección + `content/boreas-home.ts` |
+| **P2** | `clinic-builder.tsx` huérfano (gsap, ya no se importa) — eliminar archivo y dependencia de gsap del `package.json` | `components/hero/clinic-builder.tsx`, `package.json` |
+| **P2** | `final-cta-section.tsx` huérfano — decidir si se usa como CTA final tras FAQ o se elimina | `final-cta-section.tsx`, `boreas-landing-sections.tsx` |
+| **P3** | Contraste de placeholder (`placeholder:text-muted/70` probablemente <4.5:1) | `contact-form-section.tsx` |
+| **P3** | Validación de WhatsApp en el form; `package.json` name=`boreas-v2` | varios |

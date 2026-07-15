@@ -1,55 +1,120 @@
 # Boreas V3 Design Context
 
+> Fuente: `design_handoff_boreas_redesign/README.md` (rediseño "1c Vivo", junio 2026) — handoff
+> **externo, no incluido en este repo**. Este documento es la versión resumida y canónica para
+> uso diario dentro del repo; si se necesitan specs pixel-perfect por sección, pedir el handoff
+> completo aparte.
+
 ## Design Direction
 
-Dark medical editorial. The page should feel premium, calm, and legible at night, with enough clinical light to avoid looking like a generic dark SaaS product.
+**Papel cálido + arcilla.** Migración del sistema dark-medical (teal frío sobre negro) a un
+sistema editorial cálido inspirado en Claude desktop: fondo crema, acento terracota, tipografía
+serif editorial, plano y mate — sin glass ni glow fuera del hero. Soporta light mode (default)
+y dark mode vía toggle.
 
 ## Visual System
 
-- Background: off-black with a cool medical tint, never pure black.
-- Foreground: high-contrast off-white for all core copy.
-- Muted text: readable gray-blue, never below WCAG contrast for body text.
-- Accent: one teal-green used for action and proof, not decoration.
-- Secondary signal: restrained clinical white and steel-gray, used through imagery and dividers.
-- Typeface: Satoshi local. Use weight, scale, and spacing for hierarchy. No destructive negative tracking.
+### Color — tokens en `app/globals.css` (única fuente)
+
+| Rol | Token | Light | Dark | Uso |
+|-----|-------|-------|------|-----|
+| Fondo | `--bg-deep` / `--bg-surface` / `--bg-elevated` / `--bg-void` | `#FBF8F3` / `#FFFFFF` / `#F4F1EA` / `#EDE9DF` | `#1B1916` / `#252119` / `#201E1A` / `#131210` | Papel cálido. Nunca blanco/negro puro. |
+| Texto | `--ink` / `--ink-muted` / `--clinical` | `#1E1B18` / `#6C675E` / `#9C978F` | `#F5F1E8` / `#A8A192` / `#706A5F` | Cuerpo en `--ink`/`--ink-muted`. `--clinical` solo terciario/placeholder. |
+| **Acción** | `--accent` (arcilla) | `#D2674A` | `#E27F62` | CTA, foco, links activos. Único color de acción. |
+| **Acentos vivos** | `--c-amber` / `--c-mint` / `--c-lav` / `--c-rose` | `#E2A33C` / `#4FB39A` / `#7E86E8` / `#E0617E` | `#EBB45A` / `#5FC4AA` / `#949BF0` / `#EC7791` | Estadísticas, badges, elementos dinámicos. Sistema deliberado multi-color — no es decoración accidental, está mapeado en `@theme inline` como `--color-amber/-mint/-lavender/-rose-acc`. |
+| WhatsApp | `--whatsapp-green` | igual en ambos modos | | Identidad de marca de terceros. Reservado para UI de WhatsApp (badges, iconos de chat), nunca como acento genérico ni CTA. |
+| Error | `--danger` | `#C0392B` | | Mensajes de error. |
+| Líneas | `--line` (sutil) / `--border` (definida) | | | `--line` para dividers discretos; `--border` para contornos de cards/inputs. |
+
+**Estrategia de color**: Committed/Full palette, no Restrained. El acento arcilla carga la
+identidad de acción; los 4 acentos vivos son un sistema deliberado para datos y elementos
+dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior).
+
+### Tipografía
+
+- **Newsreader** (serif editorial, pesos 300–600 + italic) — display: h1–h3, wordmarks, cifras grandes.
+- **Figtree** (sans, pesos 300–700) — body/UI: párrafos, labels, nav, botones.
+- Cargadas vía `next/font/google` en `app/layout.tsx`, expuestas como `--font-newsreader` / `--font-figtree`, mapeadas a `--font-display` / `--font-sans` en `@theme inline`.
+- **Satoshi quedó retirado.** No reintroducir.
+- Escala: Display XL `clamp(2.2rem,5vw,4.6rem)` · Display LG `clamp(1.8rem,3.5vw,3.2rem)` · Display MD `clamp(1.4rem,2.5vw,2.2rem)` · Wordmark italic Newsreader 500 (excepción deliberada a cualquier límite de tracking — es marca, no headline de contenido). Body LG 18px / Base 15px / SM 13.5px, Figtree 400, lh 1.62–1.68. Eyebrow 11px mono uppercase tracking 0.14em (uso puntual, no por sección — ver Prohibiciones).
+
+### Radio y sombra
+
+```
+--radius-xl: 16px   cards principales (hero card cluster)
+--radius-md: 10px   cards secundarias, inputs anidados
+--radius-sm:  8px   botones, inputs, step markers, mockups de contenido
+--radius-pill: 999px badges, chips, toggles
+--shadow / --shadow-sm  ver tokens en globals.css (distintos por modo)
+```
+
+> Nota: la regla histórica "cards ≤ 8px" del sistema anterior queda reemplazada por esta
+> escala de 4 niveles. Usa `--radius-xl` solo para el cluster de cards del hero; cualquier
+> mockup o card de contenido (ej. WhatsApp mockup en problem-section) usa `--radius-sm`.
 
 ## Layout Rules
 
 - Mobile-first.
-- Hero uses a fabricated "clinical light" glass composition (orbital glass, scanlines, glass proof cards) as full-bleed context, with text over it. This is a deliberate brand system, not decoration. A real medical image is an allowed alternative but not required.
-- First viewport must show the offer and hint at the next section.
-- Prefer editorial rows, dividers, and columns over repeated cards.
-- Cards are allowed only for true framed tools or repeated items, with radius 8px or less.
-- Avoid cards inside cards.
-- Use generous section spacing but keep mobile scan distance reasonable.
+- Hero: gradiente cálido sutil (`linear-gradient` con `color-mix` hacia `#FFF8EC`), sin glass/glow/orbes. Card cluster flotante a la derecha en desktop (oculto en mobile) con animación `float` suave por CSS (no gsap).
+- **Sin glass/backdrop-filter en ningún lado**, incluido el hero. `.liquid-header`/`.liquid-menu` quedaron retirados — no reintroducir.
+- **Sin glow/orbes decorativos en ningún lado.** El sistema "clinical light" del hero anterior queda retirado.
+- Primer viewport muestra la oferta y sugiere la siguiente sección.
+- Filas editoriales, dividers y columnas sobre cards repetidas.
+- Cards permitidas para herramientas enmarcadas reales o ítems repetidos — usar la escala de radio de arriba, nunca cards anidadas.
+- Espaciado de sección generoso (ver specs por sección en el handoff); distancia de scan razonable en móvil.
 
 ### Horizontal line discipline
 
 - `SectionFrame` carries one `border-t border-line` per section. That is the structural separator. Do not add more borders at the same level.
-- Within a section: one anchor divider per content block maximum. Never combine `divide-y` + `border-y` on the same element — that produces 4 lines for 3 items.
-- Prose lists (pain points, bullets, short paragraphs): use spacing (`gap`, `space-y`, `py-*`) not rules. Lines are for structured rows with two or more columns (transformation table, guarantee rows), not for separated paragraphs.
-- If a block has `border-t` as its anchor, omit `border-b`. The closing line is noise.
+- Within a section: one anchor divider per content block maximum. Never combine `divide-y` + `border-y` (or per-item `border-bottom` stacked on a container `border-top`) on the same list — that produces N+1 lines for N items.
+- Prose lists (pain points, bullets, short paragraphs): use spacing (`gap`, `space-y`, `py-*`) not rules. Lines are for structured two-column rows (transformation table, guarantee rows, FAQ entries) where each row genuinely needs a visual boundary — not for separated paragraphs of running text.
+- If a block has `border-t` as its anchor, omit `border-b` on the same edge. The closing line is noise.
+- This rule holds regardless of which token system is active — it is a usability constraint, not a brand-color decision.
 
 ## Motion Rules
 
-- Motion is quiet: opacity and small translate only.
-- Respect `prefers-reduced-motion`.
+> **2026-07-13 update — owner directive, supersedes the old "quiet motion" doctrine below.**
+> The landing is Boreas's own portfolio piece: it must visually demonstrate the same
+> capability Boreas sells to clients. Every section carries choreographed, section-specific
+> motion — set pieces that demonstrate, not decorate. This overrides "motion is quiet" as
+> the default; it does not override the anti-slop bans, which stay binding:
+> - No bounce/elastic easing — ease-out exponential only.
+> - No decorative glass/glow (still banned, see Prohibitions below).
+> - `prefers-reduced-motion` still mandatory on every animation, no exceptions.
+> - Content is never gated behind animation — it must exist in the DOM and be visible by
+>   default; motion enhances an already-visible element, it doesn't reveal a hidden one.
+> - Motion must be specific to what each section reveals — the same fade+translate applied
+>   uniformly to every section is the failure mode this update exists to fix.
+>
+> Reference implementation: `docs/handoff/2026-07-13-landing-audit-handoff.md` (tasks T3, T4).
+
+- No gsap. framer-motion + CSS only, project-wide.
+- The hero card cluster is being reworked into a choreographed sequence (was: static CSS `@keyframes float` loop). See handoff T3.
+- **gsap is retired.** The previous `clinic-builder.tsx` widget (infinite gsap bot-construction loop) is superseded by the new hero card cluster and should not run. The file is currently orphaned (unused import) — pending removal, see backlog in `GUIDELINES.md`.
+- Respect `prefers-reduced-motion` on every animation: provide a static/instant equivalent, not just "skip the keyframe."
 - No scroll effects that hide content from screenshots, crawlers, or impatient users.
-- Glow/orb systems are allowed **only inside the hero/header** as the brand "clinical light" system, driven by tokens (`--accent`, `--glow-clinic`) and kept soft. Outside the hero/header the page is flat editorial — no decorative glow/orbs/glass.
-- Exception: the hero `clinic-builder` widget runs an infinite gsap construction loop (colorful
-  IDE-bots assembling the consultorio). This is a deliberate brand override of "quiet motion",
-  confined to that one hero widget; `prefers-reduced-motion` renders its completed frame statically.
+- Dark mode toggle transition: `transition: background .28s, color .28s` on `body`.
 
 ## Conversion Rules
 
 - One primary CTA: "Quiero mi consultorio digital".
 - Form submit uses the same action language.
-- Confirmation: "Te escribimos por WhatsApp en las próximas 2 horas."
+- Confirmation: "Te escribimos por WhatsApp en las próximas 2 horas." (success state replaces the form, check icon in `--c-mint`).
 - Relevo never competes with the main CTA.
 
 ## Copy Rules
 
 - Plain Spanish.
+- "Consultorio digital" everywhere — "clínica digital" is being retired (see `GUIDELINES.md` backlog for remaining occurrences).
 - No feature labels as the sell. Translate every technical term into business outcome.
 - Labels name what the user recognizes.
 - Errors explain what to fix.
+
+## Prohibitions (carried over, still binding)
+
+- No glass/backdrop-filter anywhere (including the hero, now retired).
+- No decorative glow/orbs anywhere.
+- No hardcoded color hex outside `globals.css` tokens.
+- No side-stripe borders (`border-left/right` of color as accent).
+- No gradient text.
+- No mixing gsap + framer-motion in the same component (gsap is retired project-wide; framer-motion is the only animation library in active use).

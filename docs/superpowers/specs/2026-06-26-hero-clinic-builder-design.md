@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-26
 **Component:** `components/hero/clinic-builder.tsx` (new) + `components/hero/boreas-hero.tsx` (edit)
-**Status:** Approved in brainstorming, pending spec review
+**Status:** Implemented, then retired — `clinic-builder.tsx` is no longer imported by `boreas-hero.tsx` (superseded by the "1c Vivo" hero card cluster; gsap retired). See `GUIDELINES.md` §7. Historical document; do not re-implement.
 
 ---
 

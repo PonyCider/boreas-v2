@@ -1,13 +1,65 @@
 "use client";
 
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { SectionFrame } from "./boreas-landing-sections";
-import { painPoints, problemStats } from "@/content/boreas-home";
+import { painPoints, problemStats, problemStatsSources } from "@/content/boreas-home";
+import { useAnimatedNumber } from "@/lib/use-animated-number";
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const statAccents = [
   { color: "var(--c-amber)", borderColor: "var(--c-amber)" },
-  { color: "var(--accent)",  borderColor: "var(--accent)" },
   { color: "var(--c-lav)",   borderColor: "var(--c-lav)" },
 ];
+
+// A stat value like "84%" or "3×" — split into an animatable number and its suffix.
+function splitStatValue(raw: string) {
+  const match = raw.match(/^([\d.]+)(.*)$/);
+  if (!match) return { num: null, suffix: raw };
+  return { num: parseFloat(match[1]), suffix: match[2] };
+}
+
+function StatNumber({ raw, reduceMotion }: { raw: string; reduceMotion: boolean | null }) {
+  const { num, suffix } = splitStatValue(raw);
+  const { ref, value } = useAnimatedNumber<HTMLSpanElement>(num ?? 0, {
+    reduceMotion,
+    duration: 1,
+    ease: EASE,
+    trigger: { mode: "inView", margin: "-60px" },
+  });
+  if (num === null) return <span ref={ref}>{raw}</span>;
+  return (
+    <span ref={ref}>
+      <motion.span className="tabular-nums">{value}</motion.span>
+      {suffix}
+    </span>
+  );
+}
+
+const statColumn: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0 },
+};
+
+const painPointsList: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.14 } },
+};
+
+const painPointItem: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
+};
+
+const messageList: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.22, delayChildren: 0.1 } },
+};
+
+const messageBubble: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE } },
+};
 
 const waMessages = [
   { text: "Buenas noches, ¿cuánto cuesta la primera consulta? 🙏", time: "11:43" },
@@ -15,18 +67,18 @@ const waMessages = [
   { text: "¿Tienen lugar disponible esta semana?", time: "11:47" },
 ];
 
-function WhatsAppMockup() {
+function WhatsAppMockup({ reduceMotion }: { reduceMotion: boolean | null }) {
   return (
-    <figure
-      className="overflow-hidden rounded-[var(--radius-xl)] border bg-void"
-      style={{ borderColor: "var(--border)" }}
+    <motion.figure
+      initial={{ opacity: 0, y: reduceMotion ? 0 : 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.6, ease: EASE }}
+      className="overflow-hidden rounded-[var(--radius-sm)] border border-line bg-void"
       aria-label="Conversación de WhatsApp a las 11:47 PM sin respuesta del consultorio"
     >
       {/* Header */}
-      <div
-        className="flex items-center gap-3 border-b px-4 py-3"
-        style={{ borderColor: "var(--border)", background: "rgba(79,179,154,.1)" }}
-      >
+      <div className="flex items-center gap-3 border-b border-line bg-whatsapp/10 px-4 py-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-elevated text-xs font-semibold text-muted">
           NP
         </div>
@@ -34,13 +86,19 @@ function WhatsAppMockup() {
           <p className="truncate text-[13px] font-medium text-foreground">Paciente nuevo</p>
           <p className="text-[11px] text-muted">visto por última vez ayer</p>
         </div>
-        <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-mint px-1.5 text-[10px] font-bold text-white">
+        <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-whatsapp px-1.5 text-[10px] font-bold text-white">
           3
         </span>
       </div>
 
       {/* Chat area */}
-      <div className="flex flex-col gap-2 p-4">
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-60px" }}
+        variants={messageList}
+        className="flex flex-col gap-2 p-4"
+      >
         <div className="mb-1 flex justify-center">
           <span className="rounded-full bg-elevated/50 px-3 py-0.5 text-[10px] uppercase tracking-wide text-muted">
             Ayer · 11 PM
@@ -48,26 +106,31 @@ function WhatsAppMockup() {
         </div>
 
         {waMessages.map((msg) => (
-          <div
+          <motion.div
             key={msg.time}
+            variants={messageBubble}
             className="flex max-w-[85%] flex-col rounded-lg rounded-tl-none bg-surface px-3 py-2"
           >
             <p className="text-[13px] leading-snug text-foreground">{msg.text}</p>
             <p className="mt-1 self-end text-[10px] text-muted">{msg.time} PM · ✓</p>
-          </div>
+          </motion.div>
         ))}
 
-        <p className="mt-3 text-center text-[11px] italic text-muted">
+        <motion.p
+          variants={messageBubble}
+          transition={{ duration: 0.5, ease: EASE, delay: reduceMotion ? 0 : 0.3 }}
+          className="mt-3 text-center text-[11px] font-medium italic text-muted"
+        >
           Sin respuesta · 9:12 AM del día siguiente
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
       {/* Input bar */}
-      <div className="flex items-center gap-2 border-t bg-surface/30 px-3 py-2.5" style={{ borderColor: "var(--border)" }}>
+      <div className="flex items-center gap-2 border-t border-line bg-surface/30 px-3 py-2.5">
         <div className="flex-1 rounded-full bg-elevated/60 px-4 py-1.5 text-[12px] text-muted/30">
           Escribe un mensaje…
         </div>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-mint">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-whatsapp">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="white" aria-hidden="true">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>
@@ -75,19 +138,26 @@ function WhatsAppMockup() {
       </div>
 
       {/* Caption */}
-      <figcaption className="border-t px-4 py-3 text-[11px] text-muted" style={{ borderColor: "var(--border)" }}>
+      <figcaption className="border-t border-line px-4 py-3 text-[11px] text-muted">
         Tu paciente buscó anoche a las 11 PM. Esto encontró.
       </figcaption>
-    </figure>
+    </motion.figure>
   );
 }
 
 export function ProblemSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <SectionFrame id="problema" className="border-t border-line bg-background">
       <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
         <div className="grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-20">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55, ease: EASE }}
+          >
             <h2
               className="text-balance leading-none text-foreground"
               style={{
@@ -103,73 +173,89 @@ export function ProblemSection() {
             <p className="mt-6 max-w-xl text-lg leading-relaxed" style={{ color: "var(--ink-muted)" }}>
               La pregunta no es si necesitan encontrarte. Es si llegan a un lugar que les da confianza suficiente para escribirte hoy.
             </p>
-          </div>
+          </motion.div>
 
-          <div className="grid gap-6 sm:grid-cols-3">
-            {problemStats.map((stat, i) => (
-              <div
-                key={stat.value}
-                className="pt-5"
-                style={{ borderTop: `2px solid ${statAccents[i].borderColor}` }}
-              >
-                <span
-                  className="block font-display font-medium leading-none"
-                  style={{
-                    color: statAccents[i].color,
-                    fontFamily: "var(--font-newsreader), Georgia, serif",
-                    fontSize: i === 0
-                      ? "clamp(3.2rem, 7vw, 5.8rem)"
-                      : "clamp(2.5rem, 5vw, 4.2rem)",
-                  }}
+          <div>
+            <div className="grid gap-6 sm:grid-cols-2">
+              {problemStats.map((stat, i) => (
+                <motion.div
+                  key={stat.value}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, margin: "-60px" }}
+                  variants={statColumn}
+                  transition={{ duration: 0.5, ease: EASE, delay: reduceMotion ? 0 : i * 0.12 }}
+                  className="pt-5"
+                  style={{ borderTop: `2px solid ${statAccents[i].borderColor}` }}
                 >
-                  {stat.value}
-                </span>
-                <p className={`leading-relaxed text-muted ${i === 0 ? "mt-5 text-base" : "mt-4 text-sm"}`}>
-                  {stat.label}
-                </p>
-              </div>
-            ))}
+                  <span
+                    className="block font-display font-medium leading-none"
+                    style={{
+                      color: statAccents[i].color,
+                      fontFamily: "var(--font-newsreader), Georgia, serif",
+                      fontSize: "clamp(3rem, 6vw, 5rem)",
+                    }}
+                  >
+                    <StatNumber raw={stat.value} reduceMotion={reduceMotion} />
+                  </span>
+                  <p className="mt-4 text-base leading-relaxed text-muted">
+                    {stat.label}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+
+            <p className="mt-6 text-xs text-muted/70">{problemStatsSources}</p>
           </div>
         </div>
 
-        <div className="mt-16 grid items-center gap-10 border-t pt-14 lg:grid-cols-[1fr_0.78fr] lg:gap-20" style={{ borderColor: "var(--border)" }}>
+        <div className="mt-16 grid items-center gap-10 border-t border-line pt-14 lg:grid-cols-[1fr_0.78fr] lg:gap-20">
           <div className="order-2 lg:order-1">
-            <h3
-              className="text-balance leading-tight text-foreground"
-              style={{
-                fontFamily: "var(--font-newsreader), Georgia, serif",
-                fontWeight: 400,
-                fontSize: "clamp(2rem, 4.4vw, 4rem)",
-                letterSpacing: "-0.010em",
-                lineHeight: 1.12,
-              }}
+            <motion.div
+              initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.55, ease: EASE }}
             >
-              Tu agenda no está vacía por falta de pacientes.
-            </h3>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-foreground">
-              Está vacía porque los pacientes llegan, preguntan por WhatsApp y mueren esperando mientras tu asistente contesta mensajes de curiosos.
-            </p>
+              <h3
+                className="text-balance leading-tight text-foreground"
+                style={{
+                  fontFamily: "var(--font-newsreader), Georgia, serif",
+                  fontWeight: 400,
+                  fontSize: "clamp(2rem, 4.4vw, 4rem)",
+                  letterSpacing: "-0.010em",
+                  lineHeight: 1.12,
+                }}
+              >
+                Tu agenda no está vacía por falta de pacientes.
+              </h3>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-foreground">
+                Está vacía porque los pacientes llegan, preguntan por WhatsApp y mueren esperando mientras tu asistente contesta mensajes de curiosos.
+              </p>
+            </motion.div>
 
-            <div className="mt-9" style={{ borderTop: "1px solid var(--border)" }}>
+            <motion.div
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={painPointsList}
+              className="mt-9 border-t border-line"
+            >
               {painPoints.map((point) => {
                 const [before, after] = point.text.split(point.emphasis);
                 return (
-                  <p
-                    key={point.emphasis}
-                    className="py-5 text-[15px] leading-relaxed text-muted"
-                    style={{ borderBottom: "1px solid var(--border)" }}
-                  >
+                  <motion.p key={point.emphasis} variants={painPointItem} className="py-5 text-[15px] leading-relaxed text-muted">
                     {before}
                     <strong className="font-medium text-foreground">{point.emphasis}</strong>
                     {after}
-                  </p>
+                  </motion.p>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
 
           <div className="order-1 lg:order-2">
-            <WhatsAppMockup />
+            <WhatsAppMockup reduceMotion={reduceMotion} />
           </div>
         </div>
       </div>
