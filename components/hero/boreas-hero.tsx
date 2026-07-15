@@ -1,7 +1,6 @@
 "use client";
 
-import { motion, useMotionValueEvent, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
-import { useState } from "react";
+import { motion, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
 import {
   exampleBadgeLabel,
   heroCardStats,
@@ -17,6 +16,7 @@ import {
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number";
 import { useHeroScrollPhases } from "@/lib/use-hero-scroll-phases";
+import { useMotionValueState } from "@/lib/use-motion-value-state";
 
 const doctor = socialProof.mockupDoctor;
 const doctorInitials = initials(doctor.name);
@@ -354,9 +354,9 @@ function HeroStatic() {
 function HeroCinematicLeftColumn({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   const reveal = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } };
   const ease = EASE;
-  const problemEyebrowOpacityMv = useTransform(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0]);
-  const [problemEyebrowOpacity, setProblemEyebrowOpacity] = useState(problemEyebrowOpacityMv.get());
-  useMotionValueEvent(problemEyebrowOpacityMv, "change", setProblemEyebrowOpacity);
+  const problemEyebrowOpacity = useMotionValueState(
+    useTransform(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0])
+  );
   const solutionEyebrowOpacity = 1 - problemEyebrowOpacity;
 
   return (
@@ -434,9 +434,9 @@ function HeroCinematicLeftColumn({ scrollYProgress }: { scrollYProgress: MotionV
 }
 
 function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const problemOpacityMv = useTransform(scrollYProgress, [PHASE_2_END - 0.04, PHASE_2_END], [1, 0]);
-  const [problemOpacity, setProblemOpacity] = useState(problemOpacityMv.get());
-  useMotionValueEvent(problemOpacityMv, "change", setProblemOpacity);
+  const problemOpacity = useMotionValueState(
+    useTransform(scrollYProgress, [PHASE_2_END - 0.04, PHASE_2_END], [1, 0])
+  );
   const solutionOpacity = 1 - problemOpacity;
   return (
     <div className="absolute bottom-4 left-0 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2">
