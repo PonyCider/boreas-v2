@@ -2,23 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { relevoExampleLabel, relevoExamples, type RelevoExample, type RelevoMessage } from "@/content/boreas-home";
+import { StackedCards, type StackedCardLayer } from "@/components/motion/stacked-cards";
 
 // Ported from relevo.chat's own landing (components/landing/how-it-works.tsx),
 // retinted to Boreas tokens. Card-stack depth is CSS-transition-driven (not
 // framer-motion) — matches the source implementation; the global
 // prefers-reduced-motion rule in globals.css already collapses these
 // transitions to ~0, so no extra reduced-motion branching is needed here.
-
-// Back layers read as soft shadow first, hint-of-content second (reference:
-// relevo.chat's own stack is a pure dark blurred bleed, no visible card
-// edges). More offset/blur and less opacity than a naive "duplicate card"
-// treatment, and no border on the back layers — a crisp rounded-rect
-// outline at any opacity still reads as "another card" instead of "shadow".
-const stackLayerStyles = [
-  { x: 0, y: 0, scale: 1, opacity: 1, blur: 0, zIndex: 14 },
-  { x: 24, y: 16, scale: 0.965, opacity: 0.22, blur: 6, zIndex: 13 },
-  { x: 44, y: 30, scale: 0.93, opacity: 0.1, blur: 11, zIndex: 12 },
-] as const;
 
 // The card stack is entirely aria-hidden (it's a decorative, animated,
 // duplicated-DOM effect) — this renders the same conversation as plain,
@@ -263,68 +253,17 @@ export function RelevoExampleCarousel() {
         aria-label="Ver el siguiente ejemplo"
         className="mt-6 block w-full cursor-pointer rounded-[var(--radius-sm)] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
       >
-        <div
-          className="relative overflow-x-clip pr-10"
-          style={{ clipPath: "inset(-4px 0px -40px -40px)" }}
-        >
-          {/* Ghost stack: every example rendered invisibly, all layered in the
-              same CSS grid cell (grid-area: 1 / 1). CSS Grid sizes the track to
-              its tallest item, so this wrapper's natural height is always the
-              tallest example among all of them — not just the active one. The
-              stack container below has no explicit height; it inherits this
-              ghost's height from normal document flow, so it never resizes
-              when the active example changes (the absolutely-positioned real
-              card layers don't affect flow height, same as before). Bottom
-              clip inset mirrors the left one: the back stack layers are offset
-              down as well as right (see stackLayerStyles), and the front
-              card's own --shadow reaches ~28px below its box, so the bottom
-              needs the same breathing room the right side gets from pr-10 and
-              the left gets from its -40px inset. */}
-          <div className="pointer-events-none invisible grid" aria-hidden="true">
-            {relevoExamples.map((preview) => (
-              <div
-                key={preview.business.name}
-                className="overflow-hidden rounded-[var(--radius-sm)] border border-line"
-                style={{ gridArea: "1 / 1" }}
-              >
-                <ConversationCard preview={preview} isFrontCard={true} />
-              </div>
-            ))}
-          </div>
-
-          {stackExamples.map((preview, previewIndex) => {
-            const restingStyle = stackLayerStyles[previewIndex];
-            const animatedStyle = previewIndex === 0 ? { x: -30, y: -2, scale: 0.965, opacity: 0, blur: 5, zIndex: 15 } : stackLayerStyles[previewIndex - 1];
-            const layerStyle = stackPhase === "shifting" ? animatedStyle : restingStyle;
-            const isFrontCard = previewIndex === 0;
-
-            return (
-              <div
-                key={`${preview.business.name}-${previewIndex}-${activeIndex}`}
-                aria-hidden="true"
-                className={`absolute inset-x-0 top-0 overflow-hidden rounded-[var(--radius-sm)] pointer-events-none transition-all duration-500 ${
-                  isFrontCard ? "border border-line" : ""
-                }`}
-                style={{
-                  transform: `translate3d(${layerStyle.x}px, ${layerStyle.y}px, 0) scale(${layerStyle.scale})`,
-                  opacity: layerStyle.opacity,
-                  zIndex: layerStyle.zIndex,
-                  filter: `blur(${layerStyle.blur}px)`,
-                  transformOrigin: "top left",
-                  // Front card keeps the design system's default shadow. Back
-                  // layers get a bigger, darker, more offset shadow of their
-                  // own — that's what actually reads as "soft dark bleed"
-                  // once blurred, on top of the layer's own filter:blur.
-                  boxShadow: isFrontCard
-                    ? "var(--shadow)"
-                    : "16px 22px 48px -10px rgba(20,18,15,0.38)",
-                }}
-              >
-                <ConversationCard preview={preview} isFrontCard={isFrontCard} />
-              </div>
-            );
-          })}
-        </div>
+        <StackedCards
+          layers={stackExamples.map((preview, previewIndex): StackedCardLayer => ({
+            key: `${preview.business.name}-${previewIndex}-${activeIndex}`,
+            content: <ConversationCard preview={preview} isFrontCard={previewIndex === 0} />,
+          }))}
+          ghostLayers={relevoExamples.map((preview): StackedCardLayer => ({
+            key: preview.business.name,
+            content: <ConversationCard preview={preview} isFrontCard={true} />,
+          }))}
+          frontOverride={stackPhase === "shifting" ? { x: -30, y: -2, scale: 0.965, opacity: 0, blur: 5 } : undefined}
+        />
       </button>
 
       {/* Dots + hint */}
