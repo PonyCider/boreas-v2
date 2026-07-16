@@ -29,8 +29,9 @@ Nuevos módulos, framer-motion puro (sin dependencias nuevas), pensados para que
 - **`components/motion/parallax-layer.tsx`** — envuelve una capa y la mueve a una velocidad relativa al scroll (`speed` prop). Dos capas con distinto `speed` bajo el mismo `scrollYProgress` generan profundidad, sin WebGL.
 - **`components/motion/text-reveal.tsx`** — palabras/líneas que van de `opacity: 0.2 → 1`. **Nunca 0 → 1**: el piso de 0.2 mantiene el texto legible desde el primer frame, cumpliendo la regla fija "headline visible desde scroll 0" (`docs/superpowers/specs/2026-07-14-hero-cinematic-scroll-design.md`, regla no negociable).
 - **`components/motion/horizontal-scroll-section.tsx`** — pinea verticalmente y traduce el progreso de scroll en desplazamiento horizontal de una pista interna. Se diseña hoy para que el sistema esté completo; no se usa en Hero (candidato natural: una futura galería en Transformación o testimonios).
+- **`components/motion/stacked-cards.tsx`** — generaliza el patrón de profundidad de `relevo-example-carousel.tsx` (arreglado en esta misma sesión: altura estable vía CSS grid-stacking en vez de medición JS, capas de atrás sin borde, con blur/opacity/sombra propia para leer como bulto de sombra suave — no como cards duplicadas). Reutilizable en cualquier lugar que necesite sensación de "hay más detrás" sin WebGL. Extraído de código ya en producción, no es un diseño nuevo desde cero.
 
-**Regla de construcción, aplica a los 5:** solo animan `transform` (x/y/scale/rotate) y `opacity` — nunca `width`/`height`/`top`/`left`. `will-change: transform` se aplica dentro del primitivo, no repartido a mano por componente consumidor. Cada uno acepta `reduceMotion` y en ese modo es un no-op (sin transform, contenido a su valor final fijo) — la lógica de apagado vive en el primitivo, no se reimplementa por sección.
+**Regla de construcción, aplica a los 6:** solo animan `transform` (x/y/scale/rotate) y `opacity` — nunca `width`/`height`/`top`/`left`. `will-change: transform` se aplica dentro del primitivo, no repartido a mano por componente consumidor. Cada uno acepta `reduceMotion` y en ese modo es un no-op (sin transform, contenido a su valor final fijo) — la lógica de apagado vive en el primitivo, no se reimplementa por sección.
 
 ---
 
@@ -61,6 +62,16 @@ Cambios de contenido/composición dentro del esqueleto existente:
 - **Composición del cluster derecho más grande y con jerarquía real**: la doctor card + chips dejan de ser 3 elementos chicos flotando sueltos — se agrandan y se les da profundidad real vía `ParallaxLayer` (fondo, card, chip, cada uno a su propio `speed`).
 - **Mobile recalibrado, no "desktop encogido"**: mismo tratamiento pero compuesto para su propio tamaño — regla ya fija del proyecto, se refuerza acá.
 
+### Elementos nuevos (no solo animación)
+
+Diagnóstico del dueño, confirmado: animar mejor 3 elementos chicos no arregla que sean pocos — el hueco es de masa visual, no solo de movimiento. Se agregan 5 piezas nuevas, todas reutilizables en otras secciones más adelante (no exclusivas de Hero):
+
+1. **Badge de verificación/confianza** ("✓ Verificado") — flotante, sobre o junto a la doctor card.
+2. **Mini stack de avatares** superpuestos representando "127 pacientes" — hoy ese número es solo texto (`socialProof.mockupDoctor.reviewCount`); se vuelve visual.
+3. **Segunda capa de profundidad detrás de la doctor card**, usando `components/motion/stacked-cards.tsx` (ver sección 1) — no se diseña de cero, se reutiliza el patrón recién arreglado y pulido de Relevo.
+4. **Chip de ubicación/especialidad** ("CDMX · Dermatología").
+5. **Textura de fondo sutil** (formas suaves), no solo el `bg-hero-glow` plano actual.
+
 ---
 
 ## 4. Reduced motion
@@ -72,7 +83,8 @@ Cambios de contenido/composición dentro del esqueleto existente:
 ## 5. Alcance y decisiones operativas
 
 - **Branch:** se trabaja sobre `worktree-hero-cinematic-scroll` (PR #67, sin mergear), agregando commits nuevos ahí. Al terminar, se actualiza el mismo PR en vez de abrir uno nuevo.
-- **Hoy se entrega:** los 5 primitivos de la sección 1 + el Hero rediseñado (secciones 2-4).
+- **Hoy se entrega:** los 6 primitivos de la sección 1 + el Hero rediseñado (secciones 2-4, incluyendo los 5 elementos nuevos).
+- **Ya entregado como parte de este trabajo:** el fix de `relevo-example-carousel.tsx` (altura estable, layout inline, pulido del stack) — base del primitivo `stacked-cards.tsx`, commiteado por separado en esta misma rama.
 - **No se entrega hoy:** la aplicación del sistema a Prueba social, Transformación, Proceso, Garantía, Relevo, FAQ, Contacto. Quedan como trabajo de seguimiento, usando los mismos primitivos.
 
 ---
