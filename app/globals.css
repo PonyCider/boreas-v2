@@ -101,6 +101,7 @@ html {
   background: var(--bg-deep);
   scroll-behavior: smooth;
   height: 100%;
+  overscroll-behavior-x: none;
 }
 
 body {
