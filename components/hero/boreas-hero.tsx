@@ -1,6 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion, type MotionValue } from "framer-motion";
+import { TextReveal } from "@/components/motion/text-reveal";
 import {
   exampleBadgeLabel,
   heroCardStats,
@@ -296,7 +297,7 @@ function HeroStatic() {
             variants={reveal}
             transition={{ duration: 0.7, ease }}
             className="mt-[22px] text-balance font-display font-normal leading-[1.08] tracking-[-0.012em] text-foreground"
-            style={{ fontSize: "clamp(1.85rem, 4vw, 3.8rem)" }}
+            style={{ fontSize: "clamp(2.4rem, 5.6vw, 5.4rem)" }}
           >
             {heroHeadline}
           </motion.h1>
@@ -383,14 +384,16 @@ function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: 
         Boreas
       </motion.p>
 
-      <motion.h1
-        variants={reveal}
-        transition={{ duration: 0.7, ease }}
-        className="mt-[22px] text-balance font-display font-normal leading-[1.08] tracking-[-0.012em] text-foreground"
-        style={{ fontSize: "clamp(1.85rem, 4vw, 3.8rem)" }}
-      >
-        {heroHeadline}
-      </motion.h1>
+      <motion.div variants={reveal} transition={{ duration: 0.7, ease }}>
+        <TextReveal reduceMotion={false} trigger={{ mode: "delay", ms: 200 }}>
+          <h1
+            className="mt-[22px] text-balance font-display font-normal leading-[1.08] tracking-[-0.012em] text-foreground"
+            style={{ fontSize: "clamp(2.4rem, 5.6vw, 5.4rem)" }}
+          >
+            {heroHeadline}
+          </h1>
+        </TextReveal>
+      </motion.div>
 
       <motion.p
         variants={reveal}
