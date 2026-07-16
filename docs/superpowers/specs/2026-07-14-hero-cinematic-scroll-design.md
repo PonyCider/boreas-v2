@@ -1,7 +1,7 @@
 # Hero cinematic scroll — Boreas V3
 
 **Date:** 2026-07-14
-**Status:** Design approved, not yet implemented. Piloto: solo Hero. Las otras 6 secciones "vivas" (Prueba social, Transformación, Proceso, Garantía, Relevo) quedan fuera de esta spec — se evalúan después de validar este patrón, per `docs/handoff/2026-07-13-checkpoint-and-cinematic-scroll-plan.md`.
+**Status:** Implemented — ver `components/hero/boreas-hero.tsx`. Pin mobile: mantenido (probado en iPhone 16 Pro Max real — suave, sin jank, pin/release correctos; ver Tarea 9 del plan). Piloto: solo Hero. Las otras 6 secciones "vivas" (Prueba social, Transformación, Proceso, Garantía, Relevo) quedan fuera de esta spec — se evalúan después de validar este patrón, per `docs/handoff/2026-07-13-checkpoint-and-cinematic-scroll-plan.md`.
 
 ---
 
