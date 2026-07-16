@@ -5,15 +5,24 @@ export interface StackedCardLayer {
   content: React.ReactNode;
 }
 
+export interface StackedCardLayerStyle {
+  x: number;
+  y: number;
+  scale: number;
+  opacity: number;
+  blur: number;
+  zIndex: number;
+}
+
 // Back layers read as soft shadow first, hint-of-content second (reference:
 // relevo.chat's own stack is a pure dark blurred bleed, no visible card
 // edges). No border on back layers — a crisp rounded-rect outline at any
 // opacity still reads as "another card" instead of "shadow".
-export const stackedCardLayerStyles = [
+export const stackedCardLayerStyles: StackedCardLayerStyle[] = [
   { x: 0, y: 0, scale: 1, opacity: 1, blur: 0, zIndex: 14 },
   { x: 24, y: 16, scale: 0.965, opacity: 0.22, blur: 6, zIndex: 13 },
   { x: 44, y: 30, scale: 0.93, opacity: 0.1, blur: 11, zIndex: 12 },
-] as const;
+];
 
 /**
  * Renders a front card with 0-2 blurred "echo" layers behind it for depth.
@@ -27,7 +36,7 @@ export const stackedCardLayerStyles = [
 export function StackedCards({
   layers,
   ghostLayers,
-  frontOverride,
+  layerOverrides,
   clipInset = "-4px 0px -40px -40px",
   radiusVar = "var(--radius-sm)",
   className = "",
@@ -36,9 +45,10 @@ export function StackedCards({
   layers: StackedCardLayer[];
   /** Every possible layer's content, for height-stable sizing (see above). */
   ghostLayers: StackedCardLayer[];
-  /** Temporarily override the front (index 0) layer's transform/opacity/blur
-   *  — e.g. a departure animation while cycling to a new front layer. */
-  frontOverride?: { x: number; y: number; scale: number; opacity: number; blur: number };
+  /** Per-index override of a layer's resting style — e.g. a departure/step-
+   *  forward animation while cycling. `undefined` at an index (or a shorter
+   *  array) falls back to that layer's stackedCardLayerStyles resting style. */
+  layerOverrides?: (StackedCardLayerStyle | undefined)[];
   clipInset?: string;
   radiusVar?: string;
   className?: string;
@@ -57,7 +67,7 @@ export function StackedCards({
 
       {visibleLayers.map((layer, index) => {
         const isFrontCard = index === 0;
-        const style = isFrontCard && frontOverride ? { ...frontOverride, zIndex: 15 } : stackedCardLayerStyles[index];
+        const style = layerOverrides?.[index] ?? stackedCardLayerStyles[index];
         return (
           <div
             key={layer.key}

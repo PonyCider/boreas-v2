@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { relevoExampleLabel, relevoExamples, type RelevoExample, type RelevoMessage } from "@/content/boreas-home";
-import { StackedCards, type StackedCardLayer } from "@/components/motion/stacked-cards";
+import { StackedCards, stackedCardLayerStyles, type StackedCardLayer, type StackedCardLayerStyle } from "@/components/motion/stacked-cards";
 
 // Ported from relevo.chat's own landing (components/landing/how-it-works.tsx),
 // retinted to Boreas tokens. Card-stack depth is CSS-transition-driven (not
@@ -164,6 +164,18 @@ export function RelevoExampleCarousel() {
   const stackExamples = orderedExamples.slice(0, 3);
   const [contextBefore, contextAfter] = activeExample.context.text.split(activeExample.context.emphasis);
 
+  // Cascade during the 320ms shifting window: the front card departs, the
+  // old middle layer steps forward into the old front's resting style, and
+  // the old back layer steps forward into the old middle's resting style.
+  const layerOverrides: (StackedCardLayerStyle | undefined)[] | undefined =
+    stackPhase === "shifting"
+      ? stackExamples.map((_, index): StackedCardLayerStyle | undefined =>
+          index === 0
+            ? { x: -30, y: -2, scale: 0.965, opacity: 0, blur: 5, zIndex: 15 }
+            : stackedCardLayerStyles[index - 1]
+        )
+      : undefined;
+
   const goTo = (index: number) => {
     if (stackPhase !== "idle" || index === activeIndex) return;
     setStackPhase("shifting");
@@ -262,7 +274,7 @@ export function RelevoExampleCarousel() {
             key: preview.business.name,
             content: <ConversationCard preview={preview} isFrontCard={true} />,
           }))}
-          frontOverride={stackPhase === "shifting" ? { x: -30, y: -2, scale: 0.965, opacity: 0, blur: 5 } : undefined}
+          layerOverrides={layerOverrides}
         />
       </button>
 
