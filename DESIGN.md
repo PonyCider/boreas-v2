@@ -9,7 +9,7 @@
 
 **Papel cálido + arcilla.** Migración del sistema dark-medical (teal frío sobre negro) a un
 sistema editorial cálido inspirado en Claude desktop: fondo crema, acento terracota, tipografía
-serif editorial, plano y mate — sin glass ni glow fuera del hero. Soporta light mode (default)
+serif editorial, plano y mate — glass/glow solo como acento puntual, nunca wallpaper decorativo (ver Prohibiciones). Soporta light mode (default)
 y dark mode vía toggle.
 
 ## Visual System
@@ -55,9 +55,8 @@ dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior
 ## Layout Rules
 
 - Mobile-first.
-- Hero: gradiente cálido sutil (`linear-gradient` con `color-mix` hacia `#FFF8EC`), sin glass/glow/orbes. Card cluster flotante a la derecha en desktop (oculto en mobile) con animación `float` suave por CSS (no gsap).
-- **Sin glass/backdrop-filter en ningún lado**, incluido el hero. `.liquid-header`/`.liquid-menu` quedaron retirados — no reintroducir.
-- **Sin glow/orbes decorativos en ningún lado.** El sistema "clinical light" del hero anterior queda retirado.
+- Hero: gradiente cálido sutil (`linear-gradient` con `color-mix` hacia `#FFF8EC`) como base; un acento de glow puntual (fondo con parallax) es aceptable ahí — ver Prohibiciones. Card cluster flotante a la derecha en desktop (oculto en mobile) con animación `float` suave por CSS (no gsap).
+- Glass/backdrop-filter y glow/orbes decorativos: ver reglas relajadas en Prohibiciones (acento puntual, no wallpaper). `.liquid-header`/`.liquid-menu` (el sistema "clinical light" del hero anterior) quedaron retirados — no reintroducir esos componentes específicos, aunque la técnica general ya no está prohibida.
 - Primer viewport muestra la oferta y sugiere la siguiente sección.
 - Filas editoriales, dividers y columnas sobre cards repetidas.
 - Cards permitidas para herramientas enmarcadas reales o ítems repetidos — usar la escala de radio de arriba, nunca cards anidadas.
@@ -78,8 +77,8 @@ dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior
 > capability Boreas sells to clients. Every section carries choreographed, section-specific
 > motion — set pieces that demonstrate, not decorate. This overrides "motion is quiet" as
 > the default; it does not override the anti-slop bans, which stay binding:
-> - No bounce/elastic easing — ease-out exponential only.
-> - No decorative glass/glow (still banned, see Prohibitions below).
+> - Ease-out exponential remains the default; a subtle spring/overshoot is allowed only for punctual micro-interactions (see Prohibitions § Easing — relaxed 2026-07-16).
+> - Glass/glow allowed only as a punctual accent per section, never decorative wallpaper (see Prohibitions § Glass/glow/gradient — relaxed 2026-07-16).
 > - `prefers-reduced-motion` still mandatory on every animation, no exceptions.
 > - Content is never gated behind animation — it must exist in the DOM and be visible by
 >   default; motion enhances an already-visible element, it doesn't reveal a hidden one.
