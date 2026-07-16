@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { relevoExampleLabel, relevoExamples, type RelevoExample, type RelevoMessage } from "@/content/boreas-home";
 
 // Ported from relevo.chat's own landing (components/landing/how-it-works.tsx),
@@ -9,10 +9,15 @@ import { relevoExampleLabel, relevoExamples, type RelevoExample, type RelevoMess
 // prefers-reduced-motion rule in globals.css already collapses these
 // transitions to ~0, so no extra reduced-motion branching is needed here.
 
+// Back layers read as soft shadow first, hint-of-content second (reference:
+// relevo.chat's own stack is a pure dark blurred bleed, no visible card
+// edges). More offset/blur and less opacity than a naive "duplicate card"
+// treatment, and no border on the back layers — a crisp rounded-rect
+// outline at any opacity still reads as "another card" instead of "shadow".
 const stackLayerStyles = [
   { x: 0, y: 0, scale: 1, opacity: 1, blur: 0, zIndex: 14 },
-  { x: 28, y: 10, scale: 0.96, opacity: 0.38, blur: 4, zIndex: 13 },
-  { x: 50, y: 18, scale: 0.925, opacity: 0.2, blur: 7, zIndex: 12 },
+  { x: 24, y: 16, scale: 0.965, opacity: 0.22, blur: 6, zIndex: 13 },
+  { x: 44, y: 30, scale: 0.93, opacity: 0.1, blur: 11, zIndex: 12 },
 ] as const;
 
 // The card stack is entirely aria-hidden (it's a decorative, animated,
@@ -156,29 +161,12 @@ export function RelevoExampleCarousel() {
   const [stackPhase, setStackPhase] = useState<"idle" | "shifting">("idle");
   const [textPhase, setTextPhase] = useState<"idle" | "out" | "preEnter">("idle");
   const timersRef = useRef<number[]>([]);
-  const ghostRef = useRef<HTMLDivElement>(null);
-  const [containerHeight, setContainerHeight] = useState<number | null>(null);
 
   useEffect(() => {
     const timers = timersRef.current;
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer));
     };
-  }, []);
-
-  useLayoutEffect(() => {
-    const node = ghostRef.current;
-    if (!node) return;
-    // ResizeObserver (not a one-shot offsetHeight read tied to activeIndex) so
-    // the container height stays correct across viewport resize, orientation
-    // change, and late web-font swaps — any of which can change the ghost's
-    // wrapped line count independently of which example is active.
-    const observer = new ResizeObserver(([entry]) => {
-      const h = entry.borderBoxSize?.[0]?.blockSize ?? node.offsetHeight;
-      setContainerHeight(h);
-    });
-    observer.observe(node);
-    return () => observer.disconnect();
   }, []);
 
   const activeExample = relevoExamples[activeIndex];
@@ -276,13 +264,32 @@ export function RelevoExampleCarousel() {
         className="mt-6 block w-full cursor-pointer rounded-[var(--radius-sm)] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
       >
         <div
-          className="relative overflow-x-clip pr-10 transition-[height] duration-500 ease-out"
-          style={{ height: containerHeight ?? undefined, clipPath: "inset(-4px 0px 0px -40px)" }}
+          className="relative overflow-x-clip pr-10"
+          style={{ clipPath: "inset(-4px 0px -40px -40px)" }}
         >
-          <div ref={ghostRef} className="pointer-events-none invisible" aria-hidden="true">
-            <div className="overflow-hidden rounded-[var(--radius-sm)] border border-line">
-              <ConversationCard preview={orderedExamples[0]} isFrontCard={true} />
-            </div>
+          {/* Ghost stack: every example rendered invisibly, all layered in the
+              same CSS grid cell (grid-area: 1 / 1). CSS Grid sizes the track to
+              its tallest item, so this wrapper's natural height is always the
+              tallest example among all of them — not just the active one. The
+              stack container below has no explicit height; it inherits this
+              ghost's height from normal document flow, so it never resizes
+              when the active example changes (the absolutely-positioned real
+              card layers don't affect flow height, same as before). Bottom
+              clip inset mirrors the left one: the back stack layers are offset
+              down as well as right (see stackLayerStyles), and the front
+              card's own --shadow reaches ~28px below its box, so the bottom
+              needs the same breathing room the right side gets from pr-10 and
+              the left gets from its -40px inset. */}
+          <div className="pointer-events-none invisible grid" aria-hidden="true">
+            {relevoExamples.map((preview) => (
+              <div
+                key={preview.business.name}
+                className="overflow-hidden rounded-[var(--radius-sm)] border border-line"
+                style={{ gridArea: "1 / 1" }}
+              >
+                <ConversationCard preview={preview} isFrontCard={true} />
+              </div>
+            ))}
           </div>
 
           {stackExamples.map((preview, previewIndex) => {
@@ -295,14 +302,22 @@ export function RelevoExampleCarousel() {
               <div
                 key={`${preview.business.name}-${previewIndex}-${activeIndex}`}
                 aria-hidden="true"
-                className="absolute inset-x-0 top-0 overflow-hidden rounded-[var(--radius-sm)] border border-line pointer-events-none transition-all duration-500"
+                className={`absolute inset-x-0 top-0 overflow-hidden rounded-[var(--radius-sm)] pointer-events-none transition-all duration-500 ${
+                  isFrontCard ? "border border-line" : ""
+                }`}
                 style={{
                   transform: `translate3d(${layerStyle.x}px, ${layerStyle.y}px, 0) scale(${layerStyle.scale})`,
                   opacity: layerStyle.opacity,
                   zIndex: layerStyle.zIndex,
                   filter: `blur(${layerStyle.blur}px)`,
                   transformOrigin: "top left",
-                  boxShadow: isFrontCard ? "var(--shadow)" : "var(--shadow-sm)",
+                  // Front card keeps the design system's default shadow. Back
+                  // layers get a bigger, darker, more offset shadow of their
+                  // own — that's what actually reads as "soft dark bleed"
+                  // once blurred, on top of the layer's own filter:blur.
+                  boxShadow: isFrontCard
+                    ? "var(--shadow)"
+                    : "16px 22px 48px -10px rgba(20,18,15,0.38)",
                 }}
               >
                 <ConversationCard preview={preview} isFrontCard={isFrontCard} />

@@ -26,7 +26,7 @@ export function RelevoCuriositySection() {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: reduceMotion ? 0 : 1, ease: "easeOut" }}
       >
-        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[1fr_minmax(0,460px)] lg:gap-16">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <div className="flex flex-col items-start text-left">
             <p className="mb-4 text-sm font-medium text-accent">
               {relevoKicker}
