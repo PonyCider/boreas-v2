@@ -112,9 +112,26 @@ dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior
 
 ## Prohibitions (carried over, still binding)
 
-- No glass/backdrop-filter anywhere (including the hero, now retired).
-- No decorative glow/orbs anywhere.
 - No hardcoded color hex outside `globals.css` tokens.
 - No side-stripe borders (`border-left/right` of color as accent).
-- No gradient text.
 - No mixing gsap + framer-motion in the same component (gsap is retired project-wide; framer-motion is the only animation library in active use).
+- No cards anidadas (see radius scale above) — still banned even where the rules below relax: nesting reads as generic/templated, the opposite of the direction those rules exist to serve.
+- No visible phase labels on screen ("Fase 1", "Confianza", etc.) — choreography is understood by what elements do, not by tutorial-style narration.
+
+### Glass/glow/gradient — relaxed 2026-07-16 (owner directive)
+
+> Previously fully banned. Now allowed **as a punctual accent at a single moment of
+> impact per section** — not as decorative wallpaper repeated throughout. This is a
+> narrower rule than "banned," not "anything goes":
+> - Glass/backdrop-filter: allowed for one deliberate surface per section at most.
+> - Decorative glow/orbs: allowed as an atmospheric background layer (e.g. Hero's
+>   parallax background texture), not stacked on every card.
+> - Gradient text: allowed on headline-scale text at a moment of impact, not on
+>   body copy or repeated UI labels.
+
+### Easing — relaxed 2026-07-16 (owner directive)
+
+> Ease-out exponential (`[0.22, 1, 0.36, 1]`) remains the default for everything.
+> A subtle spring/overshoot is now allowed, but only for punctual micro-interactions
+> (e.g. a card settling into place) — never a full bounce/elastic keyframe, and never
+> the default for section-level reveals.
