@@ -25,7 +25,7 @@ function StatNumber({ raw, reduceMotion }: { raw: string; reduceMotion: boolean 
     reduceMotion,
     duration: 1,
     ease: EASE,
-    trigger: { mode: "inView", margin: "-60px" },
+    trigger: { mode: "inView", margin: "0px" },
   });
   if (num === null) return <span ref={ref}>{raw}</span>;
   return (

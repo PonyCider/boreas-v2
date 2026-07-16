@@ -28,7 +28,7 @@ function AnimatedPercent({
     reduceMotion,
     duration: 1.5,
     ease: EASE_EXPO,
-    trigger: { mode: "inView", margin: "-80px" },
+    trigger: { mode: "inView", margin: "0px" },
   });
   return (
     <span ref={ref}>
