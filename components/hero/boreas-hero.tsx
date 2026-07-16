@@ -15,7 +15,7 @@ import {
 } from "@/content/boreas-home";
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number";
-import { useHeroScrollPhases, type HeroScrollPhases } from "@/lib/use-hero-scroll-phases";
+import { useScrollPin, type ScrollPin } from "@/lib/motion/use-scroll-pin";
 import { useMotionValueState } from "@/lib/use-motion-value-state";
 
 const doctor = socialProof.mockupDoctor;
@@ -501,7 +501,7 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
   );
 }
 
-function HeroCardMobilePinned({ containerRef, scrollYProgress }: HeroScrollPhases) {
+function HeroCardMobilePinned({ containerRef, scrollYProgress }: ScrollPin) {
   const problemOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [1, 0]));
   const solutionOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [0, 1]));
   const appointmentsOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END, MOBILE_PHASE_END + 0.08], [0, 1]));
@@ -543,8 +543,8 @@ function HeroCardMobilePinned({ containerRef, scrollYProgress }: HeroScrollPhase
 }
 
 function HeroCinematic() {
-  const { containerRef: desktopContainerRef, scrollYProgress: desktopScrollYProgress } = useHeroScrollPhases();
-  const { containerRef: mobileContainerRef, scrollYProgress: mobileScrollYProgress } = useHeroScrollPhases();
+  const { containerRef: desktopContainerRef, scrollYProgress: desktopScrollYProgress } = useScrollPin();
+  const { containerRef: mobileContainerRef, scrollYProgress: mobileScrollYProgress } = useScrollPin();
 
   return (
     <section className="relative bg-hero-glow transition-[background,colors] duration-[280ms]">
