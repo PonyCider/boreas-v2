@@ -8,8 +8,10 @@ import {
   heroCredibility,
   heroEyebrowProblem,
   heroHeadline,
+  heroLocationLabel,
   heroProofPoints,
   heroSubcopy,
+  heroVerifiedLabel,
   lastReplyProblemLabel,
   problemStatsSources,
   socialProof,
@@ -91,7 +93,12 @@ function DoctorCard({
         </div>
         <div>
           <p className="text-[15.5px] font-semibold leading-tight text-foreground">{doctor.name}</p>
-          <p className="mt-0.5 text-[13px] text-muted">{doctor.specialty}</p>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+            <p className="text-[13px] text-muted">{doctor.specialty}</p>
+            <span className="rounded-[var(--radius-pill)] border border-line bg-elevated px-2 py-0.5 text-[11px] text-muted">
+              {heroLocationLabel}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -189,6 +196,17 @@ function ExampleBadge() {
   );
 }
 
+function VerifiedBadge() {
+  return (
+    <span className="absolute -top-2.5 right-4 flex items-center gap-1 rounded-[var(--radius-pill)] border border-mint/30 bg-mint/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-mint">
+      <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3} aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
+      {heroVerifiedLabel}
+    </span>
+  );
+}
+
 function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
@@ -209,6 +227,7 @@ function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
         style={reduceMotion ? undefined : { animation: "float 5.2s ease-in-out infinite" }}
       >
         <ExampleBadge />
+        <VerifiedBadge />
         <DoctorCard trigger={{ mode: "delay", ms: 800 }} testimonialDelayMs={1300} reduceMotion={reduceMotion} />
       </motion.div>
 
@@ -246,6 +265,7 @@ function HeroCardMobile({ reduceMotion }: { reduceMotion: boolean }) {
       className="relative mt-10 block rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)] lg:hidden"
     >
       <ExampleBadge />
+      <VerifiedBadge />
       <DoctorCard trigger={{ mode: "delay", ms: 400 }} testimonialDelayMs={900} reduceMotion={reduceMotion} />
       <div className="mt-4 flex gap-3">
         <AppointmentsChip trigger={{ mode: "delay", ms: 700 }} reduceMotion={reduceMotion} compact />
@@ -463,6 +483,7 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
       className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]"
     >
       <ExampleBadge />
+      <VerifiedBadge />
       <DoctorCard
         trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_1_END }}
         reduceMotion={false}
@@ -509,6 +530,7 @@ function HeroCardMobilePinned({ containerRef, scrollYProgress }: ScrollPin) {
     <div ref={containerRef} className="relative mt-10 block lg:hidden" style={{ height: `${HERO_PIN_VH_MOBILE}vh` }}>
       <div className="sticky top-[88px] rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)]">
         <ExampleBadge />
+        <VerifiedBadge />
         <DoctorCard
           trigger={{ mode: "progress", value: scrollYProgress, threshold: 0.1 }}
           reduceMotion={false}

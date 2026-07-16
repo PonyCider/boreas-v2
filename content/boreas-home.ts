@@ -39,6 +39,13 @@ export const heroEyebrowProblem = "El 40% de las búsquedas ocurre fuera de hora
 
 export const exampleBadgeLabel = "Ejemplo ilustrativo";
 
+export const heroVerifiedLabel = "Verificado";
+
+// Reuses socialProof.mockupDoctor's own city context — CDMX is already the
+// city used for other example businesses in this file (relevoExamples),
+// kept consistent rather than inventing a new one.
+export const heroLocationLabel = "CDMX";
+
 // Problem section data points
 // Sourced and value-checked 2026-07-13 (see statsSources): "3×" (GMB own-site vs
 // social-redirect clicks) had no verifiable source and was removed per GUIDELINES
