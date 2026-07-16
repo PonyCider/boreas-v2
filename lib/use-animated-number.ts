@@ -46,7 +46,9 @@ export function useAnimatedNumber<T extends HTMLElement = HTMLDivElement>(
   const inViewMargin: MarginValue = trigger.mode === "inView" ? trigger.margin ?? "-80px" : "0px";
   const inView = useInView(ref, { once: true, margin: inViewMargin });
 
-  const [progressFired, setProgressFired] = useState(false);
+  const [progressFired, setProgressFired] = useState(
+    () => trigger.mode === "progress" && trigger.value.get() >= trigger.threshold
+  );
   const fallbackProgress = useMotionValue(0);
   const watchedProgress = trigger.mode === "progress" ? trigger.value : fallbackProgress;
   useMotionValueEvent(watchedProgress, "change", (latest) => {

@@ -368,10 +368,10 @@ function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: 
       transition={{ staggerChildren: 0.09, delayChildren: 0.12 }}
     >
       <motion.div variants={reveal} transition={{ duration: 0.6, ease }} className="relative mb-5 h-[20px]">
-        <p style={{ opacity: problemEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-amber">
+        <p aria-hidden={problemEyebrowOpacity < 0.5} style={{ opacity: problemEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-amber">
           {heroEyebrowProblem}
         </p>
-        <p style={{ opacity: solutionEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-mint">
+        <p aria-hidden={solutionEyebrowOpacity < 0.5} style={{ opacity: solutionEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-mint">
           {heroCredibility}
         </p>
       </motion.div>
@@ -443,10 +443,10 @@ function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> })
   return (
     <div className="absolute bottom-4 left-0 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2">
       <div className="relative">
-        <span style={{ opacity: problemOpacity }} className="text-xs text-muted">
+        <span aria-hidden={problemOpacity < 0.5} style={{ opacity: problemOpacity }} className="text-xs text-muted">
           {heroCardStats.lastReplyTime} · {lastReplyProblemLabel}
         </span>
-        <span style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-xs text-muted">
+        <span aria-hidden={solutionOpacity < 0.5} style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-xs text-muted">
           {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
         </span>
       </div>
@@ -486,9 +486,6 @@ function AppointmentsChipEntrance({ scrollYProgress }: { scrollYProgress: Motion
 }
 
 function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  // Scaffold only — every element renders in its final ("phase 3 complete")
-  // state so the pin mechanic can be verified before Tasks 6-7 wire in
-  // scroll-driven opacity/position per phase.
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
       <AppointmentsChipEntrance scrollYProgress={scrollYProgress} />
@@ -519,10 +516,10 @@ function HeroCardMobilePinned({ containerRef, scrollYProgress }: HeroScrollPhase
           instant
         />
         <div className="relative mt-3 h-[16px] text-[13px]">
-          <span style={{ opacity: problemOpacity }} className="absolute inset-0 text-muted">
+          <span aria-hidden={problemOpacity < 0.5} style={{ opacity: problemOpacity }} className="absolute inset-0 text-muted">
             {heroCardStats.lastReplyTime} · {lastReplyProblemLabel}
           </span>
-          <span style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-muted">
+          <span aria-hidden={solutionOpacity < 0.5} style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-muted">
             {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
           </span>
         </div>
