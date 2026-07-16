@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
+import { motion, useReducedMotion, type MotionValue } from "framer-motion";
 import {
   exampleBadgeLabel,
   heroCardStats,
@@ -16,7 +16,7 @@ import {
 import { trackAnalyticsEvent } from "@/lib/analytics";
 import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number";
 import { useScrollPin, type ScrollPin } from "@/lib/motion/use-scroll-pin";
-import { useMotionValueState } from "@/lib/use-motion-value-state";
+import { useScrub } from "@/lib/motion/use-scrub";
 
 const doctor = socialProof.mockupDoctor;
 const doctorInitials = initials(doctor.name);
@@ -356,9 +356,7 @@ function HeroStatic() {
 function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: MotionValue<number>; ctaId: string }) {
   const reveal = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } };
   const ease = EASE;
-  const problemEyebrowOpacity = useMotionValueState(
-    useTransform(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0])
-  );
+  const problemEyebrowOpacity = useScrub(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0]);
   const solutionEyebrowOpacity = 1 - problemEyebrowOpacity;
 
   return (
@@ -436,9 +434,7 @@ function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: 
 }
 
 function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const problemOpacity = useMotionValueState(
-    useTransform(scrollYProgress, [PHASE_2_END - 0.04, PHASE_2_END], [1, 0])
-  );
+  const problemOpacity = useScrub(scrollYProgress, [PHASE_2_END - 0.04, PHASE_2_END], [1, 0]);
   const solutionOpacity = 1 - problemOpacity;
   return (
     <div className="absolute bottom-4 left-0 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2">
@@ -455,9 +451,9 @@ function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> })
 }
 
 function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const opacity = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]));
-  const y = useMotionValueState(useTransform(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]));
-  const settleScale = useMotionValueState(useTransform(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]));
+  const opacity = useScrub(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]);
+  const y = useScrub(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]);
+  const settleScale = useScrub(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]);
   return (
     <div
       style={{ opacity, transform: `translateY(${y}px) scale(${settleScale})` }}
@@ -474,7 +470,7 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
 }
 
 function AppointmentsChipEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const opacity = useMotionValueState(useTransform(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [0, 1]));
+  const opacity = useScrub(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [0, 1]);
   return (
     <div style={{ opacity }} className="absolute right-0 top-0 z-[2]">
       <AppointmentsChip
@@ -502,9 +498,9 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
 }
 
 function HeroCardMobilePinned({ containerRef, scrollYProgress }: ScrollPin) {
-  const problemOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [1, 0]));
-  const solutionOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [0, 1]));
-  const appointmentsOpacity = useMotionValueState(useTransform(scrollYProgress, [MOBILE_PHASE_END, MOBILE_PHASE_END + 0.08], [0, 1]));
+  const problemOpacity = useScrub(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [1, 0]);
+  const solutionOpacity = useScrub(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [0, 1]);
+  const appointmentsOpacity = useScrub(scrollYProgress, [MOBILE_PHASE_END, MOBILE_PHASE_END + 0.08], [0, 1]);
 
   return (
     <div ref={containerRef} className="relative mt-10 block lg:hidden" style={{ height: `${HERO_PIN_VH_MOBILE}vh` }}>
