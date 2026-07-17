@@ -21,6 +21,7 @@ import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number
 import { useScrollPin, type ScrollPin } from "@/lib/motion/use-scroll-pin";
 import { useScrub } from "@/lib/motion/use-scrub";
 import { StackedCards, type StackedCardLayer } from "@/components/motion/stacked-cards";
+import { ParallaxLayer } from "@/components/motion/parallax-layer";
 
 const doctor = socialProof.mockupDoctor;
 const doctorInitials = initials(doctor.name);
@@ -254,9 +255,23 @@ function StackedCardsStaticDoctorCard({ reduceMotion }: { reduceMotion: boolean 
   );
 }
 
+function ClusterBackgroundTexture() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute -inset-x-10 -inset-y-16 -z-10"
+      style={{
+        background: "radial-gradient(circle at 30% 20%, color-mix(in oklch, var(--accent) 18%, transparent) 0%, transparent 60%)",
+        filter: "blur(40px)",
+      }}
+    />
+  );
+}
+
 function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
+      <ClusterBackgroundTexture />
       <motion.div
         initial={reduceMotion ? undefined : { opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -562,6 +577,10 @@ function AppointmentsChipEntrance({ scrollYProgress }: { scrollYProgress: Motion
 function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
+      <ParallaxLayer progress={scrollYProgress} speed={0.15} reduceMotion={false} className="absolute inset-0 -z-10">
+        <ClusterBackgroundTexture />
+      </ParallaxLayer>
+
       <AppointmentsChipEntrance scrollYProgress={scrollYProgress} />
 
       <DoctorCardEntrance scrollYProgress={scrollYProgress} />
