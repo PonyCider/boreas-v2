@@ -1,7 +1,7 @@
 # Sistema de motion maximalista + rediseño de Hero — Boreas V3
 
 **Date:** 2026-07-16
-**Status:** Diseño aprobado, pendiente de plan de implementación.
+**Status:** Implementado — ver `components/hero/boreas-hero.tsx` y `components/motion/`. Pendiente: validación en dispositivo real (mobile), ver checkpoint de sesión.
 **Piloto:** Hero (`components/hero/boreas-hero.tsx`), sobre el trabajo ya mergeable de `docs/superpowers/specs/2026-07-14-hero-cinematic-scroll-design.md` (PR #67, sin mergear). El sistema de primitivos se diseña para las 7 secciones del sitio, pero su *implementación* hoy es exclusivamente Hero — las otras 6 quedan fuera de alcance de esta spec (ver "Fuera de alcance").
 
 ---
