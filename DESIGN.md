@@ -134,3 +134,17 @@ dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior
 > A subtle spring/overshoot is now allowed, but only for punctual micro-interactions
 > (e.g. a card settling into place) — never a full bounce/elastic keyframe, and never
 > the default for section-level reveals.
+
+### Content gating — narrow exception, Hero intro only, relaxed 2026-07-17 (owner directive)
+
+> The general rule stays binding everywhere else: primary content must exist and be
+> visible without requiring scroll. **Narrow, named exception:** the Hero's subcopy,
+> CTAs, and doctor card may be revealed by scroll (not visible at rest) as part of the
+> wordmark→headline timed intro sequence, on the owner's explicit choice after being
+> shown the tradeoff. Conditions that keep this from becoming a precedent creep:
+> - Scroll itself is never blocked/locked — the user can always scroll immediately;
+>   the intro's own timer never delays or captures scroll input.
+> - The wordmark ("Boreas") and H1 headline still reveal automatically on a timer
+>   (not gated behind scroll) — only the CTA/subcopy/card wait for scroll.
+> - This exception is scoped to the Hero's first-viewport intro only. Do not cite this
+>   entry to justify gating content elsewhere in the site.
