@@ -283,6 +283,26 @@ function ClusterBackgroundTexture() {
   );
 }
 
+// Mobile-only ambient glow — more pronounced than ClusterBackgroundTexture
+// (30% color-mix / 48px blur vs desktop's 18% / 40px) since a small screen
+// needs more visual weight to not read as empty. "top" decorates the area
+// behind the headline (outside the pinned scroll zone, so no lg:hidden
+// caller needs it scoped — added directly here); "card" decorates the area
+// around the doctor card and is rendered inside each mobile card wrapper.
+function MobileAmbientGlow({ variant }: { variant: "top" | "card" }) {
+  const position = variant === "top" ? "-inset-x-6 -top-24 h-[70vw] lg:hidden" : "-inset-x-10 -inset-y-16";
+  return (
+    <div
+      aria-hidden="true"
+      className={`pointer-events-none absolute -z-10 ${position}`}
+      style={{
+        background: "radial-gradient(circle at 40% 30%, color-mix(in oklch, var(--accent) 30%, transparent) 0%, transparent 65%)",
+        filter: "blur(48px)",
+      }}
+    />
+  );
+}
+
 function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
@@ -332,20 +352,32 @@ function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
 }
 
 function HeroCardMobile({ reduceMotion }: { reduceMotion: boolean }) {
-  return (
-    <motion.div
-      initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="relative mt-10 block rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)] lg:hidden"
-    >
-      <ExampleBadge />
-      <VerifiedBadge />
+  const cardContent = (
+    <div className="bg-surface p-5">
       <DoctorCard trigger={{ mode: "delay", ms: 400 }} testimonialDelayMs={900} reduceMotion={reduceMotion} />
       <div className="mt-4 flex gap-3">
         <AppointmentsChip trigger={{ mode: "delay", ms: 700 }} reduceMotion={reduceMotion} compact />
         <SearchPercentChip trigger={{ mode: "delay", ms: 900 }} reduceMotion={reduceMotion} compact />
       </div>
+    </div>
+  );
+  const layers: StackedCardLayer[] = [
+    { key: "front", content: cardContent },
+    { key: "echo", content: cardContent },
+  ];
+
+  return (
+    <motion.div
+      initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="relative mt-10 block lg:hidden"
+    >
+      <MobileAmbientGlow variant="card" />
+      <ExampleBadge />
+      <VerifiedBadge />
+      <DoctorCardSrOnlyTranscript />
+      <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px -40px" />
     </motion.div>
   );
 }
@@ -362,6 +394,7 @@ function HeroStatic() {
   return (
     <section className="min-h-[calc(100vh-64px)] py-20 bg-hero-glow transition-[background,colors] duration-[280ms]">
       <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10">
+        <MobileAmbientGlow variant="top" />
         {/* Left column */}
         <motion.div
           initial="hidden"
@@ -636,38 +669,52 @@ function HeroCardMobilePinned({ containerRef, scrollYProgress }: ScrollPin) {
   const solutionOpacity = useScrub(scrollYProgress, [MOBILE_PHASE_END - 0.05, MOBILE_PHASE_END], [0, 1]);
   const appointmentsOpacity = useScrub(scrollYProgress, [MOBILE_PHASE_END, MOBILE_PHASE_END + 0.08], [0, 1]);
 
-  return (
-    <div ref={containerRef} className="relative mt-10 block lg:hidden" style={{ height: `${HERO_PIN_VH_MOBILE}vh` }}>
-      <div className="sticky top-[88px] rounded-[var(--radius-xl)] border border-border bg-surface p-5 shadow-[var(--shadow)]">
-        <ExampleBadge />
-        <VerifiedBadge />
-        <DoctorCard
-          trigger={{ mode: "progress", value: scrollYProgress, threshold: 0.1 }}
-          reduceMotion={false}
-          instant
-        />
-        <div className="relative mt-3 h-[16px] text-[13px]">
-          <span aria-hidden={problemOpacity < 0.5} style={{ opacity: problemOpacity }} className="absolute inset-0 text-muted">
-            {heroCardStats.lastReplyTime} · {lastReplyProblemLabel}
-          </span>
-          <span aria-hidden={solutionOpacity < 0.5} style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-muted">
-            {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
-          </span>
-        </div>
-        <div className="mt-4 flex gap-3">
-          <div style={{ opacity: appointmentsOpacity }} className="flex flex-1">
-            <AppointmentsChip
-              trigger={{ mode: "progress", value: scrollYProgress, threshold: MOBILE_PHASE_END }}
-              reduceMotion={false}
-              compact
-            />
-          </div>
-          <SearchPercentChip
-            trigger={{ mode: "progress", value: scrollYProgress, threshold: 0 }}
+  const cardContent = (
+    <div className="bg-surface p-5">
+      <DoctorCard
+        trigger={{ mode: "progress", value: scrollYProgress, threshold: 0.1 }}
+        reduceMotion={false}
+        instant
+      />
+      <div className="relative mt-3 h-[16px] text-[13px]">
+        <span aria-hidden={problemOpacity < 0.5} style={{ opacity: problemOpacity }} className="absolute inset-0 text-muted">
+          {heroCardStats.lastReplyTime} · {lastReplyProblemLabel}
+        </span>
+        <span aria-hidden={solutionOpacity < 0.5} style={{ opacity: solutionOpacity }} className="absolute inset-0 whitespace-nowrap text-muted">
+          {heroCardStats.lastReplyTime} · {heroCardStats.lastReplyLabel}
+        </span>
+      </div>
+      <div className="mt-4 flex gap-3">
+        <div style={{ opacity: appointmentsOpacity }} className="flex flex-1">
+          <AppointmentsChip
+            trigger={{ mode: "progress", value: scrollYProgress, threshold: MOBILE_PHASE_END }}
             reduceMotion={false}
             compact
           />
         </div>
+        <SearchPercentChip
+          trigger={{ mode: "progress", value: scrollYProgress, threshold: 0 }}
+          reduceMotion={false}
+          compact
+        />
+      </div>
+    </div>
+  );
+  const layers: StackedCardLayer[] = [
+    { key: "front", content: cardContent },
+    { key: "echo", content: cardContent },
+  ];
+
+  return (
+    <div ref={containerRef} className="relative mt-10 block lg:hidden" style={{ height: `${HERO_PIN_VH_MOBILE}vh` }}>
+      <div className="sticky top-[88px]">
+        <ParallaxLayer progress={scrollYProgress} speed={0.12} reduceMotion={false} className="absolute inset-0 -z-10">
+          <MobileAmbientGlow variant="card" />
+        </ParallaxLayer>
+        <ExampleBadge />
+        <VerifiedBadge />
+        <DoctorCardSrOnlyTranscript />
+        <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px -40px" />
       </div>
     </div>
   );
@@ -679,7 +726,8 @@ function HeroCinematic() {
 
   return (
     <section className="relative bg-hero-glow transition-[background,colors] duration-[280ms]">
-      <div className="mx-auto w-full max-w-[1460px] px-4 pt-20 sm:px-6 lg:hidden">
+      <div className="relative mx-auto w-full max-w-[1460px] px-4 pt-20 sm:px-6 lg:hidden">
+        <MobileAmbientGlow variant="top" />
         <HeroCinematicLeftColumn scrollYProgress={mobileScrollYProgress} ctaId="hero-primary-cta-mobile" />
         <HeroCardMobilePinned containerRef={mobileContainerRef} scrollYProgress={mobileScrollYProgress} />
       </div>
