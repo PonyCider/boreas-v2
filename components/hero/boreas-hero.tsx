@@ -222,6 +222,18 @@ function VerifiedBadge() {
   );
 }
 
+// StackedCards marks every layer aria-hidden (decorative depth effect), so
+// the doctor card's real content is otherwise invisible to assistive tech —
+// mirrors the transcript pattern in relevo-example-carousel.tsx.
+function DoctorCardSrOnlyTranscript() {
+  return (
+    <p className="sr-only">
+      {doctor.name} — {doctor.specialty}. Calificación {doctor.rating} de 5, {doctor.reviewCount} {heroCardStats.reviewCountLabel}.
+      &ldquo;{doctor.testimonial}&rdquo;
+    </p>
+  );
+}
+
 function StackedCardsStaticDoctorCard({ reduceMotion }: { reduceMotion: boolean }) {
   const cardContent = (
     <div className="bg-surface p-[22px]">
@@ -234,7 +246,12 @@ function StackedCardsStaticDoctorCard({ reduceMotion }: { reduceMotion: boolean 
     { key: "front", content: cardContent },
     { key: "echo", content: cardContent },
   ];
-  return <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px 0px" />;
+  return (
+    <>
+      <DoctorCardSrOnlyTranscript />
+      <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px 0px" />
+    </>
+  );
 }
 
 function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
@@ -524,6 +541,7 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
 
   return (
     <div style={{ opacity, transform: `translateY(${y}px) scale(${settleScale})` }} className="absolute left-0 right-[50px] top-[30px] z-[1]">
+      <DoctorCardSrOnlyTranscript />
       <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px 0px" />
     </div>
   );
