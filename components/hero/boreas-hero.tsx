@@ -206,7 +206,7 @@ function SearchPercentChip({ trigger, reduceMotion, compact = false }: { trigger
 
 function ExampleBadge() {
   return (
-    <span className="absolute -top-2.5 left-4 rounded-[var(--radius-pill)] border border-border bg-surface px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-clinical">
+    <span className="absolute -top-2.5 left-4 z-20 rounded-[var(--radius-pill)] border border-border bg-surface px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-clinical">
       {exampleBadgeLabel}
     </span>
   );
@@ -214,7 +214,7 @@ function ExampleBadge() {
 
 function VerifiedBadge() {
   return (
-    <span className="absolute -top-2.5 right-4 flex items-center gap-1 rounded-[var(--radius-pill)] border border-mint/30 bg-mint/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-mint">
+    <span className="absolute -top-2.5 right-4 z-20 flex items-center gap-1 rounded-[var(--radius-pill)] border border-mint/30 bg-mint/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.06em] text-mint">
       <svg className="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3} aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
       </svg>
@@ -238,8 +238,6 @@ function DoctorCardSrOnlyTranscript() {
 function StackedCardsStaticDoctorCard({ reduceMotion }: { reduceMotion: boolean }) {
   const cardContent = (
     <div className="bg-surface p-[22px]">
-      <ExampleBadge />
-      <VerifiedBadge />
       <DoctorCard trigger={{ mode: "delay", ms: 800 }} testimonialDelayMs={1300} reduceMotion={reduceMotion} />
     </div>
   );
@@ -249,6 +247,8 @@ function StackedCardsStaticDoctorCard({ reduceMotion }: { reduceMotion: boolean 
   ];
   return (
     <>
+      <ExampleBadge />
+      <VerifiedBadge />
       <DoctorCardSrOnlyTranscript />
       <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px 0px" />
     </>
@@ -540,8 +540,6 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
 
   const cardContent = (
     <div className="bg-surface p-[22px]">
-      <ExampleBadge />
-      <VerifiedBadge />
       <DoctorCard
         trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_1_END }}
         reduceMotion={false}
@@ -556,6 +554,8 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
 
   return (
     <div style={{ opacity, transform: `translateY(${y}px) scale(${settleScale})` }} className="absolute left-0 right-[50px] top-[30px] z-[1]">
+      <ExampleBadge />
+      <VerifiedBadge />
       <DoctorCardSrOnlyTranscript />
       <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px 0px" />
     </div>
