@@ -20,6 +20,7 @@ import { trackAnalyticsEvent } from "@/lib/analytics";
 import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number";
 import { useScrollPin, type ScrollPin } from "@/lib/motion/use-scroll-pin";
 import { useScrub } from "@/lib/motion/use-scrub";
+import { StackedCards, type StackedCardLayer } from "@/components/motion/stacked-cards";
 
 const doctor = socialProof.mockupDoctor;
 const doctorInitials = initials(doctor.name);
@@ -221,6 +222,21 @@ function VerifiedBadge() {
   );
 }
 
+function StackedCardsStaticDoctorCard({ reduceMotion }: { reduceMotion: boolean }) {
+  const cardContent = (
+    <div className="bg-surface p-[22px]">
+      <ExampleBadge />
+      <VerifiedBadge />
+      <DoctorCard trigger={{ mode: "delay", ms: 800 }} testimonialDelayMs={1300} reduceMotion={reduceMotion} />
+    </div>
+  );
+  const layers: StackedCardLayer[] = [
+    { key: "front", content: cardContent },
+    { key: "echo", content: cardContent },
+  ];
+  return <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px 0px" />;
+}
+
 function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
@@ -237,12 +253,10 @@ function HeroCardCluster({ reduceMotion }: { reduceMotion: boolean }) {
         initial={reduceMotion ? undefined : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]"
+        className="absolute left-0 right-[50px] top-[30px] z-[1]"
         style={reduceMotion ? undefined : { animation: "float 5.2s ease-in-out infinite" }}
       >
-        <ExampleBadge />
-        <VerifiedBadge />
-        <DoctorCard trigger={{ mode: "delay", ms: 800 }} testimonialDelayMs={1300} reduceMotion={reduceMotion} />
+        <StackedCardsStaticDoctorCard reduceMotion={reduceMotion} />
       </motion.div>
 
       <motion.div
@@ -491,11 +505,9 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
   const opacity = useScrub(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]);
   const y = useScrub(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]);
   const settleScale = useScrub(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]);
-  return (
-    <div
-      style={{ opacity, transform: `translateY(${y}px) scale(${settleScale})` }}
-      className="absolute left-0 right-[50px] top-[30px] z-[1] rounded-[var(--radius-xl)] border border-border bg-surface p-[22px] shadow-[var(--shadow)]"
-    >
+
+  const cardContent = (
+    <div className="bg-surface p-[22px]">
       <ExampleBadge />
       <VerifiedBadge />
       <DoctorCard
@@ -503,6 +515,16 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
         reduceMotion={false}
         instant
       />
+    </div>
+  );
+  const layers: StackedCardLayer[] = [
+    { key: "front", content: cardContent },
+    { key: "echo", content: cardContent },
+  ];
+
+  return (
+    <div style={{ opacity, transform: `translateY(${y}px) scale(${settleScale})` }} className="absolute left-0 right-[50px] top-[30px] z-[1]">
+      <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px 0px" />
     </div>
   );
 }
