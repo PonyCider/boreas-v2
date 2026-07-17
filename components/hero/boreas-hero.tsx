@@ -55,8 +55,11 @@ function RatingBlock({ trigger, reduceMotion, size = "md" }: { trigger: NumberTr
   const starSize = size === "md" ? "text-[15px]" : "text-[13px]";
   const numberSize = size === "md" ? "text-[22px]" : "text-lg";
 
+  const avatarInitials = ["MG", "LR", "AS"];
+  const remainingCount = Number(doctor.reviewCount) - avatarInitials.length;
+
   return (
-    <div ref={ref} className="flex items-baseline gap-2">
+    <div ref={ref} className="flex flex-wrap items-baseline gap-2">
       <span className={`${starSize} tracking-tight`} aria-hidden="true">
         {Array.from({ length: 5 }).map((_, i) => (
           <span key={i} className={i < doctorFilledStars ? "text-rating-gold" : "text-border"}>
@@ -67,8 +70,19 @@ function RatingBlock({ trigger, reduceMotion, size = "md" }: { trigger: NumberTr
       <motion.span className={`${numberSize} tabular-nums font-display font-medium leading-none text-foreground`}>
         {value}
       </motion.span>
+      <span className="flex items-center -space-x-2" aria-hidden="true">
+        {avatarInitials.map((label, i) => (
+          <span
+            key={label}
+            className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-surface bg-accent-soft text-[8px] font-medium text-accent"
+            style={{ zIndex: avatarInitials.length - i }}
+          >
+            {label}
+          </span>
+        ))}
+      </span>
       <span className="text-[13px] text-muted">
-        {doctor.reviewCount} {heroCardStats.reviewCountLabel}
+        +{remainingCount} {heroCardStats.reviewCountLabel}
       </span>
     </div>
   );
