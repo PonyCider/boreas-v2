@@ -82,7 +82,7 @@ export function StackedCards({
               zIndex: style.zIndex,
               filter: `blur(${style.blur}px)`,
               transformOrigin: "top left",
-              boxShadow: isFrontCard ? "var(--shadow)" : "16px 22px 48px -10px rgba(20,18,15,0.38)",
+              boxShadow: isFrontCard ? "var(--shadow)" : "var(--shadow-depth)",
             }}
           >
             {layer.content}

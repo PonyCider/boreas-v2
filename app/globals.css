@@ -38,8 +38,9 @@
   --glass-highlight:  transparent;
 
   /* Shadows */
-  --shadow:    0 4px 24px rgba(30,27,24,.08), 0 1px 4px rgba(30,27,24,.05);
-  --shadow-sm: 0 1px 3px rgba(30,27,24,.08);
+  --shadow:       0 4px 24px rgba(30,27,24,.08), 0 1px 4px rgba(30,27,24,.05);
+  --shadow-sm:    0 1px 3px rgba(30,27,24,.08);
+  --shadow-depth: 16px 22px 48px -10px rgba(20,18,15,.38);
 
   /* Radii */
   --radius-xl:   16px;
@@ -66,8 +67,9 @@
   --line:        rgba(255, 255, 255, 0.08);
   --border:      #373129;
   --rating-gold: #EBB45A;
-  --shadow:    0 4px 28px rgba(0,0,0,.32), 0 1px 4px rgba(0,0,0,.24);
-  --shadow-sm: 0 1px 4px rgba(0,0,0,.22);
+  --shadow:       0 4px 28px rgba(0,0,0,.32), 0 1px 4px rgba(0,0,0,.24);
+  --shadow-sm:    0 1px 4px rgba(0,0,0,.22);
+  --shadow-depth: 16px 22px 48px -10px rgba(0,0,0,.5);
 }
 
 @theme inline {
