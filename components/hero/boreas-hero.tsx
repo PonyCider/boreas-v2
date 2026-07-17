@@ -32,8 +32,21 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const HERO_PIN_VH_DESKTOP = 280;
 const HERO_PIN_VH_MOBILE = 150;
 const MOBILE_PHASE_END = 0.5; // "busca+encuentra" → "responde+agenda"
+const INTRO_END = 0.16; // desktop-only: centered intro stack → two-column split
 const PHASE_1_END = 0.3; // "Te busca" → "Te encuentra"
 const PHASE_2_END = 0.65; // "Te encuentra" → "Te escribe y agenda"
+
+// Desktop intro-reflow geometry, derived from the grid's own ratio
+// (`lg:grid-cols-[1fr_0.88fr] lg:gap-[60px]`) so centering works via CSS
+// container-query units alone (cqw), no JS measurement:
+//   col1Fraction = 1 / (1 + 0.88) = 0.531915, col2Fraction = 0.88 / 1.88 = 0.468085
+//   text block fills col1 (width auto = column track width), its resting
+//   center = colWidth1/2; card fills col2, its resting center = col1 + gap + colWidth2/2.
+//   Each translateX below = 50cqw (row center) minus that resting center,
+//   algebraically reduced. Multiplying by introProgress (1→0) animates from
+//   "fully centered" back to "resting position" (translateX 0).
+const TEXT_INTRO_TRANSLATE_X = "(23.4043cqw + 15.96px)";
+const CARD_INTRO_TRANSLATE_X = "(-26.5957cqw - 14.04px)";
 
 function initials(name: string) {
   return name
@@ -436,17 +449,31 @@ function HeroStatic() {
   );
 }
 
-function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: MotionValue<number>; ctaId: string }) {
+function HeroCinematicLeftColumn({
+  scrollYProgress,
+  ctaId,
+  enableIntroReflow = false,
+}: {
+  scrollYProgress: MotionValue<number>;
+  ctaId: string;
+  enableIntroReflow?: boolean;
+}) {
   const reveal = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } };
   const ease = EASE;
   const problemEyebrowOpacity = useScrub(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0]);
   const solutionEyebrowOpacity = 1 - problemEyebrowOpacity;
+  const introProgress = useScrub(scrollYProgress, [0, INTRO_END], [1, 0]);
 
   return (
     <motion.div
       initial="hidden"
       animate="show"
       transition={{ staggerChildren: 0.09, delayChildren: 0.12 }}
+      style={
+        enableIntroReflow
+          ? { transform: `translate3d(calc(${introProgress} * ${TEXT_INTRO_TRANSLATE_X}), 0px, 0)` }
+          : undefined
+      }
     >
       <motion.div variants={reveal} transition={{ duration: 0.6, ease }} className="relative mb-5 h-[20px]">
         <p aria-hidden={problemEyebrowOpacity < 0.5} style={{ opacity: problemEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-amber">
@@ -536,14 +563,17 @@ function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> })
 }
 
 function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const opacity = useScrub(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [0, 1]);
-  const y = useScrub(scrollYProgress, [PHASE_1_END, PHASE_1_END + 0.08], [24, 0]);
+  // Card is visible from scroll=0 (no opacity gate — content must never hide
+  // behind animation). introProgress drives its position only: 1 = stacked
+  // centered under the intro text, 0 = resting position in the right column.
+  const introProgress = useScrub(scrollYProgress, [0, INTRO_END], [1, 0]);
   const settleScale = useScrub(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]);
+  const introY = introProgress * 30; // vh — moves the card down to sit under the centered intro text
 
   const cardContent = (
     <div className="bg-surface p-[22px]">
       <DoctorCard
-        trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_1_END }}
+        trigger={{ mode: "delay", ms: 400 }}
         reduceMotion={false}
         instant
       />
@@ -555,7 +585,12 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
   ];
 
   return (
-    <div style={{ opacity, transform: `translateY(${y}px) scale(${settleScale})` }} className="absolute left-0 right-[50px] top-[30px] z-[1]">
+    <div
+      style={{
+        transform: `translate3d(calc(${introProgress} * ${CARD_INTRO_TRANSLATE_X}), ${introY}vh, 0) scale(${settleScale})`,
+      }}
+      className="absolute left-0 right-[50px] top-[30px] z-[1]"
+    >
       <ExampleBadge />
       <VerifiedBadge />
       <DoctorCardSrOnlyTranscript />
@@ -650,8 +685,8 @@ function HeroCinematic() {
       </div>
       <div ref={desktopContainerRef} className="relative hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
         <div className="sticky top-0 flex h-screen items-center overflow-hidden">
-          <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10">
-            <HeroCinematicLeftColumn scrollYProgress={desktopScrollYProgress} ctaId="hero-primary-cta" />
+          <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10 [container-type:inline-size]">
+            <HeroCinematicLeftColumn scrollYProgress={desktopScrollYProgress} ctaId="hero-primary-cta" enableIntroReflow />
             <HeroCardClusterCinematic scrollYProgress={desktopScrollYProgress} />
           </div>
         </div>
