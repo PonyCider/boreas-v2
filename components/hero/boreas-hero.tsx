@@ -732,7 +732,13 @@ function HeroCinematic() {
         <HeroCardMobilePinned containerRef={mobileContainerRef} scrollYProgress={mobileScrollYProgress} />
       </div>
       <div ref={desktopContainerRef} className="relative hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
-        <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+        {/* top-[64px]/h-[calc(100vh-64px)], not top-0/h-screen: the sticky
+            header (z-50, opaque, ~64px tall — same constant HeroStatic uses
+            in its `min-h-[calc(100vh-64px)]`) paints over anything centered
+            above this offset, which silently hid the eyebrow crossfade row
+            for the entire pinned scroll range at common viewport heights
+            (e.g. 1280x800) — found during the Task 3 verification pass. */}
+        <div className="sticky top-[64px] flex h-[calc(100vh-64px)] items-center overflow-hidden">
           <div className="relative mx-auto grid w-full max-w-[1460px] items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_0.88fr] lg:gap-[60px] lg:px-10 [container-type:inline-size]">
             <HeroCinematicLeftColumn scrollYProgress={desktopScrollYProgress} ctaId="hero-primary-cta" enableIntroReflow />
             <HeroCardClusterCinematic scrollYProgress={desktopScrollYProgress} />
