@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { motion, useReducedMotion, type MotionValue } from "framer-motion";
 import {
   exampleBadgeLabel,
@@ -510,14 +511,18 @@ function ProofPointChip({ label, className, scrollYProgress, start }: { label: s
   );
 }
 
-function ProofPointChips({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+function ProofPointChips({ scrollYProgress, compact = false }: { scrollYProgress: MotionValue<number>; compact?: boolean }) {
+  // Desktop: absolute-corner chips floating around the 460px cluster box.
+  // Mobile (`compact`): a simple wrapped flex row below the card — the card's
+  // own padding box is far narrower than 460px, so the desktop corner offsets
+  // would collide with the card content.
   return (
-    <div className="relative mt-9 h-0">
+    <div className={compact ? "relative mt-6 flex flex-wrap gap-2" : "relative mt-9 h-0"}>
       {heroProofPoints.map((point, i) => (
         <ProofPointChip
           key={point}
           label={point}
-          className={PROOF_POINT_POSITIONS[i]}
+          className={compact ? "" : PROOF_POINT_POSITIONS[i]}
           scrollYProgress={scrollYProgress}
           start={PROOF_POINTS_START + i * PROOF_POINTS_STAGGER}
         />
@@ -728,6 +733,7 @@ function HeroCardMobilePinned({ containerRef, scrollYProgress }: ScrollPin) {
   return (
     <div ref={containerRef} className="relative mt-10 block lg:hidden" style={{ height: `${HERO_PIN_VH_MOBILE}vh` }}>
       <div className="sticky top-[88px]">
+        <CardBacklight />
         <ParallaxLayer progress={scrollYProgress} speed={0.12} reduceMotion={false} className="absolute inset-0 -z-10">
           <MobileAmbientGlow variant="card" />
         </ParallaxLayer>
@@ -735,9 +741,34 @@ function HeroCardMobilePinned({ containerRef, scrollYProgress }: ScrollPin) {
         <VerifiedBadge />
         <DoctorCardSrOnlyTranscript />
         <StackedCards layers={layers} ghostLayers={[layers[0]]} radiusVar="var(--radius-xl)" clipInset="-4px -40px -40px -40px" />
+        <ProofPointChips scrollYProgress={scrollYProgress} compact />
+        <AccentOrbField progress={scrollYProgress} count={3} reduceMotion={false} className="opacity-70" />
+        <DrawnPathAccent
+          progress={scrollYProgress}
+          range={[0.2, 0.6]}
+          d="M 10 140 Q 150 40 300 100"
+          viewBox="0 0 320 180"
+          className="inset-0 h-full w-full opacity-70"
+          reduceMotion={false}
+        />
+        <GrainTexture opacity={0.03} />
+        <HeroScrollProgress progress={scrollYProgress} className="right-0" />
       </div>
     </div>
   );
+}
+
+// Mobile-only: fades and lifts the ENTIRE intro left column (wordmark,
+// headline, paragraph, CTA, proof points) away as the card enters. On mobile
+// everything stacks in one column, so there is no side-by-side reflow like
+// desktop — the intro block simply exits. This is the ONLY opacity gate on the
+// mobile left column: `HeroCinematicLeftColumn`'s inner paragraph/CTA gate is
+// scoped to `enableIntroReflow`, which the mobile call site omits, so this
+// wrapper is not stacked on a second ramp (which would keep the CTA dim).
+function MobileWordmarkExit({ mobileScrollYProgress, children }: { mobileScrollYProgress: MotionValue<number>; children: ReactNode }) {
+  const opacity = useScrub(mobileScrollYProgress, [0, 0.15], [1, 0]);
+  const y = useScrub(mobileScrollYProgress, [0, 0.15], [0, -24]);
+  return <div style={{ opacity, transform: `translate3d(0, ${y}px, 0)` }}>{children}</div>;
 }
 
 function HeroCinematic() {
@@ -746,9 +777,16 @@ function HeroCinematic() {
 
   return (
     <section className="relative bg-hero-glow transition-[background,colors] duration-[280ms]">
-      <div className="relative mx-auto w-full max-w-[1460px] px-4 pt-20 sm:px-6 lg:hidden">
+      {/* overflow-x-clip contains the decorative glow/orb bleed (negative-inset
+          MobileAmbientGlow, CardBacklight, AccentOrbField) so it can't push the
+          mobile document wider than the viewport. `clip` (not `hidden`) does not
+          establish a scroll container, so the sticky card pin still references
+          the viewport. */}
+      <div className="relative mx-auto w-full max-w-[1460px] overflow-x-clip px-4 pt-20 sm:px-6 lg:hidden">
         <MobileAmbientGlow variant="top" />
-        <HeroCinematicLeftColumn scrollYProgress={mobileScrollYProgress} ctaId="hero-primary-cta-mobile" />
+        <MobileWordmarkExit mobileScrollYProgress={mobileScrollYProgress}>
+          <HeroCinematicLeftColumn scrollYProgress={mobileScrollYProgress} ctaId="hero-primary-cta-mobile" />
+        </MobileWordmarkExit>
         <HeroCardMobilePinned containerRef={mobileContainerRef} scrollYProgress={mobileScrollYProgress} />
       </div>
       <div ref={desktopContainerRef} className="relative hidden lg:block" style={{ height: `${HERO_PIN_VH_DESKTOP}vh` }}>
