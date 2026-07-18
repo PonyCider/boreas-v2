@@ -208,6 +208,11 @@ a {
   50%       { opacity: 0.35; }
 }
 
+@keyframes hero-gradient-word-sweep {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
