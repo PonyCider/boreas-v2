@@ -699,7 +699,7 @@ function HeroCardMobilePinned({ containerRef, scrollYProgress }: ScrollPin) {
   const cardContent = (
     <div className="bg-surface p-5">
       <DoctorCard
-        trigger={{ mode: "progress", value: scrollYProgress, threshold: 0.1 }}
+        trigger={{ mode: "delay", ms: 400 }}
         reduceMotion={false}
         instant
       />
