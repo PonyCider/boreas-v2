@@ -601,7 +601,7 @@ function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> })
   const problemOpacity = useScrub(scrollYProgress, [PHASE_2_END - 0.04, PHASE_2_END], [1, 0]);
   const solutionOpacity = 1 - problemOpacity;
   return (
-    <div className="absolute bottom-4 left-0 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2">
+    <div className="absolute bottom-4 left-3 z-[2] rounded-[var(--radius-pill)] border border-border bg-surface px-3.5 py-2">
       <div className="relative">
         <span aria-hidden={problemOpacity < 0.5} style={{ opacity: problemOpacity }} className="text-xs text-muted">
           {heroCardStats.lastReplyTime} · {lastReplyProblemLabel}
@@ -650,7 +650,7 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
 function AppointmentsChipEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   const opacity = useScrub(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [0, 1]);
   return (
-    <div style={{ opacity }} className="absolute right-0 top-0 z-[2]">
+    <div style={{ opacity }} className="absolute right-3 top-3 z-[2]">
       <AppointmentsChip
         trigger={{ mode: "progress", value: scrollYProgress, threshold: PHASE_2_END }}
         reduceMotion={false}
@@ -663,11 +663,11 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
       <GrainTexture className="rounded-[var(--radius-xl)]" />
-      <AccentOrbField progress={scrollYProgress} count={5} reduceMotion={false} />
+      <AccentOrbField progress={scrollYProgress} count={3} reduceMotion={false} />
       <DrawnPathAccent
         progress={scrollYProgress}
         range={[0.1, 0.5]}
-        d="M 10 400 Q 200 100 420 250"
+        d="M 280 20 Q 420 40 440 180"
         viewBox="0 0 460 460"
         className="inset-0 h-full w-full"
         reduceMotion={false}
@@ -682,7 +682,7 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
 
       <DoctorCardEntrance scrollYProgress={scrollYProgress} />
 
-      <div className="absolute bottom-5 right-0 z-[2]">
+      <div className="absolute bottom-5 right-3 z-[2]">
         <SearchPercentChip trigger={{ mode: "progress", value: scrollYProgress, threshold: 0 }} reduceMotion={false} />
       </div>
 
