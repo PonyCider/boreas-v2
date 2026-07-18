@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useReducedMotion, type MotionValue } from "framer-motion";
-import { TextReveal } from "@/components/motion/text-reveal";
 import {
   exampleBadgeLabel,
   heroCardStats,
@@ -22,6 +21,13 @@ import { useScrollPin, type ScrollPin } from "@/lib/motion/use-scroll-pin";
 import { useScrub } from "@/lib/motion/use-scrub";
 import { StackedCards, type StackedCardLayer } from "@/components/motion/stacked-cards";
 import { ParallaxLayer } from "@/components/motion/parallax-layer";
+import { WordmarkIntro } from "@/components/hero/wordmark-intro";
+import { AccentOrbField } from "@/components/motion/accent-orb-field";
+import { DrawnPathAccent } from "@/components/motion/drawn-path-accent";
+import { GrainTexture } from "@/components/motion/grain-texture";
+import { WordmarkOrbitAccent } from "@/components/motion/wordmark-orbit-accent";
+import { HeroScrollProgress } from "@/components/motion/hero-scroll-progress";
+import { CardBacklight } from "@/components/motion/card-backlight";
 
 const doctor = socialProof.mockupDoctor;
 const doctorInitials = initials(doctor.name);
@@ -35,6 +41,9 @@ const MOBILE_PHASE_END = 0.5; // "busca+encuentra" → "responde+agenda"
 const INTRO_END = 0.16; // desktop-only: centered intro stack → two-column split
 const PHASE_1_END = 0.3; // "Te busca" → "Te encuentra"
 const PHASE_2_END = 0.65; // "Te encuentra" → "Te escribe y agenda"
+const CARD_END = INTRO_END + 0.16; // doctor card fades in (opacity gate) after the intro-reflow settles
+const PROOF_POINTS_START = CARD_END;
+const PROOF_POINTS_STAGGER = 0.04;
 
 // Desktop intro-reflow geometry, derived from the grid's own ratio
 // (`lg:grid-cols-[1fr_0.88fr] lg:gap-[60px]`) so centering works via CSS
@@ -482,6 +491,41 @@ function HeroStatic() {
   );
 }
 
+const PROOF_POINT_POSITIONS = [
+  "absolute -left-4 top-[22%] z-[2]",
+  "absolute -right-2 top-[6%] z-[2]",
+  "absolute -left-2 bottom-[16%] z-[2]",
+  "absolute -right-4 bottom-2 z-[2]",
+];
+
+function ProofPointChip({ label, className, scrollYProgress, start }: { label: string; className: string; scrollYProgress: MotionValue<number>; start: number }) {
+  const opacity = useScrub(scrollYProgress, [start, start + 0.04], [0, 1]);
+  const y = useScrub(scrollYProgress, [start, start + 0.04], [10, 0]);
+  return (
+    <div style={{ opacity, transform: `translate3d(0, ${y}px, 0)` }} className={className}>
+      <span className="rounded-[var(--radius-pill)] border border-line bg-surface px-3 py-1.5 text-[12px] text-muted shadow-[var(--shadow-sm)]">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function ProofPointChips({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+  return (
+    <div className="relative mt-9 h-0">
+      {heroProofPoints.map((point, i) => (
+        <ProofPointChip
+          key={point}
+          label={point}
+          className={PROOF_POINT_POSITIONS[i]}
+          scrollYProgress={scrollYProgress}
+          start={PROOF_POINTS_START + i * PROOF_POINTS_STAGGER}
+        />
+      ))}
+    </div>
+  );
+}
+
 function HeroCinematicLeftColumn({
   scrollYProgress,
   ctaId,
@@ -491,90 +535,58 @@ function HeroCinematicLeftColumn({
   ctaId: string;
   enableIntroReflow?: boolean;
 }) {
-  const reveal = { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } };
-  const ease = EASE;
   const problemEyebrowOpacity = useScrub(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0]);
   const solutionEyebrowOpacity = 1 - problemEyebrowOpacity;
   const introProgress = useScrub(scrollYProgress, [0, INTRO_END], [1, 0]);
+  const reflowOpacity = useScrub(scrollYProgress, [0, INTRO_END], [0, 1]);
+  const reflowY = useScrub(scrollYProgress, [0, INTRO_END], [10, 0]);
 
   return (
-    <motion.div
-      initial="hidden"
-      animate="show"
-      transition={{ staggerChildren: 0.09, delayChildren: 0.12 }}
+    <div
       style={
         enableIntroReflow
           ? { transform: `translate3d(calc(${introProgress} * ${TEXT_INTRO_TRANSLATE_X}), 0px, 0)` }
           : undefined
       }
     >
-      <motion.div variants={reveal} transition={{ duration: 0.6, ease }} className="relative mb-5 h-[20px]">
+      <div className="relative mb-5 h-[20px]">
         <p aria-hidden={problemEyebrowOpacity < 0.5} style={{ opacity: problemEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-amber">
           {heroEyebrowProblem}
         </p>
         <p aria-hidden={solutionEyebrowOpacity < 0.5} style={{ opacity: solutionEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-mint">
           {heroCredibility}
         </p>
-      </motion.div>
+      </div>
 
-      <motion.p
-        variants={reveal}
-        transition={{ duration: 0.65, ease }}
-        className="font-display italic font-medium leading-[0.88] tracking-[-0.03em] text-foreground"
-        style={{ fontSize: "clamp(5rem, 13vw, 10.5rem)" }}
+      <div className="relative">
+        <WordmarkOrbitAccent
+          active={introProgress > 0}
+          count={enableIntroReflow ? 3 : 2}
+          reduceMotion={false}
+          className="left-[-15%] top-[-8%] h-40 w-40"
+        />
+        <WordmarkIntro wordmark="Boreas" headline={heroHeadline} />
+      </div>
+
+      <div
+        style={
+          enableIntroReflow
+            ? { opacity: reflowOpacity, transform: `translate3d(0, ${reflowY}px, 0)` }
+            : undefined
+        }
       >
-        Boreas
-      </motion.p>
-
-      <motion.div variants={reveal} transition={{ duration: 0.7, ease }}>
-        <TextReveal reduceMotion={false} trigger={{ mode: "delay", ms: 200 }}>
-          <h1
-            className="mt-[22px] text-balance font-display font-normal leading-[1.08] tracking-[-0.012em] text-foreground"
-            style={{ fontSize: "clamp(2.4rem, 5.6vw, 5.4rem)" }}
-          >
-            {heroHeadline}
-          </h1>
-        </TextReveal>
-      </motion.div>
-
-      <motion.p
-        variants={reveal}
-        transition={{ duration: 0.65, ease }}
-        className="mt-6 max-w-[50ch] text-[17px] leading-[1.7] text-muted"
-      >
-        {heroSubcopy}
-      </motion.p>
-
-      <motion.div
-        variants={reveal}
-        transition={{ duration: 0.65, ease }}
-        className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center"
-      >
-        <a
-          id={ctaId}
-          href="#contacto"
-          className="btn btn-p w-full sm:w-auto"
-          onClick={() => trackAnalyticsEvent({ name: "cta_click", surface: "hero" })}
-        >
-          Quiero mi consultorio digital
-        </a>
-        <a href="#proceso" className="btn btn-s w-full sm:w-auto">
-          Ver cómo funciona
-        </a>
-      </motion.div>
-
-      <motion.ul
-        variants={reveal}
-        transition={{ duration: 0.65, ease }}
-        className="mt-9 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-      >
-        {heroProofPoints.map((point) => (
-          <li key={point} className="border-t border-line pt-3 text-[13px] text-muted">
-            {point}
-          </li>
-        ))}
-      </motion.ul>
-    </motion.div>
+        <p className="mt-6 max-w-[50ch] text-[17px] leading-[1.7] text-muted">{heroSubcopy}</p>
+        <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <a id={ctaId} href="#contacto" className="btn btn-p w-full sm:w-auto" onClick={() => trackAnalyticsEvent({ name: "cta_click", surface: "hero" })}>
+            Quiero mi consultorio digital
+          </a>
+          <a href="#proceso" className="btn btn-s w-full sm:w-auto">
+            Ver cómo funciona
+          </a>
+        </div>
+        <ProofPointChips scrollYProgress={scrollYProgress} />
+      </div>
+    </div>
   );
 }
 
@@ -596,20 +608,14 @@ function TimeChip({ scrollYProgress }: { scrollYProgress: MotionValue<number> })
 }
 
 function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  // Card is visible from scroll=0 (no opacity gate — content must never hide
-  // behind animation). introProgress drives its position only: 1 = stacked
-  // centered under the intro text, 0 = resting position in the right column.
   const introProgress = useScrub(scrollYProgress, [0, INTRO_END], [1, 0]);
   const settleScale = useScrub(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]);
-  const introY = introProgress * 30; // vh — moves the card down to sit under the centered intro text
+  const introY = introProgress * 30;
+  const cardOpacity = useScrub(scrollYProgress, [CARD_END, CARD_END + 0.08], [0, 1]);
 
   const cardContent = (
     <div className="bg-surface p-[22px]">
-      <DoctorCard
-        trigger={{ mode: "delay", ms: 400 }}
-        reduceMotion={false}
-        instant
-      />
+      <DoctorCard trigger={{ mode: "progress", value: scrollYProgress, threshold: CARD_END }} reduceMotion={false} instant />
     </div>
   );
   const layers: StackedCardLayer[] = [
@@ -620,10 +626,12 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
   return (
     <div
       style={{
+        opacity: cardOpacity,
         transform: `translate3d(calc(${introProgress} * ${CARD_INTRO_TRANSLATE_X}), ${introY}vh, 0) scale(${settleScale})`,
       }}
       className="absolute left-0 right-[50px] top-[30px] z-[1]"
     >
+      <CardBacklight />
       <ExampleBadge />
       <VerifiedBadge />
       <DoctorCardSrOnlyTranscript />
@@ -647,6 +655,18 @@ function AppointmentsChipEntrance({ scrollYProgress }: { scrollYProgress: Motion
 function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
+      <GrainTexture className="rounded-[var(--radius-xl)]" />
+      <AccentOrbField progress={scrollYProgress} count={5} reduceMotion={false} />
+      <DrawnPathAccent
+        progress={scrollYProgress}
+        range={[0.1, 0.5]}
+        d="M 10 400 Q 200 100 420 250"
+        viewBox="0 0 460 460"
+        className="inset-0 h-full w-full"
+        reduceMotion={false}
+      />
+      <HeroScrollProgress progress={scrollYProgress} className="right-0" />
+
       <ParallaxLayer progress={scrollYProgress} speed={0.15} reduceMotion={false} className="absolute inset-0 -z-10">
         <ClusterBackgroundTexture />
       </ParallaxLayer>

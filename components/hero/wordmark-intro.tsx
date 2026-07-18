@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { WordmarkLetterReveal } from "@/components/motion/wordmark-letter-reveal";
 import { TextReveal } from "@/components/motion/text-reveal";
+import { HighlighterAccent } from "@/components/motion/highlighter-accent";
+import { GradientAccentWord } from "@/components/motion/gradient-accent-word";
 import { useSkipOnScroll } from "@/lib/motion/use-skip-on-scroll";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -48,10 +50,15 @@ export function WordmarkIntro({ wordmark, headline, onSettled }: WordmarkIntroPr
       {holdDone && (
         <TextReveal reduceMotion={false} trigger={{ mode: "delay", ms: 0 }}>
           <h1
+            aria-label={headline}
             className="mt-[22px] text-balance font-display font-normal leading-[1.08] tracking-[-0.012em] text-foreground"
             style={{ fontSize: "clamp(2.4rem, 5.6vw, 5.4rem)" }}
           >
-            {headline}
+            Tu consultorio <GradientAccentWord reduceMotion={false}>digital</GradientAccentWord>,{" "}
+            <HighlighterAccent active={holdDone} reduceMotion={false}>
+              abierto las 24 horas
+            </HighlighterAccent>
+            .
           </h1>
         </TextReveal>
       )}

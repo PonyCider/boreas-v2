@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { annotate } from "rough-notation";
-import type { RoughAnnotation } from "rough-notation/lib/model";
 
 export interface HighlighterAccentProps {
   children: React.ReactNode;
@@ -14,21 +13,23 @@ export interface HighlighterAccentProps {
 
 export function HighlighterAccent({ children, active, color = "var(--accent)", reduceMotion, className = "" }: HighlighterAccentProps) {
   const ref = useRef<HTMLSpanElement>(null);
-  const annotationRef = useRef<RoughAnnotation | null>(null);
-  const shownRef = useRef(false);
 
   useEffect(() => {
-    if (!active || !ref.current || shownRef.current) return;
-    shownRef.current = true;
-    annotationRef.current = annotate(ref.current, {
+    if (!active || !ref.current) return;
+    // Create + remove the annotation within a single effect lifecycle so the
+    // React StrictMode dev double-invoke (mount → cleanup → mount) re-creates
+    // it instead of leaving a removed annotation behind. A `shownRef`-style
+    // "run once" guard breaks here: the first cleanup removes the SVG, the
+    // second mount short-circuits, and the underline never renders in dev.
+    const annotation = annotate(ref.current, {
       type: "underline",
       color,
       strokeWidth: 2,
       animationDuration: reduceMotion ? 0 : 500,
     });
-    annotationRef.current.show();
+    annotation.show();
     return () => {
-      annotationRef.current?.remove();
+      annotation.remove();
     };
   }, [active, color, reduceMotion]);
 
