@@ -15,6 +15,7 @@ export function ParallaxLayer({
   range = [0, 100],
   reduceMotion,
   className,
+  style,
   children,
 }: {
   progress: MotionValue<number>;
@@ -24,16 +25,21 @@ export function ParallaxLayer({
   range?: [number, number];
   reduceMotion: boolean;
   className?: string;
+  style?: React.CSSProperties;
   children: React.ReactNode;
 }) {
   const offset = useScrub(progress, [0, 1], [range[0] * speed, range[1] * speed]);
 
   if (reduceMotion) {
-    return <div className={className}>{children}</div>;
+    return (
+      <div className={className} style={style}>
+        {children}
+      </div>
+    );
   }
 
   return (
-    <div className={className} style={{ transform: `translate3d(0, ${offset}px, 0)`, willChange: "transform" }}>
+    <div className={className} style={{ ...style, transform: `translate3d(0, ${offset}px, 0)`, willChange: "transform" }}>
       {children}
     </div>
   );
