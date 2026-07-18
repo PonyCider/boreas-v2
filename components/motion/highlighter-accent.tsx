@@ -25,6 +25,7 @@ export function HighlighterAccent({ children, active, color = "var(--accent)", r
       type: "underline",
       color,
       strokeWidth: 2,
+      multiline: true,
       animationDuration: reduceMotion ? 0 : 500,
     });
     annotation.show();
