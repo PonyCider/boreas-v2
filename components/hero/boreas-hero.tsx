@@ -569,7 +569,7 @@ function HeroCinematicLeftColumn({
         <WordmarkOrbitAccent
           active={introProgress > 0}
           count={enableIntroReflow ? 3 : 2}
-          radiusScale={enableIntroReflow ? 1 : 0.55}
+          radiusScale={enableIntroReflow ? 1 : 0.45}
           reduceMotion={false}
           className={enableIntroReflow ? "left-[-15%] top-[-8%] h-40 w-40" : "left-[-8%] top-[-6%] h-24 w-24"}
         />
