@@ -494,10 +494,10 @@ function HeroStatic() {
 }
 
 const PROOF_POINT_POSITIONS = [
-  "absolute -left-4 top-[22%] z-[2]",
-  "absolute -right-2 top-[6%] z-[2]",
-  "absolute -left-2 bottom-[16%] z-[2]",
-  "absolute -right-4 bottom-2 z-[2]",
+  "absolute left-0 top-0 z-[2]",
+  "absolute right-0 top-9 z-[2]",
+  "absolute left-6 top-[72px] z-[2]",
+  "absolute right-6 top-[104px] z-[2]",
 ];
 
 function ProofPointChip({ label, className, scrollYProgress, start }: { label: string; className: string; scrollYProgress: MotionValue<number>; start: number }) {
