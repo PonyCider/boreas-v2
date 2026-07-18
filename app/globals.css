@@ -213,6 +213,11 @@ a {
   50%       { background-position: 100% 50%; }
 }
 
+@keyframes hero-orbit-spin {
+  from { transform: rotate(0deg) translateX(var(--orbit-radius, 90px)) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(var(--orbit-radius, 90px)) rotate(-360deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
