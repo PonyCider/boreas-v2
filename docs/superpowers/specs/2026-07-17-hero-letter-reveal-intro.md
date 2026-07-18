@@ -107,36 +107,48 @@ avatares, `ClusterBackgroundTexture`), no se reconstruye desde cero.
 
 1. **Reflow (scroll 0 → `REFLOW_END`):** el bloque Boreas+H1 (ya revelado por el intro)
    se desliza del centro a la posición izquierda actual. Párrafo + CTAs aparecen
-   (`opacity 0→1`, `translateY 12→0`) alineados con ese movimiento.
+   (`opacity 0→1`, `translateY 12→0`) alineados con ese movimiento. El wordmark, mientras
+   está centrado durante el intro, lleva `WordmarkOrbitAccent` (puntos orbitando) —se
+   desvanece cuando arranca el reflow. El headline, al revelarse, lleva
+   `HighlighterAccent` sobre la frase clave y `GradientAccentWord` en la palabra de
+   acento (a definir cuál en el plan).
 2. **Card (`REFLOW_END` → `CARD_END`):** la card de la doctora aparece (mismo mecanismo
    ya construido: `DoctorCardEntrance` + `StackedCards`), sin el gate quitado por Task 1
-   — se reintroduce.
+   — se reintroduce. Se agrega `backlight` (Magic UI) como glow extra detrás de la card,
+   complementando `--shadow-depth`.
 3. **Elementos decorativos — primera tanda (`CARD_END` → ~0.6):** los 4
    `heroProofPoints` ("Reseñas de Google", "Agenda por WhatsApp", "Pacientes
    decididos", "Sin trabajo técnico") — hoy una fila de texto plano bajo los botones —
    se convierten en mini-chips flotantes que aparecen uno por uno (stagger ~0.03-0.05
    de progreso entre cada uno), reusando contenido ya aprobado, cero cifras nuevas.
 4. **Elementos decorativos — ilustrativos (repartidos a lo largo de todo el
-   recorrido, no en un solo punto):** `AccentOrbField`, `DrawnPathAccent` y `GrainTexture` (ver Sección
-   4) aparecen/se dibujan progresivamente conforme avanza el scroll — dan sensación de
-   escena viva sin agregar más información.
-5. **Fases existentes (`PHASE_1_END=0.3` en adelante, renumeradas si hace falta):** el
+   recorrido, no en un solo punto):** `AccentOrbField`, `DrawnPathAccent` y
+   `GrainTexture` (ver Sección 4) aparecen/se dibujan progresivamente conforme avanza
+   el scroll — dan sensación de escena viva sin agregar más información.
+5. **A lo largo de todo el pin:** `scroll-progress` (Magic UI) — barra delgada de
+   avance, fija, independiente de las fases de contenido.
+6. **Fases existentes (`PHASE_1_END=0.3` en adelante, renumeradas si hace falta):** el
    crossfade "Te busca→Te encuentra→Te escribe" y sus chips (`AppointmentsChipEntrance`,
    `SearchPercentChip`, `TimeChip`) siguen exactamente igual en espíritu — solo se
    recorren un poco más adelante en el scroll para dar espacio a los pasos 1-4.
 
 ## Sección 3 — Mobile: intro + scroll-away + pin-to-top
 
-1. Mismo intro de la Sección 1 (mismo componente `WordmarkReveal`, mismos tiempos).
+1. Mismo intro de la Sección 1 (mismo componente `WordmarkReveal`, mismos tiempos),
+   incluido `WordmarkOrbitAccent` a menor escala (menos puntos que desktop).
 2. **Para "hacer desaparecer" Boreas+H1 y revelar la card:** el usuario scrollea. Boreas
    +H1 se desvanecen/deslizan fuera (`opacity`+`translateY`) conforme la card entra.
+   `HighlighterAccent`/`GradientAccentWord` del headline se desvanecen con el resto del
+   bloque, no por separado.
 3. **Pin-to-top:** al llegar la card a la parte superior del viewport, se queda pineada
    ahí (`sticky`, mismo patrón que `HeroCardMobilePinned` ya usa hoy con
-   `sticky top-[88px]` — se reusa la mecánica existente, no se inventa una nueva).
+   `sticky top-[88px]` — se reusa la mecánica existente, no se inventa una nueva). Lleva
+   `backlight` igual que desktop.
 4. **Debajo de la card pineada, con scroll adicional:** salen los elementos decorativos
    e informativos — mismos `heroProofPoints` como chips + `AccentOrbField`/
-   `DrawnPathAccent`/`GrainTexture` a menor escala (mobile usa menos orbes / línea más corta que
-   desktop, mismo primitivo con props distintas).
+   `DrawnPathAccent`/`GrainTexture` a menor escala (mobile usa menos orbes / línea más
+   corta que desktop, mismo primitivo con props distintas).
+5. `scroll-progress` presente también en mobile, mismo componente que desktop.
 
 ## Sección 4 — Nuevos primitivos decorativos (puramente ilustrativos, reutilizables)
 
@@ -144,58 +156,109 @@ Pedido explícito del owner: no solo reusar contenido informativo existente, agr
 también elementos **sin información**, puramente visuales, diseñados para reusarse a
 menor escala en otras secciones del sitio (no exclusivos del Hero).
 
-### Uso obligatorio de Magic UI MCP + React Bits MCP (evaluación, no instalación ciega)
+### Uso obligatorio de Magic UI MCP + React Bits MCP (auditoría completa, no instalación ciega)
 
-Por instrucción explícita del owner, se consultaron ambos registries
-(`mcp__magicuidesign-mcp__*` y `mcp__shadcn__*` contra `@react-bits`, configurado en
-`components.json`) antes de diseñar los primitivos de esta sección. No todo lo
-encontrado califica — se documenta qué se usa, qué se descarta, y por qué:
+Por instrucción explícita del owner, se auditaron **los dos catálogos completos**
+(`mcp__magicuidesign-mcp__*` — 77 componentes — y `mcp__shadcn__*` contra `@react-bits`
+— 139 componentes, configurado en `components.json`) antes de cerrar esta sección. No
+todo lo encontrado califica — se documenta qué se usa, qué ya está cubierto, qué se
+descarta y por qué, y qué queda anotado para después.
 
-| Necesidad | Candidato evaluado | Veredicto |
+**Se usan (nuevo, ver primitivos abajo):**
+
+| Necesidad | Fuente | Nota |
 | --- | --- | --- |
-| Reveal de letras | React Bits `SplitText` (las 4 variantes: TS/JS × TW/CSS) | **Aprobado — decisión revisada por el owner.** Las 4 variantes dependen de `gsap`+`@gsap/react` (incluso la "-CSS", el plugin `SplitText` es de GSAP internamente, no cuestión de empaquetado) — inicialmente descartado por chocar con la regla vieja de "gsap retirado". El owner pidió reconsiderar y después abrió la política de librería de animación por completo (`DESIGN.md` § "Animation library policy", 2026-07-17): framer-motion+CSS sigue de default, pero ya no es la única opción del proyecto. Se usa en un componente-hoja (`wordmark-letter-reveal.tsx`) por prolijidad de arquitectura, no por obligación de regla — ver Sección 1. |
-| Orbes/glow ambiental | Magic UI `particles` | **Descartado.** Es un sistema canvas + `requestAnimationFrame` con seguimiento de mouse y 100 partículas por default — textura equivocada (denso/interactivo) para un "acento puntual" (regla de glow relajada en `DESIGN.md` es explícita: acento, no wallpaper), y un loop de canvas por frame choca con la regla de solo animar `transform`/`opacity` (mismo principio de rendimiento de la skill `emil-design-eng` ya aplicada en esta pasada). React Bits no tiene un match directo (orb/blob) tampoco. Se mantiene el diseño original: pocos círculos con `blur` CSS + `ParallaxLayer` (primitivo ya existente). |
-| Línea que se dibuja con scroll | Magic UI `animated-beam` | **Parcial — técnica sí, componente no.** Usa un `<path>` SVG con gradiente animado vía `motion.linearGradient` y una curva easeOutExpo (`[0.16,1,0.3,1]`, cercana pero no idéntica a la constante `EASE` del proyecto `[0.22,1,0.36,1]`) — buena referencia visual. Pero está diseñado para conectar dos elementos del DOM vía `ResizeObserver` (choca con la regla "sin medición JS") y su animación es un loop infinito por tiempo, no por scroll. `DrawnPathAccent` toma la técnica del trazo con gradiente pero la ata a `useScrub` (scroll, lineal) en vez de instalar el componente tal cual. |
-| Textura de grano/papel | React Bits `Noise-TS-CSS` | **Usado — aprobado por el owner.** CSS puro, sin dependencias (confirmado vía `view_items_in_registries` — a diferencia de `SplitText`, este sí es dependency-free). Encaja con la identidad "papel cálido" ya descrita en `DESIGN.md` § Visual System. Se porta a `components/motion/grain-texture.tsx` (se ajusta al patrón de exports del resto de `components/motion/`, no se deja tal cual llega del registry). |
+| Reveal de letras | React Bits `SplitText` (gsap) | Ver Sección 1 — política de librería abierta desde 2026-07-17 |
+| Orbes/glow ambiental | React Bits `Orb` | Base para `AccentOrbField`, en vez de construirlo 100% desde cero |
+| Línea que se dibuja con scroll | React Bits `Beams`/`Threads`/`Strands` | Referencias visuales para `DrawnPathAccent` — se elige la que mejor se vea en pruebas, atada a `useScrub` |
+| Grano/textura de papel | React Bits `Noise` **y** Magic UI `noise-texture` (SVG `feTurbulence`) | Ambos sin dependencias — se comparan las dos implementaciones en la fase de implementación, se porta la que se vea mejor |
+| Subrayado tipo marcador | Magic UI `highlighter` (dep: `rough-notation`) | Nuevo — resalta una frase clave del headline, efecto trazo-a-mano |
+| Palabra de acento con gradiente | React Bits `GradientText`/`ShinyText` | Nuevo — una palabra del headline en su momento de impacto (regla ya permitida en `DESIGN.md`) |
+| Barra de progreso del scroll | Magic UI `scroll-progress` (dep: `motion`, compatible) | Nuevo — detalle funcional, no solo decorativo |
+| Glow detrás de la card de la doctora | Magic UI `backlight` | Nuevo — complementa el `StackedCards` ya existente |
+| Puntos orbitando el wordmark | Magic UI `orbiting-circles` / React Bits `OrbitImages` | Nuevo — acento puramente ilustrativo durante el intro |
 
-**Conclusión práctica:** ambos MCPs sí aportaron valor — como fuente de búsqueda/evaluación,
-como referencia técnica (SVG+gradiente, split-de-caracteres), y en dos casos (grano,
-letras) como fuente directa de un componente aprobado (`SplitText` inicialmente se
-descartó por la regla vieja de "gsap retirado" — el owner después abrió la política de
-librería de animación por completo, ver `DESIGN.md`). Lo que sigue sin calificar
-(`particles`, `animated-beam` tal cual) es por reglas que siguen vigentes — medición JS
-y transform/opacity-only — no por la librería que usen.
+**Ya construido, no se duplica:** `CountUp`/`Counter`/`number-ticker` (→ `useAnimatedNumber`
+ya existe) · `ScrollReveal`/`AnimatedContent`/`FadeContent`/`blur-fade`/Magic UI
+`text-reveal` (→ `TextReveal` ya existe) · `ScrollStack`/`Stack`/`CardSwap` (→
+`StackedCards` ya existe) · `avatar-circles` (→ stack de avatares ya existe) ·
+`Carousel` (→ carrusel de Relevo ya existe).
 
-### `components/motion/accent-orb-field.tsx`
+**Descartado — no encaja con la marca (papel cálido, editorial, audiencia de médicos +
+pacientes 40+, sitio que genera confianza):**
+- Todo lo de cursor/puntero (16 de React Bits + `smooth-cursor`/`pointer`/`lens` de
+  Magic UI) — cursores custom confunden a esta audiencia, tono equivocado.
+- Fondos WebGL/shader pesados (~40 de React Bits: `Aurora`, `Plasma`, `LiquidChrome`,
+  `Balatro`, etc.) — rompen "papel cálido, plano, mate" y la regla
+  transform/opacity-only (son canvas/WebGL).
+- Efectos glitch/hacker de texto (`DecryptedText`, `GlitchText`, `ASCIIText`, etc.) —
+  tono equivocado para confianza médica.
+- 3D/WebGL de showcase (`Cubes`, `Lanyard`, `DomeGallery`, etc.) — medio equivocado,
+  pesado.
+- `confetti`/`rainbow-button`/`cool-mode` — demasiado juguetón.
+- Magic UI `particles` y `animated-beam` tal cual (ver detalle técnico abajo) —
+  chocan con medición JS / transform-opacity-only, no con la librería que usen.
 
-Conjunto de círculos suaves y borrosos (`blur` 20-40px, `opacity` 0.15-0.3,
-`pointer-events-none`, `aria-hidden`) en los 4 acentos vivos ya definidos en
-`DESIGN.md`/`globals.css` (`--c-amber`, `--c-mint`, `--c-lav`, `--c-rose` — "sistema
-deliberado", no decoración accidental, ya lo dice el propio `DESIGN.md`). Cada orbe usa
-`ParallaxLayer` (primitivo ya existente) con su propia velocidad, dando sensación de
-profundidad/deriva sutil. Props: `count`, rango de tamaño, rango de velocidad — así el
-Hero usa una versión "grande" (5-6 orbes) y otras secciones pueden usar una versión
-"quieta" (1-2 orbes) sin duplicar código.
+**Guardado para después (no es para el Hero, otra tarea):** mockups de dispositivo
+(`android`/`iphone`/`safari` de Magic UI) · `shimmer-button`/`border-beam`/`shine-border`
+(pulir el CTA) · `PillNav`/`StaggeredMenu` (rediseño de header) · `SpotlightCard`/
+`TiltedCard` (hover en cards de otras secciones) · `confetti` (estado de éxito del
+form) · `animated-theme-toggler` (mejorar el toggle actual) · `GradualBlur` de React
+Bits (técnica de reserva si el crossfade del intro se ve tosco, ver Sección 1 §
+skip-on-scroll).
 
-### `components/motion/drawn-path-accent.tsx`
+**Detalle técnico de los 2 descartes con "casi encaja" (heredado de la evaluación
+anterior):** Magic UI `particles` es canvas+`requestAnimationFrame`+mouse-tracking,
+100 partículas por default — textura equivocada (denso/interactivo) para un "acento
+puntual" y choca con la regla de solo animar `transform`/`opacity`. Magic UI
+`animated-beam` usa un `<path>` SVG con gradiente animado (buena referencia visual,
+curva easeOutExpo `[0.16,1,0.3,1]` cercana a la constante `EASE` del proyecto
+`[0.22,1,0.36,1]`) pero está diseñado para conectar dos elementos del DOM vía
+`ResizeObserver` (choca con "sin medición JS") con loop infinito por tiempo, no por
+scroll — se prefieren `Beams`/`Threads`/`Strands` de React Bits como referencia en su
+lugar, igual atados a `useScrub`.
 
-Una línea curva delgada (SVG `path`, `stroke` en color de acento) que se "dibuja" con el
-scroll vía `stroke-dashoffset` atado a `useScrub` (lineal, mismo primitivo ya existente,
-sin curva de easing nueva). Puramente decorativo, `aria-hidden`. Reutilizable como
-elemento conector/textura en otras secciones a menor escala (path más corto, un solo
-trazo).
+### Primitivos nuevos
 
-### `components/motion/grain-texture.tsx`
+Todos van en `components/motion/`, mismo patrón de export/props que
+`parallax-layer.tsx`/`stacked-cards.tsx` — no rompen la convención existente. Los que
+usan gsap (`wordmark-letter-reveal.tsx`) lo contienen en su propio archivo, sin
+mezclarlo con framer-motion en el mismo componente (buena práctica, ya no regla
+obligatoria — ver `DESIGN.md` § "Animation library policy").
 
-Portado desde React Bits `Noise-TS-CSS` (CSS puro, sin dependencias — ver tabla de
-evaluación arriba), ajustado al patrón de exports del proyecto. Textura de grano sutil
-sobre el Hero completo, refuerza la identidad "papel cálido" ya descrita en
-`DESIGN.md`. `aria-hidden`, `pointer-events-none`, opacidad baja (no debe leerse como
-ruido/artefacto, es textura táctil de fondo). Reutilizable en otras secciones del sitio
-a la misma o menor intensidad.
-
-Los tres primitivos van en `components/motion/`, mismo patrón de export/props que
-`parallax-layer.tsx`/`stacked-cards.tsx` — no rompen la convención existente.
+- **`components/motion/accent-orb-field.tsx`** — círculos suaves y borrosos (`blur`
+  20-40px, `opacity` 0.15-0.3, `pointer-events-none`, `aria-hidden`) en los 4 acentos
+  vivos ya definidos (`--c-amber`, `--c-mint`, `--c-lav`, `--c-rose` — "sistema
+  deliberado" según el propio `DESIGN.md`). Base: React Bits `Orb`, adaptado a usar
+  `ParallaxLayer` (primitivo ya existente) por orbe. Props: `count`, rango de tamaño,
+  rango de velocidad — Hero usa versión "grande" (5-6 orbes), otras secciones pueden
+  usar 1-2.
+- **`components/motion/drawn-path-accent.tsx`** — línea curva delgada (SVG `path`,
+  gradiente en color de acento) que se "dibuja" con el scroll vía `stroke-dashoffset`
+  atado a `useScrub` (lineal). Referencia visual: React Bits `Beams`/`Threads`/
+  `Strands`. Puramente decorativo, `aria-hidden`, reutilizable a menor escala.
+- **`components/motion/grain-texture.tsx`** — grano de papel. Se compara React Bits
+  `Noise` (CSS) vs Magic UI `noise-texture` (SVG `feTurbulence`) en implementación, se
+  porta la que se vea mejor — ambas sin dependencias. `aria-hidden`,
+  `pointer-events-none`, opacidad baja.
+- **`components/motion/highlighter-accent.tsx`** — envuelve Magic UI `highlighter`
+  (dep: `rough-notation`, sin conflicto con framer-motion). Subraya una frase corta del
+  headline con trazo tipo marcador a mano, en el momento en que el headline se revela.
+  Reutilizable en otras secciones para resaltar una frase clave.
+- **`components/motion/gradient-accent-word.tsx`** — envuelve la técnica de React Bits
+  `GradientText`/`ShinyText`. Una sola palabra del headline (a definir en el plan) con
+  gradiente animado en el momento de impacto — ya permitido por la regla de gradiente
+  relajada en `DESIGN.md`, no en body copy ni labels repetidos.
+- **`components/motion/wordmark-orbit-accent.tsx`** — puntos pequeños orbitando el
+  wordmark durante el intro (referencia: Magic UI `orbiting-circles` / React Bits
+  `OrbitImages`), puramente ilustrativo, se detiene/desvanece cuando el wordmark se
+  desplaza a su posición final.
+- **Barra de scroll:** se integra Magic UI `scroll-progress` (dep: `motion`,
+  compatible) directamente, sin wrapper propio — indicador delgado del avance por el
+  pin del Hero.
+- **Glow de la card:** se integra Magic UI `backlight` como capa extra dentro de
+  `DoctorCardEntrance`/`StackedCardsStaticDoctorCard`, complementando (no
+  reemplazando) la sombra `--shadow-depth` ya existente.
 
 ## Restricciones técnicas (heredadas del spec anterior, siguen vigentes)
 
@@ -206,20 +269,33 @@ Los tres primitivos van en `components/motion/`, mismo patrón de export/props q
 - Transform + opacity únicamente para lo animado; `transform:` como string completo
   (`translate3d()`), nunca los atajos `x`/`y`/`scale` de Framer Motion.
 - Sin medición JS (`getBoundingClientRect`/`ResizeObserver`) para posicionamiento —
-  unidades de container query donde se necesite fluidez entre breakpoints.
+  unidades de container query donde se necesite fluidez entre breakpoints. `backlight`
+  no mide nada vía JS (glow puramente CSS/SVG) — confirmar en el plan.
+- Los registries de Magic UI declaran su dependencia de framer-motion como `motion`
+  (nombre nuevo del paquete). Este proyecto fija `framer-motion` como nombre de paquete
+  (ver `skills/framer-motion/SKILL.md` § "Boreas project overrides") — al portar
+  `scroll-progress`/`highlighter`/`backlight`, reescribir esos imports a
+  `from "framer-motion"`, no instalar el paquete `motion` aparte (evita dos copias del
+  mismo runtime).
 - `prefers-reduced-motion` (`HeroStatic` y su rama mobile): sin intro de letras, sin
   gate por scroll — mismo criterio de siempre, todo visible de inmediato, sin
-  coreografía. `AccentOrbField`/`DrawnPathAccent`/`GrainTexture` en modo reducido: estáticos, sin
-  parallax ni dibujo animado (aparecen ya completos, o se omiten si eso es más simple).
+  coreografía. Todos los primitivos puramente decorativos (`AccentOrbField`,
+  `DrawnPathAccent`, `GrainTexture`, `WordmarkOrbitAccent`, `backlight`) en modo
+  reducido: estáticos, sin parallax ni dibujo animado (aparecen ya completos, o se
+  omiten si eso es más simple). `HighlighterAccent`/`GradientAccentWord` en modo
+  reducido: el texto se ve completo y legible de inmediato, sin el trazo/gradiente
+  animándose (puede quedar el estado final estático, nunca oculto).
 
 ## Accesibilidad
 
 - El wordmark y headline deben seguir siendo texto real (no imágenes/canvas) —
   `WordmarkReveal` anima opacidad/posición de spans reales, el texto completo sigue
   presente en el DOM y seleccionable en todo momento (incluso letra por letra, mientras
-  se revela).
-- `AccentOrbField`/`DrawnPathAccent`/`GrainTexture`: `aria-hidden="true"`, `pointer-events-none` — cero
-  impacto en el árbol de accesibilidad.
+  se revela). `HighlighterAccent`/`GradientAccentWord` decoran texto real existente,
+  nunca lo reemplazan por imagen/canvas.
+- Elementos puramente decorativos (`AccentOrbField`, `DrawnPathAccent`, `GrainTexture`,
+  `WordmarkOrbitAccent`, `backlight`, `scroll-progress`): `aria-hidden="true"`,
+  `pointer-events-none` — cero impacto en el árbol de accesibilidad.
 - Los chips de `heroProofPoints` mantienen el texto real (no solo iconos) — si el
   usuario nunca scrollea, ese contenido no está disponible para lectores de pantalla;
   esto es aceptable bajo la misma excepción ya documentada (contenido gateado tras
@@ -235,9 +311,14 @@ Los tres primitivos van en `components/motion/`, mismo patrón de export/props q
 - Desktop, si se scrollea a la mitad del intro: el resto resuelve suave en ~150-180ms,
   sin salto brusco, sin quedar a medias.
 - Desktop, scroll continuo: texto se acomoda a la izquierda, aparece párrafo+CTA, luego
-  la card, luego los 4 proof-points como chips uno por uno, orbes, línea decorativa y grano
-  presentes a lo largo, y al final el crossfade de fases ya existente sigue intacto.
-- Mobile: mismo intro; scroll hace desaparecer Boreas+H1 y aparecer la card; la card se
-  pinea arriba al llegar; más abajo aparecen los chips + orbes/línea/grano a menor escala.
-- `prefers-reduced-motion`: contenido completo, sin animación de letras, sin gate,
-  coherente con el fallback ya existente.
+  la card, luego los 4 proof-points como chips uno por uno, orbes, línea decorativa y
+  grano presentes a lo largo, glow (`backlight`) detrás de la card, barra de scroll
+  visible, y al final el crossfade de fases ya existente sigue intacto.
+- Desktop, durante el intro: puntos orbitando el wordmark, frase clave del headline
+  subrayada tipo marcador, una palabra con gradiente animado — todo antes de scroll.
+- Mobile: mismo intro (con orbit-accent a menor escala); scroll hace desaparecer
+  Boreas+H1 y aparecer la card con su glow; la card se pinea arriba al llegar; más abajo
+  aparecen los chips + orbes/línea/grano a menor escala; barra de scroll presente.
+- `prefers-reduced-motion`: contenido completo, sin animación de letras, sin gate, sin
+  trazo/gradiente animado (texto legible de inmediato), coherente con el fallback ya
+  existente.
