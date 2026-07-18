@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { WordmarkLetterReveal } from "@/components/motion/wordmark-letter-reveal";
 import { TextReveal } from "@/components/motion/text-reveal";
 import { useSkipOnScroll } from "@/lib/motion/use-skip-on-scroll";
@@ -36,14 +35,16 @@ export function WordmarkIntro({ wordmark, headline, onSettled }: WordmarkIntroPr
 
   return (
     <div className="relative">
-      <motion.div
-        animate={{ transform: holdDone ? "translate3d(0, -8px, 0)" : "translate3d(0, 0, 0)" }}
-        transition={{ duration: moveUpDuration, ease: EASE }}
+      <div
         className="font-display italic font-medium leading-[0.88] tracking-[-0.03em] text-foreground"
-        style={{ fontSize: "clamp(5rem, 13vw, 10.5rem)" }}
+        style={{
+          fontSize: "clamp(5rem, 13vw, 10.5rem)",
+          transform: holdDone ? "translate3d(0, -8px, 0)" : "translate3d(0, 0, 0)",
+          transition: `transform ${moveUpDuration}s cubic-bezier(${EASE.join(", ")})`,
+        }}
       >
         <WordmarkLetterReveal text={wordmark} skip={skip} onComplete={() => setLettersDone(true)} />
-      </motion.div>
+      </div>
       {holdDone && (
         <TextReveal reduceMotion={false} trigger={{ mode: "delay", ms: 0 }}>
           <h1
