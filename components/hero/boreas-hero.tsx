@@ -569,8 +569,9 @@ function HeroCinematicLeftColumn({
         <WordmarkOrbitAccent
           active={introProgress > 0}
           count={enableIntroReflow ? 3 : 2}
+          radiusScale={enableIntroReflow ? 1 : 0.55}
           reduceMotion={false}
-          className="left-[-15%] top-[-8%] h-40 w-40"
+          className={enableIntroReflow ? "left-[-15%] top-[-8%] h-40 w-40" : "left-[-8%] top-[-6%] h-24 w-24"}
         />
         <WordmarkIntro wordmark="Boreas" headline={heroHeadline} onSettled={markIntroSettled} />
       </div>

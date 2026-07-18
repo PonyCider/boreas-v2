@@ -3,17 +3,18 @@
 export interface WordmarkOrbitAccentProps {
   active: boolean;
   count?: number;
+  radiusScale?: number;
   reduceMotion: boolean;
   className?: string;
 }
 
-export function WordmarkOrbitAccent({ active, count = 3, reduceMotion, className = "" }: WordmarkOrbitAccentProps) {
+export function WordmarkOrbitAccent({ active, count = 3, radiusScale = 1, reduceMotion, className = "" }: WordmarkOrbitAccentProps) {
   if (!active || reduceMotion) return null;
 
   return (
     <div aria-hidden="true" className={`pointer-events-none absolute inset-0 ${className}`}>
       {Array.from({ length: count }).map((_, i) => {
-        const radius = 90 + i * 24;
+        const radius = (90 + i * 24) * radiusScale;
         const duration = 8 + i * 3;
         return (
           <span
