@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { trackAnalyticsEvent } from "@/lib/analytics";
+import { useHeroIntroSettled } from "@/lib/motion/hero-intro-context";
 
 const navLinks = [
   { label: "Resultados", href: "#prueba" },
@@ -41,6 +42,7 @@ export function Header() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [showHeaderCta, setShowHeaderCta] = useState(false);
   const reduceMotion = useReducedMotion();
+  const introSettled = useHeroIntroSettled();
 
   useEffect(() => {
     // Reading localStorage can't happen during the initial (server-matching)
@@ -98,7 +100,10 @@ export function Header() {
           className="flex h-11 min-w-0 items-center"
           aria-label="Boreas — inicio"
         >
-          <span
+          <motion.span
+            initial={reduceMotion ? undefined : { opacity: 0 }}
+            animate={{ opacity: reduceMotion || introSettled ? 1 : 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             style={{
               fontFamily: "var(--font-newsreader), Georgia, serif",
               fontStyle: "italic",
@@ -109,7 +114,7 @@ export function Header() {
             }}
           >
             Boreas
-          </span>
+          </motion.span>
         </Link>
 
         {/* Desktop Navigation */}

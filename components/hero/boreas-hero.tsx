@@ -20,6 +20,7 @@ import { trackAnalyticsEvent } from "@/lib/analytics";
 import { useAnimatedNumber, type NumberTrigger } from "@/lib/use-animated-number";
 import { useScrollPin, type ScrollPin } from "@/lib/motion/use-scroll-pin";
 import { useScrub } from "@/lib/motion/use-scrub";
+import { useMarkHeroIntroSettled } from "@/lib/motion/hero-intro-context";
 import { StackedCards, type StackedCardLayer } from "@/components/motion/stacked-cards";
 import { ParallaxLayer } from "@/components/motion/parallax-layer";
 import { WordmarkIntro } from "@/components/hero/wordmark-intro";
@@ -540,6 +541,7 @@ function HeroCinematicLeftColumn({
   ctaId: string;
   enableIntroReflow?: boolean;
 }) {
+  const markIntroSettled = useMarkHeroIntroSettled();
   const problemEyebrowOpacity = useScrub(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0]);
   const solutionEyebrowOpacity = 1 - problemEyebrowOpacity;
   const introProgress = useScrub(scrollYProgress, [0, INTRO_END], [1, 0]);
@@ -570,7 +572,7 @@ function HeroCinematicLeftColumn({
           reduceMotion={false}
           className="left-[-15%] top-[-8%] h-40 w-40"
         />
-        <WordmarkIntro wordmark="Boreas" headline={heroHeadline} />
+        <WordmarkIntro wordmark="Boreas" headline={heroHeadline} onSettled={markIntroSettled} />
       </div>
 
       <div
