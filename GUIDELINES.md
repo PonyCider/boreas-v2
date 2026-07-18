@@ -121,7 +121,12 @@ vía toggle (`data-theme="dark"` / clase `.dark`, persistido en `localStorage`).
 - **`prefers-reduced-motion` obligatorio** en toda animación — no solo saltar el keyframe, dar
   un equivalente estático/instantáneo.
 - Ningún efecto de scroll que oculte contenido a crawlers/screenshots.
-- **gsap queda retirado.** El widget `clinic-builder.tsx` (loop de bots IDE) está superado por el nuevo card cluster del hero y ya no se importa en `boreas-hero.tsx` — el archivo quedó huérfano, pendiente eliminarlo (ver §7).
+- **Librería de animación:** framer-motion + CSS es el default del proyecto, pero ya
+  no es la única opción permitida — política abierta desde 2026-07-17 (ver
+  `DESIGN.md → Animation library policy`), decisión del owner para no bloquear
+  herramientas necesarias. El widget `clinic-builder.tsx` (loop de bots IDE con gsap)
+  sigue huérfano y sin usarse — pendiente eliminarlo como código muerto (ver §7),
+  independiente de la política de librerías.
 - Toggle de dark mode: transición `background .28s, color .28s` en `body`.
 
 ### Prohibiciones (cross-register)
@@ -137,8 +142,11 @@ glass/glow decorativo en cualquier parte del sitio (incluido el hero).
   (`next/font/google`) · framer-motion. Server Actions para el form.
 - ⚠️ **Next 16 NO es el Next que conoces.** APIs/convenciones pueden diferir del entrenamiento.
   Lee `node_modules/next/dist/docs/` antes de escribir código nuevo (regla de AGENTS.md).
-- **Animación:** framer-motion únicamente. **gsap quedó retirado** — `clinic-builder.tsx` ya no
-  se importa desde `boreas-hero.tsx`; el archivo es código muerto pendiente de eliminar (§7).
+- **Animación:** framer-motion + CSS es el default; otras librerías (incluido gsap) se
+  permiten cuando el caso lo justifica — ver `DESIGN.md → Animation library policy`
+  (abierta 2026-07-17). `clinic-builder.tsx` sigue sin importarse desde
+  `boreas-hero.tsx`; el archivo es código muerto pendiente de eliminar (§7), aparte de
+  la política de librerías.
 
 ### Estructura
 ```
@@ -174,7 +182,7 @@ public/brand/   logos/lockups
 **DON'T**
 - ❌ Precio/escasez públicos. ❌ Jerga técnica como gancho.
 - ❌ Hex de color hardcodeado. ❌ Glass/glow en cualquier parte del sitio, incluido el hero. ❌ Side-stripe borders, gradient text.
-- ❌ Cards anidadas. ❌ gsap (retirado del proyecto).
+- ❌ Cards anidadas.
 - ❌ Dejar leads sin medir (analytics sigue sin invocarse — ver §7).
 - ❌ `divide-y + border-y` juntos en listas de texto, o `border-bottom` por ítem sobre un contenedor con `border-top` — genera N+1 líneas para N ítems. Listas de prosa usan espaciado (`gap`/`py-*`), no reglas. Regla en detalle: `DESIGN.md → Horizontal line discipline`.
 
@@ -186,7 +194,7 @@ public/brand/   logos/lockups
 |------|------|-------|
 | **P0** | Analytics nunca se llama (`trackAnalyticsEvent` no se invoca en CTA-click/submit) — KPIs inmedibles | `lib/analytics.ts` |
 | **P1** | Cero prueba social independiente del mockup de problem-section (testimonios/demo/fuente de stats) | nueva sección + `content/boreas-home.ts` |
-| **P2** | `clinic-builder.tsx` huérfano (gsap, ya no se importa) — eliminar archivo y dependencia de gsap del `package.json` | `components/hero/clinic-builder.tsx`, `package.json` |
+| **P2** | `clinic-builder.tsx` huérfano (ya no se importa) — eliminar archivo. gsap en `package.json` ya no aplica para limpieza: es dependencia activa desde 2026-07-17 (Hero wordmark reveal) | `components/hero/clinic-builder.tsx` |
 | **P2** | `final-cta-section.tsx` huérfano — decidir si se usa como CTA final tras FAQ o se elimina | `final-cta-section.tsx`, `boreas-landing-sections.tsx` |
 | **P3** | Contraste de placeholder (`placeholder:text-muted/70` probablemente <4.5:1) | `contact-form-section.tsx` |
 | **P3** | Validación de WhatsApp en el form; `package.json` name=`boreas-v2` | varios |

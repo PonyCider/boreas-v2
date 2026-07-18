@@ -70,9 +70,11 @@ scroll real de la página — solo lee el evento para decidir el estado visual d
 ### Nuevo primitivo, en dos partes (decisión revisada — ver tabla de evaluación de MCPs)
 
 El owner eligió usar gsap `SplitText` para esto en vez de una implementación nativa con
-framer-motion (excepción puntual documentada en `DESIGN.md` § Prohibitions →
-"gsap — narrow exception..."). Para no romper la regla "no mezclar gsap+framer-motion en
-el mismo componente" (que sí sigue vigente), se parte en dos:
+framer-motion — política de librería de animación abierta desde 2026-07-17 (ver
+`DESIGN.md` § "Animation library policy"; framer-motion + CSS sigue siendo el default
+del resto del sitio, ya no es la única opción permitida). Se sigue partiendo en dos
+componentes, no porque una regla lo exija, sino por buena práctica de arquitectura
+(un import de gsap contenido en un solo archivo, resto del Hero sin tocar):
 
 - **`components/motion/wordmark-letter-reveal.tsx`** (hoja, gsap-only): recibe el
   string, usa `SplitText` de gsap para el split a letras + stagger-in. No importa
@@ -83,9 +85,9 @@ el mismo componente" (que sí sigue vigente), se parte en dos:
   framer-motion).
 - **Componente orquestador** (en `boreas-hero.tsx`, framer-motion): monta
   `WordmarkLetterReveal`, escucha su `onComplete`, y a partir de ahí anima la
-  transición "Boreas sube + headline aparece" (reutiliza `TextReveal`). Nunca importa
-  gsap directamente — coordina por callback/ref, no por mezclar librerías en el mismo
-  archivo.
+  transición "Boreas sube + headline aparece" (reutiliza `TextReveal`). Coordina por
+  callback/ref — mantiene el resto del Hero en framer-motion por consistencia, no por
+  obligación.
 
 Dependencias nuevas: `gsap` + `@gsap/react` (mismas que usa `SplitText` de React Bits —
 ver tabla de evaluación de MCPs arriba, ahora aprobado en vez de descartado).
@@ -151,16 +153,18 @@ encontrado califica — se documenta qué se usa, qué se descarta, y por qué:
 
 | Necesidad | Candidato evaluado | Veredicto |
 | --- | --- | --- |
-| Reveal de letras | React Bits `SplitText` (las 4 variantes: TS/JS × TW/CSS) | **Aprobado — decisión revisada por el owner.** Las 4 variantes dependen de `gsap`+`@gsap/react` (incluso la "-CSS", el plugin `SplitText` es de GSAP internamente, no cuestión de empaquetado) — inicialmente descartado por chocar con "gsap retirado". El owner pidió reconsiderar: sí se usa, como excepción puntual documentada en `DESIGN.md` § Prohibitions ("gsap — narrow exception..."), acotada a un componente-hoja (`wordmark-letter-reveal.tsx`) que nunca mezcla gsap con framer-motion en el mismo archivo — ver Sección 1. |
+| Reveal de letras | React Bits `SplitText` (las 4 variantes: TS/JS × TW/CSS) | **Aprobado — decisión revisada por el owner.** Las 4 variantes dependen de `gsap`+`@gsap/react` (incluso la "-CSS", el plugin `SplitText` es de GSAP internamente, no cuestión de empaquetado) — inicialmente descartado por chocar con la regla vieja de "gsap retirado". El owner pidió reconsiderar y después abrió la política de librería de animación por completo (`DESIGN.md` § "Animation library policy", 2026-07-17): framer-motion+CSS sigue de default, pero ya no es la única opción del proyecto. Se usa en un componente-hoja (`wordmark-letter-reveal.tsx`) por prolijidad de arquitectura, no por obligación de regla — ver Sección 1. |
 | Orbes/glow ambiental | Magic UI `particles` | **Descartado.** Es un sistema canvas + `requestAnimationFrame` con seguimiento de mouse y 100 partículas por default — textura equivocada (denso/interactivo) para un "acento puntual" (regla de glow relajada en `DESIGN.md` es explícita: acento, no wallpaper), y un loop de canvas por frame choca con la regla de solo animar `transform`/`opacity` (mismo principio de rendimiento de la skill `emil-design-eng` ya aplicada en esta pasada). React Bits no tiene un match directo (orb/blob) tampoco. Se mantiene el diseño original: pocos círculos con `blur` CSS + `ParallaxLayer` (primitivo ya existente). |
 | Línea que se dibuja con scroll | Magic UI `animated-beam` | **Parcial — técnica sí, componente no.** Usa un `<path>` SVG con gradiente animado vía `motion.linearGradient` y una curva easeOutExpo (`[0.16,1,0.3,1]`, cercana pero no idéntica a la constante `EASE` del proyecto `[0.22,1,0.36,1]`) — buena referencia visual. Pero está diseñado para conectar dos elementos del DOM vía `ResizeObserver` (choca con la regla "sin medición JS") y su animación es un loop infinito por tiempo, no por scroll. `DrawnPathAccent` toma la técnica del trazo con gradiente pero la ata a `useScrub` (scroll, lineal) en vez de instalar el componente tal cual. |
 | Textura de grano/papel | React Bits `Noise-TS-CSS` | **Usado — aprobado por el owner.** CSS puro, sin dependencias (confirmado vía `view_items_in_registries` — a diferencia de `SplitText`, este sí es dependency-free). Encaja con la identidad "papel cálido" ya descrita en `DESIGN.md` § Visual System. Se porta a `components/motion/grain-texture.tsx` (se ajusta al patrón de exports del resto de `components/motion/`, no se deja tal cual llega del registry). |
 
-**Conclusión práctica:** ambos MCPs sí aportaron valor — como fuente de búsqueda/evaluación
-y como referencia técnica (SVG+gradiente, split-de-caracteres), y en un caso (grano) como
-fuente directa de un componente aprobado. Ninguno se instala a ciegas cuando choca con una
-regla dura ya vigente del proyecto (gsap, medición JS, transform/opacity-only) — mismo
-criterio que se ha aplicado toda esta pasada a cualquier fuente externa.
+**Conclusión práctica:** ambos MCPs sí aportaron valor — como fuente de búsqueda/evaluación,
+como referencia técnica (SVG+gradiente, split-de-caracteres), y en dos casos (grano,
+letras) como fuente directa de un componente aprobado (`SplitText` inicialmente se
+descartó por la regla vieja de "gsap retirado" — el owner después abrió la política de
+librería de animación por completo, ver `DESIGN.md`). Lo que sigue sin calificar
+(`particles`, `animated-beam` tal cual) es por reglas que siguen vigentes — medición JS
+y transform/opacity-only — no por la librería que usen.
 
 ### `components/motion/accent-orb-field.tsx`
 

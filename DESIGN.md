@@ -87,9 +87,11 @@ dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior
 >
 > Reference implementation: `docs/handoff/2026-07-13-landing-audit-handoff.md` (tasks T3, T4).
 
-- No gsap. framer-motion + CSS only, project-wide.
+- framer-motion + CSS is the default toolkit project-wide. Other animation libraries
+  (gsap included) are allowed when a task genuinely calls for them — see "Animation
+  library policy — opened 2026-07-17" below.
 - The hero card cluster is being reworked into a choreographed sequence (was: static CSS `@keyframes float` loop). See handoff T3.
-- **gsap is retired.** The previous `clinic-builder.tsx` widget (infinite gsap bot-construction loop) is superseded by the new hero card cluster and should not run. The file is currently orphaned (unused import) — pending removal, see backlog in `GUIDELINES.md`.
+- The old `clinic-builder.tsx` widget (gsap bot-construction loop) is superseded by the new hero card cluster and orphaned (unused import) — pending removal as dead code, see backlog in `GUIDELINES.md`. Its removal is a dead-code cleanup, unrelated to which animation libraries are currently allowed.
 - Respect `prefers-reduced-motion` on every animation: provide a static/instant equivalent, not just "skip the keyframe."
 - No scroll effects that hide content from screenshots, crawlers, or impatient users.
 - Dark mode toggle transition: `transition: background .28s, color .28s` on `body`.
@@ -113,7 +115,6 @@ dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior
 
 - No hardcoded color hex outside `globals.css` tokens.
 - No side-stripe borders (`border-left/right` of color as accent).
-- No mixing gsap + framer-motion in the same component (gsap is retired project-wide; framer-motion is the only animation library in active use).
 - No cards anidadas (see radius scale above) — still banned even where the rules below relax: nesting reads as generic/templated, the opposite of the direction those rules exist to serve.
 - No visible phase labels on screen ("Fase 1", "Confianza", etc.) — choreography is understood by what elements do, not by tutorial-style narration.
 
@@ -135,22 +136,20 @@ dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior
 > (e.g. a card settling into place) — never a full bounce/elastic keyframe, and never
 > the default for section-level reveals.
 
-### gsap — narrow exception, Hero wordmark letter-reveal only, relaxed 2026-07-17 (owner directive)
+### Animation library policy — opened 2026-07-17 (owner directive, supersedes the gsap ban above)
 
-> "gsap is retired project-wide" stays binding everywhere else. **Narrow, named
-> exception:** `components/motion/wordmark-letter-reveal.tsx` (the Hero's "Boreas"
-> letter-by-letter reveal) may use gsap's `SplitText` plugin, on the owner's explicit
-> choice after being shown the tradeoff (bundle size, dual-engine maintenance cost, vs.
-> a robust battle-tested utility for a simple-looking effect that's fussier than it
-> looks). Conditions that keep this from becoming precedent creep:
-> - gsap lives ONLY inside that one leaf component — it does the character split and
->   stagger-in, nothing else.
-> - The "no mixing gsap + framer-motion in the same component" rule still holds at the
->   component-file level: the orchestrating parent (which sequences the hold →
->   move-up → headline reveal, all framer-motion) coordinates with this leaf via a
->   completion callback/ref, never by importing both libraries into one file.
-> - Do not cite this entry to justify gsap anywhere else in the codebase — every other
->   component stays framer-motion + CSS only.
+> The previous "no gsap, framer-motion + CSS only" rule and "no mixing gsap +
+> framer-motion in the same component" prohibition are lifted. Owner's explicit call:
+> don't let this document block using whatever tool actually gets the intended result —
+> gsap, other animation libraries, or anything else genuinely needed. framer-motion + CSS
+> stays the **default** (most work should keep using it, for consistency and bundle
+> size), but it is no longer the only option. First real use: gsap's `SplitText` in the
+> Hero's wordmark letter-reveal (`components/motion/wordmark-letter-reveal.tsx`).
+> Everything else in this document (no-hardcoded-hex, no nested cards, no visible phase
+> labels, `prefers-reduced-motion` mandatory, content-never-gated-by-default, no-JS-
+> measurement, transform/opacity-only performance rule) stays binding regardless of
+> which animation library is in use — this entry only removes the single-library
+> restriction, not the other quality/accessibility/performance rules.
 
 ### Content gating — narrow exception, Hero intro only, relaxed 2026-07-17 (owner directive)
 
