@@ -135,6 +135,23 @@ dinámicos (no se reduce a "un solo color de acento" como en el sistema anterior
 > (e.g. a card settling into place) — never a full bounce/elastic keyframe, and never
 > the default for section-level reveals.
 
+### gsap — narrow exception, Hero wordmark letter-reveal only, relaxed 2026-07-17 (owner directive)
+
+> "gsap is retired project-wide" stays binding everywhere else. **Narrow, named
+> exception:** `components/motion/wordmark-letter-reveal.tsx` (the Hero's "Boreas"
+> letter-by-letter reveal) may use gsap's `SplitText` plugin, on the owner's explicit
+> choice after being shown the tradeoff (bundle size, dual-engine maintenance cost, vs.
+> a robust battle-tested utility for a simple-looking effect that's fussier than it
+> looks). Conditions that keep this from becoming precedent creep:
+> - gsap lives ONLY inside that one leaf component — it does the character split and
+>   stagger-in, nothing else.
+> - The "no mixing gsap + framer-motion in the same component" rule still holds at the
+>   component-file level: the orchestrating parent (which sequences the hold →
+>   move-up → headline reveal, all framer-motion) coordinates with this leaf via a
+>   completion callback/ref, never by importing both libraries into one file.
+> - Do not cite this entry to justify gsap anywhere else in the codebase — every other
+>   component stays framer-motion + CSS only.
+
 ### Content gating — narrow exception, Hero intro only, relaxed 2026-07-17 (owner directive)
 
 > The general rule stays binding everywhere else: primary content must exist and be

@@ -67,11 +67,28 @@ duración corta en vez de continuar su timeline de varios cientos de ms.
 **Restricción dura:** el listener de scroll NUNCA llama `preventDefault()` ni retrasa el
 scroll real de la página — solo lee el evento para decidir el estado visual del intro.
 
-### Nuevo primitivo: `components/motion/wordmark-reveal.tsx`
+### Nuevo primitivo, en dos partes (decisión revisada — ver tabla de evaluación de MCPs)
 
-Componente reutilizable (no hardcoded solo para "Boreas") — recibe el string, hace el
-split a letras, aplica el stagger, expone el flag `introSkipped` vía prop o contexto
-interno. Vive junto a `text-reveal.tsx`/`parallax-layer.tsx`, mismo patrón de imports.
+El owner eligió usar gsap `SplitText` para esto en vez de una implementación nativa con
+framer-motion (excepción puntual documentada en `DESIGN.md` § Prohibitions →
+"gsap — narrow exception..."). Para no romper la regla "no mezclar gsap+framer-motion en
+el mismo componente" (que sí sigue vigente), se parte en dos:
+
+- **`components/motion/wordmark-letter-reveal.tsx`** (hoja, gsap-only): recibe el
+  string, usa `SplitText` de gsap para el split a letras + stagger-in. No importa
+  framer-motion. Expone un callback `onComplete` y respeta el flag `introSkipped` (si
+  se activa a medio-timeline, gsap resuelve el resto del timeline a su estado final en
+  ~150-180ms en vez de un `.progress(1)` instantáneo — mismo criterio de "nunca snap
+  barato" de la Sección 1, solo que implementado con la API de gsap en vez de
+  framer-motion).
+- **Componente orquestador** (en `boreas-hero.tsx`, framer-motion): monta
+  `WordmarkLetterReveal`, escucha su `onComplete`, y a partir de ahí anima la
+  transición "Boreas sube + headline aparece" (reutiliza `TextReveal`). Nunca importa
+  gsap directamente — coordina por callback/ref, no por mezclar librerías en el mismo
+  archivo.
+
+Dependencias nuevas: `gsap` + `@gsap/react` (mismas que usa `SplitText` de React Bits —
+ver tabla de evaluación de MCPs arriba, ahora aprobado en vez de descartado).
 
 ## Sección 2 — Desktop: qué se revela con scroll, después del intro
 
@@ -134,7 +151,7 @@ encontrado califica — se documenta qué se usa, qué se descarta, y por qué:
 
 | Necesidad | Candidato evaluado | Veredicto |
 | --- | --- | --- |
-| Reveal de letras | React Bits `SplitText` (las 4 variantes: TS/JS × TW/CSS) | **Descartado.** Las 4 variantes dependen de `gsap`+`@gsap/react` — choca con la regla dura y ya reafirmada del proyecto ("No gsap. framer-motion + CSS only, project-wide", `DESIGN.md` § Motion Rules). Incluso la variante "-CSS" depende de gsap (usa el plugin `SplitText` de GSAP internamente, no es cuestión de empaquetado). Se reusa la técnica (split a caracteres + stagger) reimplementada nativa con framer-motion en `wordmark-reveal.tsx` — mismo patrón que el `TextReveal` ya existente en el repo. |
+| Reveal de letras | React Bits `SplitText` (las 4 variantes: TS/JS × TW/CSS) | **Aprobado — decisión revisada por el owner.** Las 4 variantes dependen de `gsap`+`@gsap/react` (incluso la "-CSS", el plugin `SplitText` es de GSAP internamente, no cuestión de empaquetado) — inicialmente descartado por chocar con "gsap retirado". El owner pidió reconsiderar: sí se usa, como excepción puntual documentada en `DESIGN.md` § Prohibitions ("gsap — narrow exception..."), acotada a un componente-hoja (`wordmark-letter-reveal.tsx`) que nunca mezcla gsap con framer-motion en el mismo archivo — ver Sección 1. |
 | Orbes/glow ambiental | Magic UI `particles` | **Descartado.** Es un sistema canvas + `requestAnimationFrame` con seguimiento de mouse y 100 partículas por default — textura equivocada (denso/interactivo) para un "acento puntual" (regla de glow relajada en `DESIGN.md` es explícita: acento, no wallpaper), y un loop de canvas por frame choca con la regla de solo animar `transform`/`opacity` (mismo principio de rendimiento de la skill `emil-design-eng` ya aplicada en esta pasada). React Bits no tiene un match directo (orb/blob) tampoco. Se mantiene el diseño original: pocos círculos con `blur` CSS + `ParallaxLayer` (primitivo ya existente). |
 | Línea que se dibuja con scroll | Magic UI `animated-beam` | **Parcial — técnica sí, componente no.** Usa un `<path>` SVG con gradiente animado vía `motion.linearGradient` y una curva easeOutExpo (`[0.16,1,0.3,1]`, cercana pero no idéntica a la constante `EASE` del proyecto `[0.22,1,0.36,1]`) — buena referencia visual. Pero está diseñado para conectar dos elementos del DOM vía `ResizeObserver` (choca con la regla "sin medición JS") y su animación es un loop infinito por tiempo, no por scroll. `DrawnPathAccent` toma la técnica del trazo con gradiente pero la ata a `useScrub` (scroll, lineal) en vez de instalar el componente tal cual. |
 | Textura de grano/papel | React Bits `Noise-TS-CSS` | **Usado — aprobado por el owner.** CSS puro, sin dependencias (confirmado vía `view_items_in_registries` — a diferencia de `SplitText`, este sí es dependency-free). Encaja con la identidad "papel cálido" ya descrita en `DESIGN.md` § Visual System. Se porta a `components/motion/grain-texture.tsx` (se ajusta al patrón de exports del resto de `components/motion/`, no se deja tal cual llega del registry). |
@@ -179,7 +196,9 @@ Los tres primitivos van en `components/motion/`, mismo patrón de export/props q
 ## Restricciones técnicas (heredadas del spec anterior, siguen vigentes)
 
 - `ease-out-exponential` (`[0.22, 1, 0.36, 1]`) como default de cualquier transición por
-  tiempo. Los `useScrub` atados a scroll siguen lineales.
+  tiempo. Los `useScrub` atados a scroll siguen lineales. Dentro de
+  `wordmark-letter-reveal.tsx` (gsap), usar el equivalente de gsap (`"expo.out"`) —
+  misma familia de curva, sintaxis propia de esa librería.
 - Transform + opacity únicamente para lo animado; `transform:` como string completo
   (`translate3d()`), nunca los atajos `x`/`y`/`scale` de Framer Motion.
 - Sin medición JS (`getBoundingClientRect`/`ResizeObserver`) para posicionamiento —
