@@ -54,6 +54,11 @@ export function WordmarkIntro({ wordmark, headline, onSettled }: WordmarkIntroPr
             className="mt-[22px] text-balance font-display font-normal leading-[1.08] tracking-[-0.012em] text-foreground"
             style={{ fontSize: "clamp(2.4rem, 5.6vw, 5.4rem)" }}
           >
+            {/* Hardcoded to match content/boreas-home.ts's heroHeadline
+                ("Tu consultorio digital, abierto las 24 horas.") so the
+                gradient/underline land on the right words — if heroHeadline
+                changes, update this split too (and the fallback render in
+                HeroStatic, which uses heroHeadline directly). */}
             Tu consultorio <GradientAccentWord reduceMotion={false}>digital</GradientAccentWord>,{" "}
             <HighlighterAccent active={holdDone} reduceMotion={false}>
               abierto las 24 horas
