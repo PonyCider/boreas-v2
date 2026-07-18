@@ -4,7 +4,7 @@
 
 **Goal:** Replace the Hero's current "everything visible at rest" desktop entrance with a timed letter-by-letter "Boreas" reveal (gsap) that hands off to a scroll-gated reflow (paragraph/CTA/card behind scroll), add 6 new reusable decorative primitives ported from Magic UI/React Bits, and convert the 4 static `heroProofPoints` into floating chips — desktop and mobile both.
 
-**Architecture:** A gsap-only leaf component (`WordmarkLetterReveal`) does the character split/stagger; a framer-motion orchestrator (`WordmarkIntro`) sequences hold → move-up → headline reveal and owns the scroll-skip logic via a shared hook. `boreas-hero.tsx`'s existing scroll-pin infrastructure (`useScrollPin`, `useScrub`, `PHASE_1_END`/`PHASE_2_END`) gets a new pre-phase (`REFLOW_END`, `CARD_END`) inserted before it. Six new files in `components/motion/` (each independently reusable elsewhere in the site) supply the decorative layer.
+**Architecture:** A gsap-only leaf component (`WordmarkLetterReveal`) does the character split/stagger; a framer-motion orchestrator (`WordmarkIntro`) sequences hold → move-up → headline reveal and owns the scroll-skip logic via a shared hook. `boreas-hero.tsx`'s existing scroll-pin infrastructure (`useScrollPin`, `useScrub`, `PHASE_1_END`/`PHASE_2_END`, and — already built in the prior pass — `INTRO_END`/`TEXT_INTRO_TRANSLATE_X`/`CARD_INTRO_TRANSLATE_X` for the centered→left horizontal reflow) gets one new constant (`CARD_END`, derived from `INTRO_END`) for the reintroduced scroll-gate on paragraph/CTA/card. Six new files in `components/motion/` (each independently reusable elsewhere in the site) supply the decorative layer.
 
 **Tech Stack:** Next.js 16, React 19, framer-motion, gsap + `@gsap/react` (new, scoped to one leaf component), `rough-notation` (new, via `highlighter`), Tailwind v4.
 
@@ -512,6 +512,7 @@ export function DrawnPathAccent({
         stroke={`url(#${id})`}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
+        pathLength={1000}
         strokeDasharray={1000}
         strokeDashoffset={dashOffset}
       />
@@ -519,6 +520,8 @@ export function DrawnPathAccent({
   );
 }
 ```
+
+(`pathLength={1000}` normalizes the path's length to exactly 1000 units regardless of its real geometric length — without it, `strokeDasharray`/`strokeDashoffset` assume the path IS 1000 units long, and a real curve of a different length would under- or over-shoot the draw-in animation, e.g. finishing at 60% visible or fully drawing in before `progress` reaches 1.)
 
 - [ ] **Step 3: Verify types**
 
@@ -551,26 +554,32 @@ Run `mcp__shadcn__view_items_in_registries` with `items: ["@react-bits/Noise-TS-
 ```tsx
 "use client";
 
+import { useId } from "react";
+
 export interface GrainTextureProps {
   opacity?: number;
   className?: string;
 }
 
+// The Hero mounts this on both the desktop and mobile branches, which can be
+// simultaneously present in the DOM (one hidden via CSS, not unmounted) — a
+// hardcoded filter id would collide. useId() keeps each instance unique.
 export function GrainTexture({ opacity = 0.04, className = "" }: GrainTextureProps) {
+  const filterId = useId();
   return (
     <svg
       aria-hidden="true"
       className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
       style={{ opacity }}
     >
-      <filter id="hero-grain-texture">
+      <filter id={filterId}>
         <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" />
         <feColorMatrix type="saturate" values="0" />
         <feComponentTransfer>
           <feFuncA type="linear" slope="0.5" />
         </feComponentTransfer>
       </filter>
-      <rect width="100%" height="100%" filter="url(#hero-grain-texture)" />
+      <rect width="100%" height="100%" filter={`url(#${filterId})`} />
     </svg>
   );
 }
@@ -834,7 +843,7 @@ Port the fetched `scroll-progress` source, adapted to take an existing `MotionVa
 ```tsx
 "use client";
 
-import { motion, type MotionValue } from "framer-motion";
+import { motion, useMotionTemplate, type MotionValue } from "framer-motion";
 
 export interface HeroScrollProgressProps {
   progress: MotionValue<number>;
@@ -842,17 +851,22 @@ export interface HeroScrollProgressProps {
 }
 
 export function HeroScrollProgress({ progress, className = "" }: HeroScrollProgressProps) {
+  // useMotionTemplate composes a real `transform: scaleX(...)` string from the
+  // MotionValue — this is the actual "full transform string, never the x/y/
+  // scale shorthand" rule from Global Constraints, not `style={{ scaleX }}`
+  // (which IS the shorthand prop framer-motion special-cases; an earlier
+  // draft of this plan justified `scaleX` as an exception, which was wrong —
+  // this version needs no exception because it doesn't use the shorthand).
+  const transform = useMotionTemplate`scaleX(${progress})`;
   return (
     <motion.div
       aria-hidden="true"
       className={`pointer-events-none absolute left-0 top-0 h-[2px] origin-left bg-accent ${className}`}
-      style={{ scaleX: progress }}
+      style={{ transform }}
     />
   );
 }
 ```
-
-(`scaleX` bound directly to a `MotionValue` via framer-motion's `style` prop is the one documented exception to the "no `x`/`y`/`scale` shorthand" rule — it's not the shorthand prop, it's a raw CSS `transform` sub-property passed through `style`, and framer-motion handles `MotionValue`-typed style values with a dedicated fast path.)
 
 - [ ] **Step 3: Write `card-backlight.tsx`**
 
@@ -901,10 +915,10 @@ git commit -m "feat: add HeroScrollProgress and CardBacklight primitives"
 - Modify: `content/boreas-home.ts` (read-only reference — no copy changes needed, `heroHeadline`/`heroProofPoints` already exist)
 
 **Interfaces:**
-- Consumes: `WordmarkIntro` (Task 4), `AccentOrbField` (Task 5), `DrawnPathAccent` (Task 6), `GrainTexture` (Task 7), `HighlighterAccent` (Task 8), `GradientAccentWord` (Task 9), `WordmarkOrbitAccent` (Task 10), `HeroScrollProgress` + `CardBacklight` (Task 11).
-- Produces: desktop Hero renders the new intro + scroll-gated reflow + decorative layer. `REFLOW_END` and `CARD_END` constants (values below) are consumed by no later task in this plan — they're internal to this file.
+- Consumes: `WordmarkIntro` (Task 4), `AccentOrbField` (Task 5), `DrawnPathAccent` (Task 6), `GrainTexture` (Task 7), `HighlighterAccent` (Task 8), `GradientAccentWord` (Task 9), `WordmarkOrbitAccent` (Task 10), `HeroScrollProgress` + `CardBacklight` (Task 11). ALSO consumes code that already exists in the current file from the prior pass: `INTRO_END` (constant, `= 0.16`), `TEXT_INTRO_TRANSLATE_X`/`CARD_INTRO_TRANSLATE_X` (cqw-based translateX formulas), and the `enableIntroReflow` prop on `HeroCinematicLeftColumn` — this task extends that existing horizontal-reflow mechanism, it does NOT replace or remove it. Read the file first; do not assume it's greenfield.
+- Produces: desktop Hero renders the new intro + scroll-gated reflow + decorative layer. New `CARD_END` constant (derived from `INTRO_END`, see below).
 
-**Before starting:** read the CURRENT content of `components/hero/boreas-hero.tsx` in full — Tasks 1-11 didn't touch it, but it reflects commits `e29ce5b`/`27db9c8`/`ed3bc03` from the prior pass. Locate `HeroCinematicLeftColumn`, `DoctorCardEntrance`, and `HeroCardClusterCinematic` by function name (not line number).
+**Before starting:** read the CURRENT content of `components/hero/boreas-hero.tsx` in full — Tasks 1-11 didn't touch it, but it reflects commits `e29ce5b`/`27db9c8`/`ed3bc03` from the prior pass. Locate `HeroCinematicLeftColumn`, `DoctorCardEntrance`, and `HeroCardClusterCinematic` by function name (not line number). **Important:** the prior pass already built the centered→left horizontal slide for both the text block (`TEXT_INTRO_TRANSLATE_X`, gated by the `enableIntroReflow` prop, `true` on the desktop call site only, `false`/omitted on the mobile call site) and the doctor card (`CARD_INTRO_TRANSLATE_X`, unconditional). This task's job is to (a) swap the plain wordmark+H1 markup for `WordmarkIntro`, and (b) layer a NEW opacity gate on top of paragraph/CTA/card — it must NOT delete the existing translateX mechanism, and it must NOT apply the new opacity gate to the mobile call site (mobile's own visibility control comes from Task 13's `MobileWordmarkExit` instead — stacking both would multiply two opacity ramps together and leave the CTA never fully visible).
 
 - [ ] **Step 1: Add new imports and constants**
 
@@ -915,35 +929,49 @@ import { WordmarkIntro } from "@/components/hero/wordmark-intro";
 import { AccentOrbField } from "@/components/motion/accent-orb-field";
 import { DrawnPathAccent } from "@/components/motion/drawn-path-accent";
 import { GrainTexture } from "@/components/motion/grain-texture";
-import { HighlighterAccent } from "@/components/motion/highlighter-accent";
-import { GradientAccentWord } from "@/components/motion/gradient-accent-word";
 import { WordmarkOrbitAccent } from "@/components/motion/wordmark-orbit-accent";
 import { HeroScrollProgress } from "@/components/motion/hero-scroll-progress";
 import { CardBacklight } from "@/components/motion/card-backlight";
 ```
 
-Add two new phase constants near the existing `PHASE_1_END`/`PHASE_2_END`:
+(`HighlighterAccent`/`GradientAccentWord` are imported inside `wordmark-intro.tsx` directly in Step 3, not here.)
+
+Add one new constant near the existing `PHASE_1_END`/`PHASE_2_END`/`INTRO_END` — do NOT redefine `INTRO_END`, it already exists and already drives the translateX reflow:
 
 ```tsx
-const REFLOW_END = 0.2; // wordmark+H1 settle left, paragraph+CTA appear
-const CARD_END = 0.32; // doctor card appears (was the old PHASE_1_END gate)
+const CARD_END = INTRO_END + 0.16; // doctor card fades in (opacity gate) after the intro-reflow settles
 const PROOF_POINTS_START = CARD_END;
 const PROOF_POINTS_STAGGER = 0.04;
 ```
 
-- [ ] **Step 2: Rewrite `HeroCinematicLeftColumn` to use `WordmarkIntro` + scroll-gated reveal**
+- [ ] **Step 2: Rewrite `HeroCinematicLeftColumn` to use `WordmarkIntro`, keeping the existing translateX reflow, adding a NEW opacity gate scoped to `enableIntroReflow`**
 
-Replace the function's wordmark/H1 block (the `<motion.p>` for "Boreas" and the `<motion.div><TextReveal>...<h1>` block) with a single `<WordmarkIntro wordmark="Boreas" headline={heroHeadline} />` call. Keep the eyebrow crossfade above it and the CTA/subcopy/proof-points below it, but gate THOSE behind scroll now (they were unconditionally visible after Task 1 of the prior pass — that gate is being reintroduced here). Read the current function's full JSX before editing; the shape after your edit should be:
+Replace the function's wordmark/H1 block (the `<motion.p>` for "Boreas" and the `<motion.div><TextReveal>...<h1>` block) with `<WordmarkIntro wordmark="Boreas" headline={heroHeadline} />`. Keep the `enableIntroReflow` prop and its existing `TEXT_INTRO_TRANSLATE_X` transform on the outer wrapper UNCHANGED. Add the new opacity gate for paragraph/CTA/proof-points, but — this is the fix for the Critical mobile bug found in review — only apply it `enableIntroReflow ? {...} : undefined`, exactly like the existing translateX conditional already does, so mobile (which passes `enableIntroReflow={false}` implicitly by omitting the prop) renders that block at a flat `opacity: 1` always, with its OWN visibility fully owned by Task 13's `MobileWordmarkExit` wrapper instead:
 
 ```tsx
-function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: MotionValue<number>; ctaId: string }) {
+function HeroCinematicLeftColumn({
+  scrollYProgress,
+  ctaId,
+  enableIntroReflow = false,
+}: {
+  scrollYProgress: MotionValue<number>;
+  ctaId: string;
+  enableIntroReflow?: boolean;
+}) {
   const problemEyebrowOpacity = useScrub(scrollYProgress, [PHASE_1_END - 0.06, PHASE_1_END], [1, 0]);
   const solutionEyebrowOpacity = 1 - problemEyebrowOpacity;
-  const reflowOpacity = useScrub(scrollYProgress, [0, REFLOW_END], [0, 1]);
-  const reflowY = useScrub(scrollYProgress, [0, REFLOW_END], [10, 0]);
+  const introProgress = useScrub(scrollYProgress, [0, INTRO_END], [1, 0]);
+  const reflowOpacity = useScrub(scrollYProgress, [0, INTRO_END], [0, 1]);
+  const reflowY = useScrub(scrollYProgress, [0, INTRO_END], [10, 0]);
 
   return (
-    <div>
+    <div
+      style={
+        enableIntroReflow
+          ? { transform: `translate3d(calc(${introProgress} * ${TEXT_INTRO_TRANSLATE_X}), 0px, 0)` }
+          : undefined
+      }
+    >
       <div className="relative mb-5 h-[20px]">
         <p aria-hidden={problemEyebrowOpacity < 0.5} style={{ opacity: problemEyebrowOpacity }} className="absolute inset-0 text-sm font-semibold text-amber">
           {heroEyebrowProblem}
@@ -953,9 +981,23 @@ function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: 
         </p>
       </div>
 
-      <WordmarkIntro wordmark="Boreas" headline={heroHeadline} />
+      <div className="relative">
+        <WordmarkOrbitAccent
+          active={introProgress > 0}
+          count={enableIntroReflow ? 3 : 2}
+          reduceMotion={false}
+          className="left-[-15%] top-[-8%] h-40 w-40"
+        />
+        <WordmarkIntro wordmark="Boreas" headline={heroHeadline} />
+      </div>
 
-      <div style={{ opacity: reflowOpacity, transform: `translate3d(0, ${reflowY}px, 0)` }}>
+      <div
+        style={
+          enableIntroReflow
+            ? { opacity: reflowOpacity, transform: `translate3d(0, ${reflowY}px, 0)` }
+            : undefined
+        }
+      >
         <p className="mt-6 max-w-[50ch] text-[17px] leading-[1.7] text-muted">{heroSubcopy}</p>
         <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
           <a id={ctaId} href="#contacto" className="btn btn-p w-full sm:w-auto" onClick={() => trackAnalyticsEvent({ name: "cta_click", surface: "hero" })}>
@@ -972,7 +1014,7 @@ function HeroCinematicLeftColumn({ scrollYProgress, ctaId }: { scrollYProgress: 
 }
 ```
 
-Note: the `HighlighterAccent`/`GradientAccentWord` wrapping happens INSIDE `WordmarkIntro`'s `headline` rendering, not here — that's Step 3 below, since `WordmarkIntro` owns the `<h1>` markup.
+Note: `WordmarkOrbitAccent` lives here, in the LEFT column, next to the wordmark it orbits — not in `HeroCardClusterCinematic` (the right column), which is where an earlier draft of this plan mistakenly placed it. `HighlighterAccent`/`GradientAccentWord` wrapping happens INSIDE `WordmarkIntro`'s `headline` rendering — that's Step 3 below, since `WordmarkIntro` owns the `<h1>` markup.
 
 - [ ] **Step 3: Wire `HighlighterAccent` and `GradientAccentWord` into the headline**
 
@@ -1035,15 +1077,16 @@ function ProofPointChips({ scrollYProgress }: { scrollYProgress: MotionValue<num
 
 Note: these chips are positioned `absolute` relative to a zero-height wrapper inside the left column, reading visually as floating near the paragraph/CTA block. If live testing shows they overlap the right-column card cluster at any breakpoint ≥1024px, adjust the `left`/`right` values in `PROOF_POINT_POSITIONS` — this is a decorative-positioning tuning pass, not a structural change.
 
-- [ ] **Step 5: Re-gate `DoctorCardEntrance` behind scroll (reverting Task 1's always-visible change)**
+- [ ] **Step 5: Add an opacity gate to `DoctorCardEntrance`, keeping its existing translateX/Y/scale reflow**
 
-Locate `DoctorCardEntrance` in the current file. It currently has `opacity` fixed at `1` (from the prior pass's fix). Change it back to scroll-gated, using the new `CARD_END` constant instead of the old `PHASE_1_END`:
+Locate `DoctorCardEntrance` in the current file. It currently has NO opacity gate (fully `opacity: 1`, from the prior pass's fix) but DOES already have the `introProgress`/`CARD_INTRO_TRANSLATE_X`/`introY` reflow (card starts stacked centered under the intro text, slides right into the cluster). Keep that reflow exactly as-is; layer a new opacity gate on top using `CARD_END`, and revert `DoctorCard`'s trigger from `{mode:"delay"}` back to `{mode:"progress"}` (it was switched to delay-mode specifically because the card used to be visible on mount — now that it's scroll-gated again, progress-mode is correct so the rating-number count-up fires when the card actually becomes visible):
 
 ```tsx
 function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const opacity = useScrub(scrollYProgress, [CARD_END, CARD_END + 0.08], [0, 1]);
-  const y = useScrub(scrollYProgress, [CARD_END, CARD_END + 0.08], [24, 0]);
+  const introProgress = useScrub(scrollYProgress, [0, INTRO_END], [1, 0]);
   const settleScale = useScrub(scrollYProgress, [PHASE_2_END, PHASE_2_END + 0.05], [1, 1.015]);
+  const introY = introProgress * 30;
+  const cardOpacity = useScrub(scrollYProgress, [CARD_END, CARD_END + 0.08], [0, 1]);
 
   const cardContent = (
     <div className="bg-surface p-[22px]">
@@ -1056,7 +1099,13 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
   ];
 
   return (
-    <div style={{ opacity, transform: `translate3d(0, ${y}px, 0) scale(${settleScale})` }} className="absolute left-0 right-[50px] top-[30px] z-[1]">
+    <div
+      style={{
+        opacity: cardOpacity,
+        transform: `translate3d(calc(${introProgress} * ${CARD_INTRO_TRANSLATE_X}), ${introY}vh, 0) scale(${settleScale})`,
+      }}
+      className="absolute left-0 right-[50px] top-[30px] z-[1]"
+    >
       <CardBacklight />
       <ExampleBadge />
       <VerifiedBadge />
@@ -1069,12 +1118,10 @@ function DoctorCardEntrance({ scrollYProgress }: { scrollYProgress: MotionValue<
 
 - [ ] **Step 6: Add the illustrative decorative layer to `HeroCardClusterCinematic`**
 
-Locate `HeroCardClusterCinematic`. Add `AccentOrbField`, `DrawnPathAccent`, `GrainTexture`, `WordmarkOrbitAccent`, and `HeroScrollProgress` alongside the existing `ParallaxLayer`-wrapped `ClusterBackgroundTexture`:
+Locate `HeroCardClusterCinematic`. Add `AccentOrbField`, `DrawnPathAccent`, `GrainTexture`, and `HeroScrollProgress` alongside the existing `ParallaxLayer`-wrapped `ClusterBackgroundTexture`. Do NOT add `WordmarkOrbitAccent` here — it belongs in `HeroCinematicLeftColumn` (Step 2 above), next to the wordmark it orbits, not in this right-column cluster:
 
 ```tsx
 function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
-  const wordmarkOrbitActive = useScrub(scrollYProgress, [0, 0.02], [1, 0]) > 0.5;
-
   return (
     <div className="relative hidden lg:block" style={{ height: "460px" }}>
       <GrainTexture className="rounded-[var(--radius-xl)]" />
@@ -1087,7 +1134,6 @@ function HeroCardClusterCinematic({ scrollYProgress }: { scrollYProgress: Motion
         className="inset-0 h-full w-full"
         reduceMotion={false}
       />
-      <WordmarkOrbitAccent active={wordmarkOrbitActive} count={3} reduceMotion={false} className="left-[10%] top-[10%] h-32 w-32" />
       <HeroScrollProgress progress={scrollYProgress} className="right-0" />
 
       <ParallaxLayer progress={scrollYProgress} speed={0.15} reduceMotion={false} className="absolute inset-0 -z-10">
@@ -1165,6 +1211,8 @@ function MobileWordmarkExit({ mobileScrollYProgress, children }: { mobileScrollY
 Wrap the `<HeroCinematicLeftColumn scrollYProgress={mobileScrollYProgress} ctaId="hero-primary-cta-mobile" />` call in `HeroCinematic`'s mobile branch with `<MobileWordmarkExit mobileScrollYProgress={mobileScrollYProgress}><HeroCinematicLeftColumn ... /></MobileWordmarkExit>`.
 
 Note: this makes the ENTIRE left column (wordmark, headline, paragraph, CTA, proof points) fade/slide away together on mobile scroll, matching the spec's "Boreas+H1 se desvanecen/deslizan fuera conforme la card entra" — since on mobile there's no side-by-side reflow (everything stacks), fading the whole intro block as the card takes over is the correct mobile-specific behavior, distinct from desktop's reflow-to-the-side.
+
+**Why this doesn't double-gate the CTA:** `HeroCinematicLeftColumn`'s internal paragraph/CTA opacity gate (Task 12 Step 2) is scoped to `enableIntroReflow ? {...} : undefined`, and the mobile call site never passes `enableIntroReflow` (defaults `false`) — so on mobile that inner block renders at a flat `opacity: 1`, and `MobileWordmarkExit` here is the ONLY thing controlling its visibility. If a future edit ever makes the inner gate unconditional again, the CTA would become effectively invisible on mobile (two opacity ramps multiplying to near-zero) — this was caught and fixed during plan review, verify it stays fixed when you read Task 12's actual output before starting this task.
 
 - [ ] **Step 3: Add `CardBacklight` to `HeroCardMobilePinned`**
 
