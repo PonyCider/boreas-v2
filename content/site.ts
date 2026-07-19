@@ -16,16 +16,11 @@ export const navLinks: Array<{ label: string; href: string }> = [
   { label: "Contacto", href: `#${sectionIds.pricing}` },
 ];
 
-// Provisional — Epic 1 may finalize this string once the Hero copy is written.
 // Kept audience-neutral ("presencia digital") rather than "consultorio digital"
-// (V3's medico-specific term) per design spec §6.
+// (V3's medico-specific term) per design spec §6. Confirmed in Epic 1.
 export const primaryCta = "Quiero mi presencia digital";
 
-export const sectionStubs: Record<SectionId, { eyebrow: string; heading: string }> = {
-  [sectionIds.hero]: {
-    eyebrow: "Epic 1",
-    heading: "Hero — pendiente de pulir",
-  },
+export const sectionStubs: Record<Exclude<SectionId, "hero">, { eyebrow: string; heading: string }> = {
   [sectionIds.problema]: {
     eyebrow: "Epic 2",
     heading: "El problema — pendiente de pulir",
