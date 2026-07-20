@@ -7,7 +7,7 @@ import { SectionFrame } from "./landing-sections";
 import LightRays from "./light-rays";
 import SpecularButton from "./specular-button";
 import { InteractiveHoverButton } from "./interactive-hover-button";
-import { GsapCounter } from "./gsap-counter";
+import { HeroVisual } from "./hero-visual";
 import { sectionIds, primaryCta } from "@/content/site";
 import { heroContent } from "@/content/hero";
 
@@ -23,7 +23,7 @@ export function HeroSection() {
   const subheadRef = useRef<HTMLParagraphElement>(null);
   const primaryCtaRef = useRef<HTMLButtonElement>(null);
   const secondaryCtaRef = useRef<HTMLButtonElement>(null);
-  const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const visualRef = useRef<HTMLDivElement>(null);
   // Guards against the setup running twice while a previous run's timeline is
   // still alive.
   const isAnimatingRef = useRef(false);
@@ -46,7 +46,8 @@ export function HeroSection() {
         !headlineRef.current ||
         !subheadRef.current ||
         !primaryCtaRef.current ||
-        !secondaryCtaRef.current
+        !secondaryCtaRef.current ||
+        !visualRef.current
       ) {
         return;
       }
@@ -59,8 +60,6 @@ export function HeroSection() {
       // previous pass (see Epic 1 pass 1's Hero fix). InteractiveHoverButton's
       // outer button has no such transition, so only this one needs suspending.
       gsap.set(secondaryCtaRef.current, { transition: "none" });
-
-      const cards = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
 
       const tl = gsap
         .timeline({ defaults: { ease: "power3.out" } })
@@ -81,7 +80,7 @@ export function HeroSection() {
           },
           1.66
         )
-        .from(cards, { opacity: 0, y: 24, duration: 0.7, stagger: 0.12 }, 1.85);
+        .from(visualRef.current, { opacity: 0, y: 24, duration: 0.7 }, 1.85);
 
       return () => {
         tl.kill();
@@ -117,7 +116,7 @@ export function HeroSection() {
 
       <div
         ref={containerRef}
-        className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 pt-20 sm:px-6 sm:pt-28 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-10 lg:pt-16"
+        className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 pt-20 sm:px-6 sm:pt-28 lg:grid-cols-[1fr_1fr] lg:gap-10 lg:px-10 lg:pt-16"
       >
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <h2
@@ -163,27 +162,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="hidden flex-col gap-4 lg:flex">
-          {heroContent.proofStats.map((stat, index) => (
-            <div
-              key={stat.label}
-              ref={(el) => {
-                cardRefs.current[index] = el;
-              }}
-              className="rounded-[var(--radius-xl)] border border-border bg-surface p-6 shadow-[var(--shadow)]"
-            >
-              <p className="text-2xl font-display text-foreground">
-                {stat.animated ? (
-                  <GsapCounter to={stat.value} decimals={stat.decimals} suffix={stat.suffix} />
-                ) : (
-                  stat.staticValue
-                )}
-              </p>
-              <p className="mt-1 text-sm text-muted">{stat.label}</p>
-            </div>
-          ))}
-          <p className="text-xs text-clinical">{heroContent.proofBadge}</p>
-        </div>
+        <HeroVisual ref={visualRef} />
       </div>
     </SectionFrame>
   );
