@@ -40,11 +40,10 @@ export const navCards: NavCard[] = [
 // (V3's medico-specific term) per design spec §6. Confirmed in Epic 1.
 export const primaryCta = "Quiero mi presencia digital";
 
-export const sectionStubs: Record<Exclude<SectionId, "hero">, { eyebrow: string; heading: string }> = {
-  [sectionIds.problema]: {
-    eyebrow: "Epic 2",
-    heading: "El problema — pendiente de pulir",
-  },
+export const sectionStubs: Record<
+  Exclude<SectionId, "hero" | "problema">,
+  { eyebrow: string; heading: string }
+> = {
   [sectionIds.motores]: {
     eyebrow: "Epic 3",
     heading: "Motores de conversión — pendiente de pulir",
