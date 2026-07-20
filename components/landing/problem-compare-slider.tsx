@@ -47,7 +47,11 @@ function BoreasMock() {
         {heading}
       </h3>
       <p className="max-w-xs text-sm leading-relaxed text-muted">{body}</p>
-      <InteractiveHoverButton className="mt-2 min-h-9 px-4 text-xs">
+      <InteractiveHoverButton
+        tabIndex={-1}
+        aria-hidden="true"
+        className="mt-2 min-h-9 px-4 text-xs"
+      >
         {ctaLabel}
       </InteractiveHoverButton>
     </div>
