@@ -1,34 +1,16 @@
 "use client";
 
 import { forwardRef, useEffect, useState } from "react";
-import {
-  Activity,
-  Brain,
-  CalendarCheck,
-  ClipboardCheck,
-  MessageCircle,
-  NotebookPen,
-  Star,
-  UserPlus,
-  type LucideIcon,
-} from "lucide-react";
+import { CalendarCheck, ClipboardCheck, MessageCircle, Star, UserPlus, type LucideIcon } from "lucide-react";
 import CardSwap, { Card } from "./card-swap";
 import { AnimatedList } from "@/components/ui/animated-list";
-import { GsapCounter } from "./gsap-counter";
-import { motorScreens, feedEvents, heroContent, type Accent, type MotorScreen, type FeedEvent } from "@/content/hero";
+import { motorScreens, feedEvents, heroContent, type Accent, type FeedEvent } from "@/content/hero";
 
 const accentVar: Record<Accent, string> = {
   amber: "var(--c-amber)",
   mint: "var(--c-mint)",
   lav: "var(--c-lav)",
   rose: "var(--c-rose)",
-};
-
-const motorIcon: Record<MotorScreen["icon"], LucideIcon> = {
-  brain: Brain,
-  "notebook-pen": NotebookPen,
-  activity: Activity,
-  "calendar-check": CalendarCheck,
 };
 
 const feedIcon: Record<FeedEvent["icon"], LucideIcon> = {
@@ -47,31 +29,6 @@ function AccentBadge({ accent, Icon }: { accent: Accent; Icon: LucideIcon }) {
     >
       <Icon className="h-4 w-4" style={{ color: accentVar[accent] }} />
     </span>
-  );
-}
-
-function MotorCard({ screen }: { screen: MotorScreen }) {
-  const Icon = motorIcon[screen.icon];
-  return (
-    <Card
-      className="flex flex-col justify-between p-5"
-      style={{
-        backgroundColor: "var(--bg-surface)",
-        borderColor: "var(--border)",
-        borderRadius: "var(--radius-xl)",
-      }}
-    >
-      <div className="flex items-center gap-3">
-        <AccentBadge accent={screen.accent} Icon={Icon} />
-        <p className="text-sm font-medium text-foreground">{screen.title}</p>
-      </div>
-      {screen.metric && (
-        <p className="mt-4 text-3xl font-display text-foreground">
-          <GsapCounter to={screen.metric.value} decimals={screen.metric.decimals} suffix={screen.metric.suffix} />
-        </p>
-      )}
-      <p className="mt-2 text-sm text-muted">{screen.body}</p>
-    </Card>
   );
 }
 
@@ -117,16 +74,19 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div ref={ref} className="flex w-full flex-col items-center gap-4 lg:items-end">
       <div className="flex w-full flex-col items-center gap-6 lg:flex-row lg:items-stretch lg:justify-end">
-        <div className="relative h-[260px] w-[220px] shrink-0">
-          <CardSwap width={220} height={260} cardDistance={36} verticalDistance={44} delay={4200} pauseOnHover skewAmount={4}>
-            {motorScreens.map((screen, i) => (
-              <MotorCard key={i} screen={screen} />
-            ))}
-          </CardSwap>
+        <div className="hidden h-[300px] w-[240px] lg:block">
+          <HeroFeed />
         </div>
 
-        <div className="hidden h-[300px] w-[220px] lg:block">
-          <HeroFeed />
+        <div className="relative h-[280px] w-[240px] shrink-0">
+          <CardSwap width={240} height={280} cardDistance={36} verticalDistance={44} delay={4200} pauseOnHover skewAmount={4}>
+            {motorScreens.map((screen, i) => (
+              <Card key={i} className="flex flex-col justify-center gap-2 p-6">
+                <h3 className="text-lg font-medium text-white">{screen.title}</h3>
+                <p className="text-sm text-white/70">{screen.body}</p>
+              </Card>
+            ))}
+          </CardSwap>
         </div>
       </div>
 
