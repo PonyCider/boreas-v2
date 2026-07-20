@@ -1,10 +1,20 @@
 "use client";
 
 import { forwardRef, useEffect, useState } from "react";
-import { CalendarCheck, ClipboardCheck, MessageCircle, Star, UserPlus, type LucideIcon } from "lucide-react";
+import {
+  Activity,
+  Brain,
+  CalendarCheck,
+  ClipboardCheck,
+  MessageCircle,
+  NotebookPen,
+  Star,
+  UserPlus,
+  type LucideIcon,
+} from "lucide-react";
 import CardSwap, { Card } from "./card-swap";
 import { AnimatedList } from "@/components/ui/animated-list";
-import { motorScreens, feedEvents, heroContent, type Accent, type FeedEvent } from "@/content/hero";
+import { motorScreens, feedEvents, heroContent, type Accent, type FeedEvent, type MotorScreen } from "@/content/hero";
 
 const accentVar: Record<Accent, string> = {
   amber: "var(--c-amber)",
@@ -21,6 +31,33 @@ const feedIcon: Record<FeedEvent["icon"], LucideIcon> = {
   "user-plus": UserPlus,
 };
 
+const motorIcon: Record<MotorScreen["icon"], LucideIcon> = {
+  brain: Brain,
+  "notebook-pen": NotebookPen,
+  activity: Activity,
+  "calendar-check": CalendarCheck,
+};
+
+function MotorCardContent({ screen }: { screen: MotorScreen }) {
+  const Icon = motorIcon[screen.icon];
+  return (
+    <>
+      <div className="flex items-center gap-2 border-b border-white/10 px-5 py-3">
+        <Icon className="h-4 w-4 text-white/70" />
+        <span className="text-sm font-medium text-white">{screen.title}</span>
+      </div>
+      <div
+        className="flex flex-1 items-center justify-center"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, color-mix(in oklch, ${accentVar[screen.accent]} 35%, transparent), black 70%)`,
+        }}
+      >
+        <Icon className="h-16 w-16 text-white/10" />
+      </div>
+    </>
+  );
+}
+
 function AccentBadge({ accent, Icon }: { accent: Accent; Icon: LucideIcon }) {
   return (
     <span
@@ -35,17 +72,17 @@ function AccentBadge({ accent, Icon }: { accent: Accent; Icon: LucideIcon }) {
 function FeedItem({ event }: { event: FeedEvent }) {
   const Icon = feedIcon[event.icon];
   return (
-    <div className="flex w-full items-center gap-3 rounded-[var(--radius-md)] border border-border bg-surface px-4 py-3 shadow-[var(--shadow-sm)]">
+    <div className="flex w-full items-center gap-3 rounded-[var(--radius-md)] border border-white/10 bg-black/50 px-4 py-3 backdrop-blur-sm">
       <AccentBadge accent={event.accent} Icon={Icon} />
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-foreground">{event.title}</p>
-        <p className="text-xs text-muted">{event.meta}</p>
+        <p className="truncate text-sm font-medium text-white">{event.title}</p>
+        <p className="text-xs text-white/50">{event.meta}</p>
       </div>
     </div>
   );
 }
 
-const FEED_ITEM_DELAY = 2200;
+const FEED_ITEM_DELAY = 1700;
 
 function HeroFeed() {
   // AnimatedList only plays forward once; remounting via `key` on a timer
@@ -59,13 +96,12 @@ function HeroFeed() {
   }, [cycle]);
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden">
+    <div className="flex h-full w-full flex-col justify-end overflow-hidden">
       <AnimatedList key={cycle} delay={FEED_ITEM_DELAY} className="gap-3">
         {feedEvents.map((event, i) => (
           <FeedItem key={i} event={event} />
         ))}
       </AnimatedList>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
     </div>
   );
 }
@@ -73,17 +109,16 @@ function HeroFeed() {
 export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div ref={ref} className="flex w-full flex-col items-center gap-4 lg:items-end">
-      <div className="flex w-full flex-col items-center gap-6 lg:flex-row lg:items-stretch lg:justify-end">
-        <div className="hidden h-[300px] w-[240px] lg:block">
+      <div className="flex w-full flex-col items-center gap-6 lg:flex-row lg:items-end lg:justify-end lg:pr-16">
+        <div className="hidden h-[360px] w-[240px] lg:block">
           <HeroFeed />
         </div>
 
-        <div className="relative h-[280px] w-[240px] shrink-0">
-          <CardSwap width={240} height={280} cardDistance={36} verticalDistance={44} delay={4200} pauseOnHover skewAmount={4}>
+        <div className="relative h-[380px] w-[320px] shrink-0">
+          <CardSwap width={320} height={380} cardDistance={60} verticalDistance={70} delay={3200} pauseOnHover skewAmount={6}>
             {motorScreens.map((screen, i) => (
-              <Card key={i} className="flex flex-col justify-center gap-2 p-6">
-                <h3 className="text-lg font-medium text-white">{screen.title}</h3>
-                <p className="text-sm text-white/70">{screen.body}</p>
+              <Card key={i} className="flex h-full flex-col overflow-hidden">
+                <MotorCardContent screen={screen} />
               </Card>
             ))}
           </CardSwap>
