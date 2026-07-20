@@ -133,7 +133,7 @@ export function HeroSection() {
 
           <h1
             ref={headlineRef}
-            className="mt-4 max-w-2xl text-[clamp(2rem,4.5vw,3.8rem)] font-display font-normal leading-[1.12] tracking-[-0.010em] text-foreground"
+            className="mt-4 max-w-2xl text-balance text-[clamp(2rem,4.5vw,3.8rem)] font-display font-normal leading-[1.12] tracking-[-0.010em] text-foreground"
           >
             {heroContent.headline}
           </h1>

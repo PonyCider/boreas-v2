@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
@@ -255,8 +256,7 @@ export function CardNav({
             aria-label="Boreas — inicio"
             className="logo-container order-1 flex items-center md:absolute md:left-1/2 md:top-1/2 md:order-none md:-translate-x-1/2 md:-translate-y-1/2"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logo} alt={logoAlt} className="logo h-[28px]" />
+            <Image src={logo} alt={logoAlt} width={38} height={28} priority className="logo h-[28px] w-auto" />
           </Link>
 
           {showCta && (

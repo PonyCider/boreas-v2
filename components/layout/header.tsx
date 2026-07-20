@@ -66,7 +66,10 @@ export function Header() {
           baseColor="var(--bg-surface)"
           menuColor="var(--ink)"
           buttonBgColor="var(--accent)"
-          buttonTextColor="var(--bg-deep)"
+          // Fixed dark ink, not var(--bg-deep) — that flips near-white in
+          // light sections, which fails contrast (~3.4:1) against --accent.
+          // This dark value clears 4.5:1 against both theme's accent.
+          buttonTextColor="#1E1B18"
           reduceMotion={reduceMotion}
         />
       </div>
