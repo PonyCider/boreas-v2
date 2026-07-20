@@ -24,8 +24,13 @@ function useCurrentSectionTheme() {
       (entries) => {
         const visible = entries.filter((entry) => entry.isIntersecting);
         if (visible.length === 0) return;
+        // Among sections currently overlapping the nav's observation band,
+        // the active one is whichever sits closest to (but still below) the
+        // band's top edge — not whichever has the smallest (most negative)
+        // top, which picks an outgoing section's trailing sliver instead of
+        // the incoming one during the crossfade between two sections.
         const topMost = visible.reduce((a, b) =>
-          a.boundingClientRect.top <= b.boundingClientRect.top ? a : b
+          a.boundingClientRect.top >= b.boundingClientRect.top ? a : b
         );
         const el = topMost.target as HTMLElement;
         setTheme(el.dataset.theme === "dark" ? "dark" : "light");
