@@ -1,89 +1,140 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { gsap } from "gsap";
+import { SplitText as GSAPSplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { SectionFrame } from "./landing-sections";
-import SplitText from "./split-text";
+import LightRays from "./light-rays";
 import { GsapCounter } from "./gsap-counter";
 import { sectionIds, primaryCta } from "@/content/site";
 import { heroContent } from "@/content/hero";
 
+gsap.registerPlugin(GSAPSplitText);
+
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const eyebrowRef = useRef<HTMLParagraphElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
   const subheadRef = useRef<HTMLParagraphElement>(null);
   const primaryCtaRef = useRef<HTMLAnchorElement>(null);
   const secondaryCtaRef = useRef<HTMLAnchorElement>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   useGSAP(
     () => {
-      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const duration = prefersReduced ? 0.01 : 0.7;
-      const stagger = prefersReduced ? 0 : 0.08;
-      const introStart = prefersReduced ? 0 : 0.9;
-      const cardStart = prefersReduced ? 0 : 1.1;
-      const cardStagger = prefersReduced ? 0 : 0.12;
-
-      // `.btn` carries `transition: all .18s ease` for its hover/active lift.
-      // Left in place, that CSS transition fights GSAP's own per-frame inline
-      // opacity/transform updates on the same element (the two systems chase
-      // different targets every frame), which can leave the button stuck
-      // mid-tween. Suspend it for the entrance, restore it once settled so
-      // hover/active still transitions smoothly afterward.
-      if (primaryCtaRef.current) {
-        gsap.set(primaryCtaRef.current, { transition: "none" });
+      if (reducedMotion) return;
+      if (
+        !logoRef.current ||
+        !eyebrowRef.current ||
+        !headlineRef.current ||
+        !subheadRef.current ||
+        !primaryCtaRef.current ||
+        !secondaryCtaRef.current
+      ) {
+        return;
       }
+
+      // .btn carries `transition: all .18s ease` for its hover/active lift,
+      // which fights GSAP's per-frame inline writes on the same element
+      // (see Epic 1 pass 1). Suspend it for the entrance, restore on completion.
+      gsap.set(primaryCtaRef.current, { transition: "none" });
+
+      const split = new GSAPSplitText(headlineRef.current, {
+        type: "words",
+        wordsClass: "split-word",
+      });
+      gsap.set(split.words, { opacity: 0, y: 24 });
+
+      const cards = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
 
       gsap
         .timeline({ defaults: { ease: "power3.out" } })
-        .from(subheadRef.current, { opacity: 0, y: prefersReduced ? 0 : 16, duration }, introStart)
+        .from(logoRef.current, { opacity: 0, y: 20, scale: 0.94, duration: 0.8 }, 0)
+        .from(eyebrowRef.current, { opacity: 0, y: 12, duration: 0.6 }, 0.55)
+        .to(split.words, { opacity: 1, y: 0, duration: 0.8, stagger: 0.04 }, 0.75)
+        .from(subheadRef.current, { opacity: 0, y: 16, duration: 0.7 }, 1.5)
         .from(
           primaryCtaRef.current,
           {
             opacity: 0,
-            y: prefersReduced ? 0 : 16,
-            duration,
+            y: 16,
+            duration: 0.7,
             onComplete: () => {
               if (primaryCtaRef.current) primaryCtaRef.current.style.transition = "";
             },
           },
-          introStart + stagger
+          1.58
         )
-        .from(
-          secondaryCtaRef.current,
-          { opacity: 0, y: prefersReduced ? 0 : 16, duration },
-          introStart + stagger * 2
-        )
-        .from(
-          cardRefs.current.filter((el): el is HTMLDivElement => el !== null),
-          { opacity: 0, y: prefersReduced ? 0 : 24, duration, stagger: cardStagger },
-          cardStart
-        );
+        .from(secondaryCtaRef.current, { opacity: 0, y: 16, duration: 0.7 }, 1.66)
+        .from(cards, { opacity: 0, y: 24, duration: 0.7, stagger: 0.12 }, 1.85);
+
+      return () => {
+        split.revert();
+      };
     },
-    { scope: containerRef }
+    { scope: containerRef, dependencies: [reducedMotion] }
   );
 
   return (
-    <SectionFrame id={sectionIds.hero} className="bg-hero-glow">
+    <SectionFrame
+      id={sectionIds.hero}
+      theme="dark"
+      className="relative overflow-hidden bg-background"
+    >
+      {!reducedMotion && (
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <LightRays
+            raysOrigin="top-left"
+            raysColor="#FBF8F3"
+            raysSpeed={0.6}
+            lightSpread={0.85}
+            rayLength={1.3}
+            fadeDistance={1.1}
+            saturation={1}
+            followMouse
+            mouseInfluence={0.08}
+            noiseAmount={0.06}
+            distortion={0.05}
+          />
+        </div>
+      )}
+
       <div
         ref={containerRef}
-        className="mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-10"
+        className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-10"
       >
         <div className="flex flex-col items-start text-left">
-          <p className="text-sm font-medium text-accent">{heroContent.eyebrow}</p>
-
-          <SplitText
-            text={heroContent.headline}
-            tag="h1"
-            splitType="words"
-            textAlign="left"
-            delay={40}
-            duration={0.9}
-            from={{ opacity: 0, y: 24 }}
-            to={{ opacity: 1, y: 0 }}
-            className="mt-4 max-w-2xl text-[clamp(2rem,4.5vw,3.8rem)] font-display font-normal leading-[1.12] tracking-[-0.010em] text-foreground"
+          <Image
+            ref={logoRef}
+            src="/brand/boreas-lockup.png"
+            alt="Boreas"
+            width={1186}
+            height={735}
+            priority
+            className="w-full max-w-[280px] brightness-0 invert sm:max-w-[340px]"
           />
+
+          <p ref={eyebrowRef} className="mt-6 text-sm font-medium text-accent">
+            {heroContent.eyebrow}
+          </p>
+
+          <h1
+            ref={headlineRef}
+            className="mt-4 max-w-2xl text-[clamp(2rem,4.5vw,3.8rem)] font-display font-normal leading-[1.12] tracking-[-0.010em] text-foreground"
+          >
+            {heroContent.headline}
+          </h1>
 
           <p
             ref={subheadRef}
