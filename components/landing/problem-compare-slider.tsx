@@ -63,7 +63,10 @@ export function ProblemCompareSlider() {
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
-    setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    const raf = requestAnimationFrame(() => {
+      setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    });
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   useGSAP(
