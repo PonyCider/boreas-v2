@@ -9,11 +9,31 @@ export const sectionIds = {
 
 export type SectionId = (typeof sectionIds)[keyof typeof sectionIds];
 
-export const navLinks: Array<{ label: string; href: string }> = [
-  { label: "Problema", href: `#${sectionIds.problema}` },
-  { label: "Motores", href: `#${sectionIds.motores}` },
-  { label: "Resultados", href: `#${sectionIds.socialProof}` },
-  { label: "Contacto", href: `#${sectionIds.pricing}` },
+export type NavCard = {
+  label: string;
+  bgColor: string;
+  links: Array<{ label: string; href: string; ariaLabel: string }>;
+};
+
+// Capped at 3 — CardNav only ever renders the first 3 items it's given.
+// "Contacto" isn't a 4th card: the nav's always-visible CTA (hidden only
+// while the Hero itself is in view) already covers that action.
+export const navCards: NavCard[] = [
+  {
+    label: "Problema",
+    bgColor: "var(--bg-elevated)",
+    links: [{ label: "Ver el problema", href: `#${sectionIds.problema}`, ariaLabel: "Ir a Problema" }],
+  },
+  {
+    label: "Motores",
+    bgColor: "var(--accent-soft)",
+    links: [{ label: "Ver los motores", href: `#${sectionIds.motores}`, ariaLabel: "Ir a Motores" }],
+  },
+  {
+    label: "Resultados",
+    bgColor: "var(--bg-elevated)",
+    links: [{ label: "Ver resultados", href: `#${sectionIds.socialProof}`, ariaLabel: "Ir a Resultados" }],
+  },
 ];
 
 // Kept audience-neutral ("presencia digital") rather than "consultorio digital"
