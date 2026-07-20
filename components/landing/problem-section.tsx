@@ -15,6 +15,29 @@ import {
   painPoints,
 } from "@/content/problem";
 
+function StaticOrRevealText({
+  as: Tag,
+  inView,
+  delay,
+  className,
+  children,
+}: {
+  as: "p" | "span";
+  inView: boolean;
+  delay?: number;
+  className?: string;
+  children: string;
+}) {
+  if (!inView) {
+    return <Tag className={className}>{children}</Tag>;
+  }
+  return (
+    <TextEffect as={Tag} per="word" preset="fade" trigger delay={delay} className={className}>
+      {children}
+    </TextEffect>
+  );
+}
+
 export function ProblemSection() {
   const textRef = useRef<HTMLDivElement>(null);
   const inView = useInView(textRef, { once: true, margin: "-100px" });
@@ -24,15 +47,13 @@ export function ProblemSection() {
       <ProblemCompareSlider />
 
       <div ref={textRef} className="mx-auto max-w-[1460px] px-4 pt-16 sm:px-6 lg:px-10">
-        <TextEffect
+        <StaticOrRevealText
           as="p"
-          per="word"
-          preset="fade"
-          trigger={inView}
+          inView={inView}
           className="text-sm font-medium text-accent"
         >
           {problemHeading.eyebrow}
-        </TextEffect>
+        </StaticOrRevealText>
 
         <SplitText
           text={problemHeading.heading}
@@ -58,31 +79,27 @@ export function ProblemSection() {
                     `0${suffix}`
                   )}
                 </span>
-                <TextEffect
+                <StaticOrRevealText
                   as="p"
-                  per="word"
-                  preset="fade"
-                  trigger={inView}
+                  inView={inView}
                   delay={0.3 + i * 0.15}
                   className="mt-4 text-base leading-relaxed text-muted"
                 >
                   {stat.label}
-                </TextEffect>
+                </StaticOrRevealText>
               </div>
             );
           })}
         </div>
 
-        <TextEffect
+        <StaticOrRevealText
           as="p"
-          per="word"
-          preset="fade"
-          trigger={inView}
+          inView={inView}
           delay={0.6}
           className="mt-6 text-xs text-clinical"
         >
           {problemStatsSource}
-        </TextEffect>
+        </StaticOrRevealText>
 
         <div className="mt-16 border-t border-line pt-14">
           {painPoints.map((point, i) => {
@@ -93,22 +110,20 @@ export function ProblemSection() {
                 key={point.emphasis}
                 className="border-b border-line py-5 text-[15px] leading-relaxed text-muted last:border-b-0"
               >
-                <TextEffect as="span" per="word" preset="fade" trigger={inView} delay={base}>
+                <StaticOrRevealText as="span" inView={inView} delay={base}>
                   {before}
-                </TextEffect>
-                <TextEffect
+                </StaticOrRevealText>
+                <StaticOrRevealText
                   as="span"
-                  per="word"
-                  preset="fade"
-                  trigger={inView}
+                  inView={inView}
                   delay={base + 0.1}
                   className="font-medium text-foreground"
                 >
                   {point.emphasis}
-                </TextEffect>
-                <TextEffect as="span" per="word" preset="fade" trigger={inView} delay={base + 0.2}>
+                </StaticOrRevealText>
+                <StaticOrRevealText as="span" inView={inView} delay={base + 0.2}>
                   {after}
-                </TextEffect>
+                </StaticOrRevealText>
               </p>
             );
           })}
