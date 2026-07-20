@@ -1,26 +1,31 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { gsap } from "gsap";
 import { SplitText as GSAPSplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { SectionFrame } from "./landing-sections";
 import LightRays from "./light-rays";
+import SpecularButton from "./specular-button";
+import { InteractiveHoverButton } from "./interactive-hover-button";
 import { GsapCounter } from "./gsap-counter";
 import { sectionIds, primaryCta } from "@/content/site";
 import { heroContent } from "@/content/hero";
 
 gsap.registerPlugin(GSAPSplitText);
 
+function scrollToSection(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+}
+
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const logoRef = useRef<HTMLImageElement>(null);
+  const logoRef = useRef<HTMLHeadingElement>(null);
   const eyebrowRef = useRef<HTMLParagraphElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subheadRef = useRef<HTMLParagraphElement>(null);
-  const primaryCtaRef = useRef<HTMLAnchorElement>(null);
-  const secondaryCtaRef = useRef<HTMLAnchorElement>(null);
+  const primaryCtaRef = useRef<HTMLButtonElement>(null);
+  const secondaryCtaRef = useRef<HTMLButtonElement>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -45,16 +50,18 @@ export function HeroSection() {
         return;
       }
 
-      // .btn carries `transition: all .18s ease` for its hover/active lift,
-      // which fights GSAP's per-frame inline writes on the same element
-      // (see Epic 1 pass 1). Suspend it for the entrance, restore on completion.
-      gsap.set(primaryCtaRef.current, { transition: "none" });
-
       const split = new GSAPSplitText(headlineRef.current, {
         type: "words",
         wordsClass: "split-word",
       });
       gsap.set(split.words, { opacity: 0, y: 24 });
+
+      // SpecularButton's outer button carries `transition-transform duration-150`
+      // (for its active:scale press feedback), which fights GSAP's own per-frame
+      // transform writes the same way `.btn`'s `transition: all` did in the
+      // previous pass (see Epic 1 pass 1's Hero fix). InteractiveHoverButton's
+      // outer button has no such transition, so only this one needs suspending.
+      gsap.set(secondaryCtaRef.current, { transition: "none" });
 
       const cards = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
 
@@ -64,19 +71,19 @@ export function HeroSection() {
         .from(eyebrowRef.current, { opacity: 0, y: 12, duration: 0.6 }, 0.55)
         .to(split.words, { opacity: 1, y: 0, duration: 0.8, stagger: 0.04 }, 0.75)
         .from(subheadRef.current, { opacity: 0, y: 16, duration: 0.7 }, 1.5)
+        .from(primaryCtaRef.current, { opacity: 0, y: 16, duration: 0.7 }, 1.58)
         .from(
-          primaryCtaRef.current,
+          secondaryCtaRef.current,
           {
             opacity: 0,
             y: 16,
             duration: 0.7,
             onComplete: () => {
-              if (primaryCtaRef.current) primaryCtaRef.current.style.transition = "";
+              if (secondaryCtaRef.current) secondaryCtaRef.current.style.transition = "";
             },
           },
-          1.58
+          1.66
         )
-        .from(secondaryCtaRef.current, { opacity: 0, y: 16, duration: 0.7 }, 1.66)
         .from(cards, { opacity: 0, y: 24, duration: 0.7, stagger: 0.12 }, 1.85);
 
       return () => {
@@ -95,15 +102,15 @@ export function HeroSection() {
       {!reducedMotion && (
         <div className="pointer-events-none absolute inset-0 z-0">
           <LightRays
-            raysOrigin="top-left"
+            raysOrigin="top-center"
             raysColor="#FBF8F3"
-            raysSpeed={0.6}
-            lightSpread={0.85}
-            rayLength={1.3}
-            fadeDistance={1.1}
+            raysSpeed={1.1}
+            lightSpread={0.4}
+            rayLength={1.8}
+            fadeDistance={1.4}
             saturation={1}
             followMouse
-            mouseInfluence={0.08}
+            mouseInfluence={0.15}
             noiseAmount={0.06}
             distortion={0.05}
           />
@@ -115,15 +122,13 @@ export function HeroSection() {
         className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-10"
       >
         <div className="flex flex-col items-start text-left">
-          <Image
+          <h2
             ref={logoRef}
-            src="/brand/boreas-lockup.png"
-            alt="Boreas"
-            width={1186}
-            height={735}
-            priority
-            className="w-full max-w-[280px] brightness-0 invert sm:max-w-[340px]"
-          />
+            style={{ fontFamily: "var(--font-newsreader), Georgia, serif" }}
+            className="text-[clamp(2.6rem,7vw,5.5rem)] font-medium italic leading-none tracking-[-0.01em] text-foreground"
+          >
+            Boreas
+          </h2>
 
           <p ref={eyebrowRef} className="mt-6 text-sm font-medium text-accent">
             {heroContent.eyebrow}
@@ -144,16 +149,19 @@ export function HeroSection() {
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <a ref={primaryCtaRef} href={`#${sectionIds.pricing}`} className="btn btn-p">
+            <InteractiveHoverButton
+              ref={primaryCtaRef}
+              onClick={() => scrollToSection(sectionIds.pricing)}
+            >
               {primaryCta}
-            </a>
-            <a
+            </InteractiveHoverButton>
+            <SpecularButton
               ref={secondaryCtaRef}
-              href={heroContent.ctaSecondaryHref}
-              className="flex min-h-11 items-center text-sm font-medium text-muted underline-offset-4 hover:text-foreground hover:underline"
+              size="md"
+              onClick={() => scrollToSection(sectionIds.motores)}
             >
               {heroContent.ctaSecondaryLabel}
-            </a>
+            </SpecularButton>
           </div>
         </div>
 
