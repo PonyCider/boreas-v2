@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInView } from "motion/react";
 import { SectionFrame } from "./landing-sections";
 import SplitText from "./split-text";
@@ -41,6 +41,14 @@ function StaticOrRevealText({
 export function ProblemSection() {
   const textRef = useRef<HTMLDivElement>(null);
   const inView = useInView(textRef, { once: true, margin: "-100px" });
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   return (
     <SectionFrame id={sectionIds.problema} className="border-t border-line">
@@ -55,13 +63,19 @@ export function ProblemSection() {
           {problemHeading.eyebrow}
         </StaticOrRevealText>
 
-        <SplitText
-          text={problemHeading.heading}
-          tag="h2"
-          splitType="words"
-          textAlign="left"
-          className="mt-4 max-w-3xl text-[clamp(1.8rem,3.5vw,3.2rem)] font-display font-normal leading-[1.12] tracking-[-0.010em] text-foreground"
-        />
+        {reducedMotion ? (
+          <h2 className="mt-4 max-w-3xl text-left text-[clamp(1.8rem,3.5vw,3.2rem)] font-display font-normal leading-[1.12] tracking-[-0.010em] text-foreground">
+            {problemHeading.heading}
+          </h2>
+        ) : (
+          <SplitText
+            text={problemHeading.heading}
+            tag="h2"
+            splitType="words"
+            textAlign="left"
+            className="mt-4 max-w-3xl text-[clamp(1.8rem,3.5vw,3.2rem)] font-display font-normal leading-[1.12] tracking-[-0.010em] text-foreground"
+          />
+        )}
 
         <div className="mt-14 grid gap-8 sm:grid-cols-2">
           {problemStats.map((stat, i) => {
