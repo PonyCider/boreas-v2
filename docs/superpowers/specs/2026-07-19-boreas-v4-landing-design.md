@@ -62,8 +62,9 @@ pixel-perfect de cada motor, ni el detalle de implementación (eso vive en los p
 | Estructura `content/site.ts` multi-cliente, `lib/mechanisms/*` completo | boreas-template | No se porta — es infraestructura para clonar-por-cliente, over-engineering para una landing bandera única |
 
 Todo lo demás (hero, problema, motores, social proof, pricing/CTA) se escribe desde cero: la
-audiencia de V4 es más amplia que la de V3 (especialistas de salud en general, no solo médicos),
-así que el copy se adapta, no se copia literal.
+audiencia de V4 sigue siendo exclusivamente profesionales de la salud — se amplía el rango de
+especialidades dentro de ese mismo vertical (psicólogos, terapeutas, nutriólogos, fisioterapeutas,
+médicos), no sale de él, así que el copy se adapta, no se copia literal.
 
 ### 3. Motores de conversión — arquitectura
 
