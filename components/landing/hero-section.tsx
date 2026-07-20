@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { SplitText as GSAPSplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 import { SectionFrame } from "./landing-sections";
 import LightRays from "./light-rays";
@@ -11,8 +10,6 @@ import { InteractiveHoverButton } from "./interactive-hover-button";
 import { GsapCounter } from "./gsap-counter";
 import { sectionIds, primaryCta } from "@/content/site";
 import { heroContent } from "@/content/hero";
-
-gsap.registerPlugin(GSAPSplitText);
 
 function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -27,6 +24,9 @@ export function HeroSection() {
   const primaryCtaRef = useRef<HTMLButtonElement>(null);
   const secondaryCtaRef = useRef<HTMLButtonElement>(null);
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
+  // Guards against the setup running twice while a previous run's timeline is
+  // still alive.
+  const isAnimatingRef = useRef(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -39,6 +39,7 @@ export function HeroSection() {
   useGSAP(
     () => {
       if (reducedMotion) return;
+      if (isAnimatingRef.current) return;
       if (
         !logoRef.current ||
         !eyebrowRef.current ||
@@ -50,11 +51,7 @@ export function HeroSection() {
         return;
       }
 
-      const split = new GSAPSplitText(headlineRef.current, {
-        type: "words",
-        wordsClass: "split-word",
-      });
-      gsap.set(split.words, { opacity: 0, y: 24 });
+      isAnimatingRef.current = true;
 
       // SpecularButton's outer button carries `transition-transform duration-150`
       // (for its active:scale press feedback), which fights GSAP's own per-frame
@@ -65,11 +62,11 @@ export function HeroSection() {
 
       const cards = cardRefs.current.filter((el): el is HTMLDivElement => el !== null);
 
-      gsap
+      const tl = gsap
         .timeline({ defaults: { ease: "power3.out" } })
         .from(logoRef.current, { opacity: 0, y: 20, scale: 0.94, duration: 0.8 }, 0)
         .from(eyebrowRef.current, { opacity: 0, y: 12, duration: 0.6 }, 0.55)
-        .to(split.words, { opacity: 1, y: 0, duration: 0.8, stagger: 0.04 }, 0.75)
+        .from(headlineRef.current, { opacity: 0, y: 20, duration: 0.8 }, 0.85)
         .from(subheadRef.current, { opacity: 0, y: 16, duration: 0.7 }, 1.5)
         .from(primaryCtaRef.current, { opacity: 0, y: 16, duration: 0.7 }, 1.58)
         .from(
@@ -87,7 +84,8 @@ export function HeroSection() {
         .from(cards, { opacity: 0, y: 24, duration: 0.7, stagger: 0.12 }, 1.85);
 
       return () => {
-        split.revert();
+        tl.kill();
+        isAnimatingRef.current = false;
       };
     },
     { scope: containerRef, dependencies: [reducedMotion] }
