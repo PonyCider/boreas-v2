@@ -117,13 +117,13 @@ export function HeroSection() {
 
       <div
         ref={containerRef}
-        className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-10"
+        className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 pt-20 sm:px-6 sm:pt-28 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:px-10 lg:pt-16"
       >
-        <div className="flex flex-col items-start text-left">
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <h2
             ref={logoRef}
             style={{ fontFamily: "var(--font-newsreader), Georgia, serif" }}
-            className="text-[clamp(2.6rem,7vw,5.5rem)] font-medium italic leading-none tracking-[-0.01em] text-foreground"
+            className="text-[clamp(3.2rem,16vw,5.5rem)] font-medium italic leading-none tracking-[-0.01em] text-foreground lg:text-[clamp(2.6rem,7vw,5.5rem)]"
           >
             Boreas
           </h2>
@@ -146,7 +146,7 @@ export function HeroSection() {
             {heroContent.subheadline}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
             <InteractiveHoverButton
               ref={primaryCtaRef}
               onClick={() => scrollToSection(sectionIds.pricing)}

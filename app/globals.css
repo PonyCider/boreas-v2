@@ -48,6 +48,12 @@
   --radius-pill: 999px;
 }
 
+html {
+  /* Kills the top/bottom rubber-band bounce so the light body color never
+     flashes over the Hero's dark background mid-scroll. */
+  overscroll-behavior-y: none;
+}
+
 [data-theme="dark"], .dark {
   --bg-deep:     #1B1916;
   --bg-surface:  #252119;
