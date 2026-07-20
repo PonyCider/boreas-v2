@@ -116,9 +116,9 @@ export function HeroSection() {
 
       <div
         ref={containerRef}
-        className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 pt-20 sm:px-6 sm:pt-28 lg:grid-cols-[1fr_1fr] lg:gap-10 lg:px-10 lg:pt-16"
+        className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 pt-20 sm:px-6 sm:pt-28 lg:px-10 lg:pt-16"
       >
-        <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+        <div className="flex flex-col items-center text-center lg:max-w-xl lg:items-start lg:text-left">
           <h2
             ref={logoRef}
             style={{ fontFamily: "var(--font-newsreader), Georgia, serif" }}

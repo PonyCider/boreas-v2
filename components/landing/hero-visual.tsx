@@ -46,9 +46,12 @@ function MotorCardContent({ screen }: { screen: MotorScreen }) {
 
 export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
   return (
-    <div ref={ref} className="flex w-full flex-col items-center gap-4">
-      <div className="relative h-[380px] w-[320px] shrink-0">
-        <CardSwap width={320} height={380} cardDistance={60} verticalDistance={70} delay={3200} pauseOnHover skewAmount={6}>
+    <div
+      ref={ref}
+      className="relative flex w-full flex-col items-center gap-4 lg:absolute lg:bottom-[-140px] lg:right-0 lg:w-auto lg:items-end lg:pr-16 xl:pr-28"
+    >
+      <div className="relative h-[300px] w-[260px] shrink-0 lg:h-[560px] lg:w-[460px]">
+        <CardSwap width={460} height={560} cardDistance={70} verticalDistance={85} delay={3200} skewAmount={6}>
           {motorScreens.map((screen, i) => (
             <Card key={i} className="flex h-full flex-col overflow-hidden">
               <MotorCardContent screen={screen} />
@@ -57,7 +60,7 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
         </CardSwap>
       </div>
 
-      <p className="text-xs text-clinical">{heroContent.proofBadge}</p>
+      <p className="text-xs text-clinical lg:hidden">{heroContent.proofBadge}</p>
     </div>
   );
 });
