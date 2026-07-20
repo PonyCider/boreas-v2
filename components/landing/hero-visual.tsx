@@ -82,23 +82,36 @@ function FeedItem({ event }: { event: FeedEvent }) {
   );
 }
 
-const FEED_ITEM_DELAY = 1700;
+const FEED_ITEM_DELAY = 1275; // 25% faster than the previous 1700ms
+
+// Repeats the 6 events into a long stream (magicui's own hero demo does the
+// same) so the list keeps feeding new items for a good while instead of
+// stopping after one pass through — AnimatedList only advances forward and
+// never loops on its own.
+const feedStream = Array.from({ length: 8 }, () => feedEvents).flat();
 
 function HeroFeed() {
-  // AnimatedList only plays forward once; remounting via `key` on a timer
-  // is what makes the feed loop instead of freezing after the last item.
+  // AnimatedList's index stops advancing once it runs out of children;
+  // remounting via `key` on a timer is what makes it pick back up once the
+  // (long) stream above is exhausted.
   const [cycle, setCycle] = useState(0);
 
   useEffect(() => {
-    const total = feedEvents.length * FEED_ITEM_DELAY + 2600;
+    const total = feedStream.length * FEED_ITEM_DELAY + 2600;
     const timeout = setTimeout(() => setCycle((c) => c + 1), total);
     return () => clearTimeout(timeout);
   }, [cycle]);
 
   return (
-    <div className="flex h-full w-full flex-col justify-end overflow-hidden">
+    <div
+      className="h-full w-full overflow-hidden"
+      style={{
+        maskImage: "linear-gradient(to top, transparent 0%, black 20%)",
+        WebkitMaskImage: "linear-gradient(to top, transparent 0%, black 20%)",
+      }}
+    >
       <AnimatedList key={cycle} delay={FEED_ITEM_DELAY} className="gap-3">
-        {feedEvents.map((event, i) => (
+        {feedStream.map((event, i) => (
           <FeedItem key={i} event={event} />
         ))}
       </AnimatedList>
