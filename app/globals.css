@@ -218,3 +218,12 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* CardNav logo recolor — flips to white when the nav's wrapper carries
+   data-theme="dark" (Header sets this based on which section is under the
+   nav). The raster logo can't follow a CSS variable the way text/border
+   colors can, so this is a plain filter swap scoped to the same attribute
+   the rest of the per-section theming already uses. */
+[data-theme="dark"] .card-nav-container .logo {
+  filter: brightness(0) invert(1);
+}
