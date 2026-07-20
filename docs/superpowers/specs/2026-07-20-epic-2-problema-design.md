@@ -29,15 +29,19 @@ línea de la implementación (vive en el plan que genera `writing-plans`).
 Dentro de `SectionFrame` (mismo `border-t border-line`, mismo `max-w-[1460px]` que el resto del
 sitio — la unión visual con el Hero ya está resuelta por esta convención compartida):
 
-1. **Header** — eyebrow + heading (reemplaza el placeholder actual).
-2. **Fila de stats** — 2 stats numéricos animados. Se reutiliza el par de V3 (`82%` búsqueda
+1. **Comparison slider genérico-vs-Boreas** — va PRIMERO, inmediatamente después del Hero (detalle
+   en §2-§3). Es un teaser: aparece pineado antes de cualquier texto de la sección, el usuario lo
+   ve/interactúa, se suelta, y solo entonces aparece el resto del contenido debajo. Coherente con
+   la mecánica de pin (nada se solapa, nada tiene que leerse "debajo" de un elemento fijo).
+2. **Header** — eyebrow + heading (reemplaza el placeholder actual), aparece después de que el
+   slider se suelta.
+3. **Fila de stats** — 2 stats numéricos animados. Se reutiliza el par de V3 (`82%` búsqueda
    previa online, `40%` citas fuera de horario — fuente Accenture Health Consumer Survey / Kyruus
    Care Access Benchmark Report), aplicable a salud en general, no solo médicos. Conteo animado
    vía GSAP (extiende el patrón de `gsap-counter.tsx` del Hero), trigger por ScrollTrigger.
-3. **Pain points** — 3 líneas (patrón V3: texto + frase en `<strong>`), copy adaptada a
+4. **Pain points** — 3 líneas (patrón V3: texto + frase en `<strong>`), copy adaptada a
    vocabulario neutro de salud (paciente/consulta/agenda, sin hardcodear "médico"). Stagger
    reveal al entrar en viewport.
-4. **Comparison slider genérico-vs-Boreas** — pieza nueva (detalle en §2-§3).
 
 ### 2. Comparison slider — librería
 
