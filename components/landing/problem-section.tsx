@@ -6,7 +6,6 @@ import { SectionFrame } from "./landing-sections";
 import SplitText from "./split-text";
 import { TextEffect } from "./text-effect";
 import { GsapCounter } from "./gsap-counter";
-import { ProblemCompareSlider } from "./problem-compare-slider";
 import { sectionIds } from "@/content/site";
 import {
   problemHeading,
@@ -52,9 +51,7 @@ export function ProblemSection() {
 
   return (
     <SectionFrame id={sectionIds.problema} className="border-t border-line">
-      <ProblemCompareSlider />
-
-      <div ref={textRef} className="mx-auto max-w-[1460px] px-4 pt-16 sm:px-6 lg:px-10">
+      <div ref={textRef} className="mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
         <StaticOrRevealText
           as="p"
           inView={inView}
