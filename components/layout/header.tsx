@@ -64,7 +64,7 @@ export function Header() {
           baseColor="var(--bg-surface)"
           menuColor="var(--ink)"
           buttonBgColor="var(--accent)"
-          buttonTextColor="#1E1B18"
+          buttonTextColor="var(--bg-deep)"
           reduceMotion={reduceMotion}
         />
       </div>

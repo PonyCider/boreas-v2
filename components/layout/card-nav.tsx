@@ -301,7 +301,15 @@ export function CardNav({
             aria-label="Boreas — inicio"
             className="logo-container order-1 flex items-center md:absolute md:left-1/2 md:top-1/2 md:order-none md:-translate-x-1/2 md:-translate-y-1/2"
           >
-            <Image src={logo} alt={logoAlt} width={38} height={28} priority className="logo h-[28px] w-auto transition-[filter,transform] duration-300" />
+            <Image
+              src={logo}
+              alt={logoAlt}
+              width={38}
+              height={28}
+              priority
+              style={{ width: "auto" }}
+              className="logo h-[28px] w-auto transition-[filter,transform] duration-300"
+            />
           </Link>
 
           {showCta && (

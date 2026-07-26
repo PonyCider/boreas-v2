@@ -156,6 +156,7 @@ export function NavbarLogo({
         width={36}
         height={26}
         priority
+        style={{ width: "auto" }}
         className="h-7 w-auto transition-transform duration-300 group-hover:scale-105 logo"
       />
     </Link>

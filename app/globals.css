@@ -14,16 +14,16 @@
   /* Text */
   --ink:         #1E1B18;
   --ink-muted:   #6C675E;
-  --clinical:    #9C978F;
+  --clinical:    #6E6860;
 
   /* Action — arcilla */
-  --accent:      #D2674A;
-  --accent-h:    #BA5238;
+  --accent:      #A94932;
+  --accent-h:    #8F3D2C;
   --accent-soft: rgba(210, 103, 74, 0.12);
 
   /* Acentos vivos */
   --c-amber:     #E2A33C;
-  --c-mint:      #4FB39A;
+  --c-mint:      #276C5B;
   --c-lav:       #7E86E8;
   --c-rose:      #E0617E;
 
@@ -65,7 +65,7 @@ html {
   --bg-void:     #131210;
   --ink:         #F5F1E8;
   --ink-muted:   #A8A192;
-  --clinical:    #706A5F;
+  --clinical:    #A8A192;
   --accent:      #E27F62;
   --accent-h:    #C9633C;
   --accent-soft: rgba(226, 127, 98, 0.18);

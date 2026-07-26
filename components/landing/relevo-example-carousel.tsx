@@ -132,7 +132,7 @@ function ConversationCard({
                   </span>
                   <div className="h-px flex-1 bg-border" />
                 </div>
-                <p className="text-center font-mono text-[10px] uppercase tracking-[0.06em] text-muted/70">
+                <p className="text-center font-mono text-[10px] uppercase tracking-[0.06em] text-muted">
                   {message.reason}
                 </p>
               </div>
@@ -345,7 +345,7 @@ export function RelevoExampleCarousel() {
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted">
               {relevoContent.exampleLabel}
             </p>
-            <p className="text-right font-mono text-[11px] uppercase tracking-[0.08em] text-muted/70">
+            <p className="text-right font-mono text-[11px] uppercase tracking-[0.08em] text-muted">
               {activeExample.practice.channel}
             </p>
           </div>

@@ -186,7 +186,7 @@ function EngineImcView({ accent }: { accent: string }) {
           <div className="h-full bg-amber-400/40 w-[25%]" />
           <div className="h-full rounded-r-full bg-rose-400/40 w-[15%]" />
         </div>
-        <div className="flex justify-between text-[10px] font-mono text-white/40 px-0.5">
+        <div className="flex justify-between text-[10px] font-mono text-white/60 px-0.5">
           <span>18.5 (Bajo)</span>
           <span style={{ color: accent }} className="font-semibold">24.9 (Normo)</span>
           <span>30.0 (Sobre)</span>
@@ -427,7 +427,7 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
                   {activeScreen.title}
                 </h4>
               </div>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-white/40">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-white/60">
                 Motor #{activeIndex + 1}
               </span>
             </div>
@@ -472,7 +472,7 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
               <span className="text-xs font-semibold text-white tracking-tight">Actividad en tiempo real</span>
             </div>
-            <span className="text-[10px] font-mono text-white/40">Boreas Feed</span>
+            <span className="text-[10px] font-mono text-white/60">Boreas Feed</span>
           </div>
           <div className="h-[180px] w-full">
             <HeroFeed />
@@ -480,7 +480,7 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
         </div>
       </div>
 
-      <p className="mt-3 text-center text-xs text-clinical lg:hidden">{heroContent.proofBadge}</p>
+      <p className="mt-3 text-center text-xs text-foreground lg:hidden">{heroContent.proofBadge}</p>
     </div>
   );
 });
