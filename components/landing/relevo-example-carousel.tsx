@@ -399,7 +399,7 @@ export function RelevoExampleCarousel() {
       <div className="min-w-0 lg:col-span-7">
       <motion.button
         type="button"
-        drag={reduceMotion ? false : "x"}
+        drag="x"
         dragConstraints={{ left: -56, right: 56 }}
         dragElastic={0}
         dragMomentum={false}

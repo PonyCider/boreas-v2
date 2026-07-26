@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { relevoContent } from "@/content/relevo";
 import { RelevoExampleCarousel } from "./relevo-example-carousel";
+import { RelevoFlowVisual } from "./relevo-flow-visual";
 
 export function RelevoCuriositySection() {
   const reduceMotion = useReducedMotion();
@@ -10,7 +11,7 @@ export function RelevoCuriositySection() {
   return (
     <motion.div
       className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10"
-      initial={reduceMotion ? false : { opacity: 0.72 }}
+      initial={{ opacity: 0.72 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: reduceMotion ? 0 : 0.9, ease: "easeOut" }}
@@ -50,7 +51,9 @@ export function RelevoCuriositySection() {
           </a>
         </div>
 
-        <div className="mt-14 w-full min-w-0 lg:mt-20">
+        <RelevoFlowVisual />
+
+        <div className="mt-12 w-full min-w-0 lg:mt-16">
           <RelevoExampleCarousel />
         </div>
       </div>
