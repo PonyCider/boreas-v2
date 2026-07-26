@@ -1,18 +1,32 @@
 import type { Metadata } from "next";
-import { Newsreader, Figtree } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
+const newsreader = localFont({
+  src: [
+    {
+      path: "./fonts/newsreader-latin.woff2",
+      weight: "300 600",
+      style: "normal",
+    },
+    {
+      path: "./fonts/newsreader-latin-italic.woff2",
+      weight: "300 600",
+      style: "italic",
+    },
+  ],
   variable: "--font-newsreader",
   display: "swap",
 });
 
-const figtree = Figtree({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+const figtree = localFont({
+  src: [
+    {
+      path: "./fonts/figtree-latin.woff2",
+      weight: "300 700",
+      style: "normal",
+    },
+  ],
   variable: "--font-figtree",
   display: "swap",
 });
