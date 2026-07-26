@@ -50,7 +50,7 @@ export function ProblemSection() {
   }, []);
 
   return (
-    <SectionFrame id={sectionIds.problema} className="border-t border-line">
+    <SectionFrame id={sectionIds.problema} theme="light" className="border-t border-line">
       <div ref={textRef} className="mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
         <StaticOrRevealText
           as="p"

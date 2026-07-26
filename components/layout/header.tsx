@@ -5,7 +5,7 @@ import { useReducedMotion } from "framer-motion";
 import { CardNav, type CardNavItem } from "@/components/layout/card-nav";
 import { navCards, primaryCta, sectionIds } from "@/content/site";
 
-const navItems: CardNavItem[] = navCards.map((card) => ({
+const cardNavItems: CardNavItem[] = navCards.map((card) => ({
   label: card.label,
   bgColor: card.bgColor,
   textColor: "var(--ink)",
@@ -15,6 +15,7 @@ const navItems: CardNavItem[] = navCards.map((card) => ({
 function useCurrentSectionTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [isHero, setIsHero] = useState(true);
+  const [activeSectionId, setActiveSectionId] = useState<string>("hero");
 
   useEffect(() => {
     const sectionEls = Array.from(document.querySelectorAll<HTMLElement>("section[id]"));
@@ -24,17 +25,13 @@ function useCurrentSectionTheme() {
       (entries) => {
         const visible = entries.filter((entry) => entry.isIntersecting);
         if (visible.length === 0) return;
-        // Among sections currently overlapping the nav's observation band,
-        // the active one is whichever sits closest to (but still below) the
-        // band's top edge — not whichever has the smallest (most negative)
-        // top, which picks an outgoing section's trailing sliver instead of
-        // the incoming one during the crossfade between two sections.
         const topMost = visible.reduce((a, b) =>
           a.boundingClientRect.top >= b.boundingClientRect.top ? a : b
         );
         const el = topMost.target as HTMLElement;
         setTheme(el.dataset.theme === "dark" ? "dark" : "light");
         setIsHero(el.id === sectionIds.hero);
+        setActiveSectionId(el.id);
       },
       { rootMargin: "-72px 0px -70% 0px", threshold: 0 }
     );
@@ -43,11 +40,11 @@ function useCurrentSectionTheme() {
     return () => observer.disconnect();
   }, []);
 
-  return { theme, isHero };
+  return { theme, isHero, activeSectionId };
 }
 
 export function Header() {
-  const { theme, isHero } = useCurrentSectionTheme();
+  const { theme, isHero, activeSectionId } = useCurrentSectionTheme();
   const reduceMotion = !!useReducedMotion();
 
   return (
@@ -59,16 +56,14 @@ export function Header() {
         <CardNav
           logo="/brand/boreas-mark.png"
           logoAlt="Boreas"
-          items={navItems}
+          items={cardNavItems}
           ctaLabel={primaryCta}
           ctaHref={`#${sectionIds.pricing}`}
           showCta={!isHero}
+          activeSectionId={activeSectionId}
           baseColor="var(--bg-surface)"
           menuColor="var(--ink)"
           buttonBgColor="var(--accent)"
-          // Fixed dark ink, not var(--bg-deep) — that flips near-white in
-          // light sections, which fails contrast (~3.4:1) against --accent.
-          // This dark value clears 4.5:1 against both theme's accent.
           buttonTextColor="#1E1B18"
           reduceMotion={reduceMotion}
         />

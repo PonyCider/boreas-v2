@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { gsap } from "gsap";
+import { motion, useScroll } from "framer-motion";
 
 export type CardNavLink = {
   label: string;
@@ -35,7 +36,17 @@ export interface CardNavProps {
   reduceMotion?: boolean;
   /** When false, the CTA button is not rendered at all. Defaults to true. */
   showCta?: boolean;
+  activeSectionId?: string;
 }
+
+const sectionNameMap: Record<string, string> = {
+  hero: "Inicio",
+  problema: "Problema",
+  motores: "Motores",
+  "social-proof": "Resultados",
+  pricing: "Planes",
+  relevo: "Relevo",
+};
 
 function ArrowUpRightIcon() {
   return (
@@ -65,22 +76,29 @@ export function CardNav({
   onCtaClick,
   className = "",
   ease = "expo.out",
-  baseColor = "#fff",
-  menuColor,
   buttonBgColor,
   buttonTextColor,
   reduceMotion = false,
   showCta = true,
+  activeSectionId,
 }: CardNavProps) {
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const navRef = useRef<HTMLDivElement | null>(null);
   const cardsRef = useRef<HTMLDivElement[]>([]);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
-  // Tracks the *intended* open/closed target synchronously, independent of in-flight
-  // animations or React state batching — handleResize must always branch on this, not on
-  // `isExpanded`, since `isExpanded` only flips to false after the close tween finishes.
   const expandedTargetRef = useRef(false);
+
+  const { scrollY } = useScroll();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const activeSectionName = activeSectionId ? sectionNameMap[activeSectionId] : null;
+
+  useEffect(() => {
+    const unsubscribe = scrollY.on("change", (latest) => {
+      setIsScrolled(latest > 40);
+    });
+    return () => unsubscribe();
+  }, [scrollY]);
 
   const calculateHeight = () => {
     const navEl = navRef.current;
@@ -100,7 +118,7 @@ export function CardNav({
         contentEl.style.position = "static";
         contentEl.style.height = "auto";
 
-        void contentEl.offsetHeight; // force a layout read (reflow) so scrollHeight below reflects the temporarily-unhidden content
+        void contentEl.offsetHeight;
 
         const topBar = 60;
         const padding = 16;
@@ -144,8 +162,6 @@ export function CardNav({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ease, items, reduceMotion]);
 
-  // Instant (non-animated) height sync for the reduced-motion path: no gsap timeline exists,
-  // so the nav's expanded/collapsed height is applied directly whenever isExpanded flips.
   useLayoutEffect(() => {
     if (!reduceMotion) return;
     const navEl = navRef.current;
@@ -162,9 +178,6 @@ export function CardNav({
         return;
       }
       if (!tlRef.current) return;
-      // A tween (open or close) is actively running — let it finish naturally instead of
-      // yanking it mid-flight. Killing an in-flight reverse tween here is what used to strand
-      // the nav in a stuck, contradictory state (see expandedTargetRef comment above).
       if (tlRef.current.isActive()) return;
       if (expandedTargetRef.current) {
         const newHeight = calculateHeight();
@@ -219,36 +232,68 @@ export function CardNav({
   };
 
   return (
-    <div
-      className={`card-nav-container absolute left-1/2 top-[1.2em] z-[99] w-[90%] max-md:w-[62%] max-w-[800px] -translate-x-1/2 md:top-[2em] ${className}`}
+    <motion.div
+      animate={{
+        maxWidth: isScrolled ? "740px" : "880px",
+      }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+      className={`card-nav-container fixed left-1/2 top-[1.2em] z-[99] w-[90%] -translate-x-1/2 md:top-[1.6em] ${className}`}
     >
       <nav
         ref={navRef}
-        className={`card-nav ${isExpanded ? "open" : ""} relative block h-[60px] overflow-hidden rounded-xl p-0 shadow-md will-change-[height]`}
-        style={{ backgroundColor: baseColor }}
+        className={`card-nav ${isExpanded ? "open" : ""} relative block h-[60px] overflow-hidden rounded-2xl p-0 backdrop-blur-xl border border-[var(--border)] transition-colors duration-300 ${
+          isScrolled ? "shadow-2xl bg-[var(--bg-surface)]/90" : "shadow-lg bg-[var(--bg-surface)]/80"
+        } will-change-[height]`}
       >
         <div className="card-nav-top absolute inset-x-0 top-0 z-[2] flex h-[60px] items-center justify-between p-2 pl-[1.1rem]">
-          <div
-            className={`hamburger-menu ${isHamburgerOpen ? "open" : ""} group order-2 flex h-full cursor-pointer flex-col items-center justify-center gap-[6px] md:order-none`}
-            onClick={toggleMenu}
-            onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                toggleMenu();
-              }
-            }}
-            role="button"
-            aria-label={isExpanded ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={isExpanded}
-            tabIndex={0}
-            style={{ color: menuColor || "#000" }}
-          >
-            <div
-              className={`hamburger-line h-[2px] w-[30px] bg-current transition-[transform,opacity,margin] duration-300 ease-linear [transform-origin:50%_50%] ${isHamburgerOpen ? "translate-y-[4px] rotate-45" : ""} group-hover:opacity-75`}
-            />
-            <div
-              className={`hamburger-line h-[2px] w-[30px] bg-current transition-[transform,opacity,margin] duration-300 ease-linear [transform-origin:50%_50%] ${isHamburgerOpen ? "-translate-y-[4px] -rotate-45" : ""} group-hover:opacity-75`}
-            />
+          <div className="order-2 md:order-none flex items-center gap-2.5">
+            {/* Indicador de Sección Activa (a la izquierda del hamburguesa) */}
+            {activeSectionName && (
+              <motion.span
+                key={activeSectionId}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: 0.25 }}
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--accent)] border border-[var(--accent)]/30 backdrop-blur-md"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+                {activeSectionName}
+              </motion.span>
+            )}
+
+            {/* Micro-interacción animada de Botón Hamburguesa */}
+            <button
+              onClick={toggleMenu}
+              onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  toggleMenu();
+                }
+              }}
+              aria-label={isExpanded ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={isExpanded}
+              className="relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[var(--bg-elevated)] border border-[var(--border)] text-[var(--ink)] transition-colors hover:bg-[var(--bg-surface)] focus:outline-none shadow-sm group"
+            >
+              <div className="flex flex-col items-center justify-center w-5 h-5 gap-1.5">
+                <motion.span
+                  animate={{
+                    rotate: isHamburgerOpen ? 45 : 0,
+                    y: isHamburgerOpen ? 4 : 0,
+                  }}
+                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                  className="h-[2px] w-5 rounded-full bg-current block origin-center"
+                />
+                <motion.span
+                  animate={{
+                    rotate: isHamburgerOpen ? -45 : 0,
+                    y: isHamburgerOpen ? -4 : 0,
+                  }}
+                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                  className="h-[2px] w-5 rounded-full bg-current block origin-center"
+                />
+              </div>
+            </button>
           </div>
 
           <Link
@@ -256,18 +301,20 @@ export function CardNav({
             aria-label="Boreas — inicio"
             className="logo-container order-1 flex items-center md:absolute md:left-1/2 md:top-1/2 md:order-none md:-translate-x-1/2 md:-translate-y-1/2"
           >
-            <Image src={logo} alt={logoAlt} width={38} height={28} priority className="logo h-[28px] w-auto" />
+            <Image src={logo} alt={logoAlt} width={38} height={28} priority className="logo h-[28px] w-auto transition-[filter,transform] duration-300" />
           </Link>
 
           {showCta && (
-            <a
+            <motion.a
               href={ctaHref}
               onClick={onCtaClick}
-              className="card-nav-cta-button hidden h-full items-center rounded-[calc(0.75rem-0.2rem)] border-0 px-4 font-medium transition-colors duration-300 md:inline-flex"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              className="card-nav-cta-button hidden h-[40px] items-center justify-center rounded-full border border-[var(--accent)]/40 px-5 text-xs font-semibold tracking-wide text-[#1E1B18] transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-[var(--accent)]/25 md:inline-flex"
               style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
             >
               {ctaLabel}
-            </a>
+            </motion.a>
           )}
         </div>
 
@@ -300,6 +347,6 @@ export function CardNav({
           ))}
         </div>
       </nav>
-    </div>
+    </motion.div>
   );
 }

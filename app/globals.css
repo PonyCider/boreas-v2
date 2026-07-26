@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: false;
+  prefix: "daisy-";
+}
 
 :root {
   /* Backgrounds */
@@ -54,7 +58,7 @@ html {
   overscroll-behavior-y: none;
 }
 
-[data-theme="dark"], .dark {
+[data-theme="dark"] {
   --bg-deep:     #1B1916;
   --bg-surface:  #252119;
   --bg-elevated: #201E1A;
@@ -121,8 +125,7 @@ body {
   background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 70%, #FFF8EC) 0%, var(--bg-deep) 50%);
 }
 
-[data-theme="dark"] .bg-hero-glow,
-.dark .bg-hero-glow {
+[data-theme="dark"] .bg-hero-glow {
   background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 48%, #FFF8EC) 0%, var(--bg-deep) 60%);
 }
 

@@ -437,7 +437,9 @@ void main() {
       mouseRef.current = { x, y };
     };
 
-    if (followMouse) {
+    const isCoarse = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+
+    if (followMouse && !isCoarse) {
       window.addEventListener('mousemove', handleMouseMove);
       return () => window.removeEventListener('mousemove', handleMouseMove);
     }

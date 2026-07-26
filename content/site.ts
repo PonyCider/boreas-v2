@@ -41,7 +41,7 @@ export const navCards: NavCard[] = [
 export const primaryCta = "Quiero mi presencia digital";
 
 export const sectionStubs: Record<
-  Exclude<SectionId, "hero" | "problema">,
+  Exclude<SectionId, "hero" | "problema" | "relevo">,
   { eyebrow: string; heading: string }
 > = {
   [sectionIds.motores]: {
@@ -55,9 +55,5 @@ export const sectionStubs: Record<
   [sectionIds.pricing]: {
     eyebrow: "Epic 5",
     heading: "Empecemos — pendiente de pulir",
-  },
-  [sectionIds.relevo]: {
-    eyebrow: "Epic 6",
-    heading: "Relevo — pendiente de pulir",
   },
 };

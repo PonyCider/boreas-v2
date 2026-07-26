@@ -19,6 +19,8 @@
   },
   "iconLibrary": "lucide",
   "registries": {
-    "@react-bits": "https://reactbits.dev/r/{name}.json"
+    "@react-bits": "https://reactbits.dev/r/{name}.json",
+    "@smoothui": "https://smoothui.dev/r/{name}.json",
+    "@unlumen-ui": "https://ui.unlumen.com/r/{name}.json"
   }
 }

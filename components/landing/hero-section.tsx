@@ -8,6 +8,9 @@ import LightRays from "./light-rays";
 import SpecularButton from "./specular-button";
 import { InteractiveHoverButton } from "./interactive-hover-button";
 import { HeroVisual } from "./hero-visual";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
+import { VariableProximity } from "@/components/ui/variable-proximity";
+import { AvatarCircles } from "@/components/ui/avatar-circles";
 import { sectionIds, primaryCta } from "@/content/site";
 import { heroContent } from "@/content/hero";
 
@@ -18,14 +21,14 @@ function scrollToSection(id: string) {
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const logoRef = useRef<HTMLHeadingElement>(null);
-  const eyebrowRef = useRef<HTMLParagraphElement>(null);
+  const eyebrowRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subheadRef = useRef<HTMLParagraphElement>(null);
   const primaryCtaRef = useRef<HTMLButtonElement>(null);
   const secondaryCtaRef = useRef<HTMLButtonElement>(null);
+  const avatarsRef = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLDivElement>(null);
-  // Guards against the setup running twice while a previous run's timeline is
-  // still alive.
+  // Guards against the setup running twice while a previous run's timeline is still alive.
   const isAnimatingRef = useRef(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
@@ -47,6 +50,7 @@ export function HeroSection() {
         !subheadRef.current ||
         !primaryCtaRef.current ||
         !secondaryCtaRef.current ||
+        !avatarsRef.current ||
         !visualRef.current
       ) {
         return;
@@ -56,9 +60,7 @@ export function HeroSection() {
 
       // SpecularButton's outer button carries `transition-transform duration-150`
       // (for its active:scale press feedback), which fights GSAP's own per-frame
-      // transform writes the same way `.btn`'s `transition: all` did in the
-      // previous pass (see Epic 1 pass 1's Hero fix). InteractiveHoverButton's
-      // outer button has no such transition, so only this one needs suspending.
+      // transform writes. Suspend during animation.
       gsap.set(secondaryCtaRef.current, { transition: "none" });
 
       const tl = gsap
@@ -80,6 +82,7 @@ export function HeroSection() {
           },
           1.66
         )
+        .from(avatarsRef.current, { opacity: 0, y: 16, duration: 0.7 }, 1.74)
         .from(visualRef.current, { opacity: 0, y: 24, duration: 0.7 }, 1.85);
 
       return () => {
@@ -94,7 +97,7 @@ export function HeroSection() {
     <SectionFrame
       id={sectionIds.hero}
       theme="dark"
-      className="relative overflow-hidden bg-background"
+      className="relative flex min-h-screen items-center overflow-hidden bg-background"
     >
       {!reducedMotion && (
         <div className="pointer-events-none absolute inset-0 z-0">
@@ -116,7 +119,7 @@ export function HeroSection() {
 
       <div
         ref={containerRef}
-        className="relative z-10 mx-auto grid max-w-[1460px] grid-cols-1 items-center gap-12 px-4 pt-20 sm:px-6 sm:pt-28 lg:px-10 lg:pt-16"
+        className="relative z-10 mx-auto grid w-full max-w-[1460px] grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16 px-4 pt-20 sm:px-6 sm:pt-28 lg:px-10 lg:pt-16"
       >
         <div className="flex flex-col items-center text-center lg:max-w-xl lg:items-start lg:text-left">
           <h2
@@ -124,12 +127,19 @@ export function HeroSection() {
             style={{ fontFamily: "var(--font-newsreader), Georgia, serif" }}
             className="text-[clamp(3.2rem,16vw,5.5rem)] font-medium italic leading-none tracking-[-0.01em] text-foreground lg:text-[clamp(2.6rem,7vw,5.5rem)]"
           >
-            Boreas
+            <span className="hidden sm:inline-block">
+              <VariableProximity label="Boreas" radius={140} />
+            </span>
+            <span className="inline-block sm:hidden">
+              Boreas
+            </span>
           </h2>
 
-          <p ref={eyebrowRef} className="mt-6 text-sm font-medium text-accent">
-            {heroContent.eyebrow}
-          </p>
+          <div ref={eyebrowRef} className="mt-6">
+            <AnimatedShinyText>
+              {heroContent.eyebrow}
+            </AnimatedShinyText>
+          </div>
 
           <h1
             ref={headlineRef}
@@ -159,6 +169,10 @@ export function HeroSection() {
             >
               {heroContent.ctaSecondaryLabel}
             </SpecularButton>
+          </div>
+
+          <div ref={avatarsRef} className="mt-8">
+            <AvatarCircles />
           </div>
         </div>
 

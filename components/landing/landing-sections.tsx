@@ -16,7 +16,7 @@ export function SectionFrame({
   children: React.ReactNode;
   className?: string;
   id?: string;
-  theme?: "dark";
+  theme?: "light" | "dark";
 }) {
   return (
     <section
