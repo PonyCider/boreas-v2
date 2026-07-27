@@ -23,6 +23,7 @@ const stackLayerStyles = [
 
 const SWIPE_OFFSET_THRESHOLD = 44;
 const SWIPE_VELOCITY_THRESHOLD = 420;
+const AUTO_ADVANCE_DELAY = 6000;
 
 function messageToText(message: RelevoMessage): string {
   switch (message.role) {
@@ -217,6 +218,7 @@ export function RelevoExampleCarousel() {
   const [textPhase, setTextPhase] = useState<"idle" | "out" | "preEnter">("idle");
   const [direction, setDirection] = useState<1 | -1>(1);
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
+  const [isAutoPaused, setIsAutoPaused] = useState(false);
   const timersRef = useRef<number[]>([]);
   const ghostRef = useRef<HTMLDivElement>(null);
   const draggedRef = useRef(false);
@@ -285,6 +287,13 @@ export function RelevoExampleCarousel() {
     goTo((activeIndex - 1 + relevoExamples.length) % relevoExamples.length, -1);
   }, [activeIndex, goTo]);
 
+  useEffect(() => {
+    if (reduceMotion || isAutoPaused || relevoExamples.length < 2) return;
+
+    const interval = window.setInterval(nextExample, AUTO_ADVANCE_DELAY);
+    return () => window.clearInterval(interval);
+  }, [isAutoPaused, nextExample, reduceMotion]);
+
   const resetDragPosition = () => {
     animate(dragX, 0, { duration: reduceMotion ? 0 : 0.2, ease: "easeOut" });
   };
@@ -305,6 +314,14 @@ export function RelevoExampleCarousel() {
       className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12 lg:gap-14 xl:gap-20"
       aria-roledescription="carrusel"
       aria-label="Ejemplos de conversaciones con Relevo"
+      onMouseEnter={() => setIsAutoPaused(true)}
+      onMouseLeave={() => setIsAutoPaused(false)}
+      onFocusCapture={() => setIsAutoPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setIsAutoPaused(false);
+        }
+      }}
     >
       <div className="min-w-0 lg:col-span-5">
         <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Especialidades">
