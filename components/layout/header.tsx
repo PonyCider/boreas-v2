@@ -21,23 +21,46 @@ function useCurrentSectionTheme() {
     const sectionEls = Array.from(document.querySelectorAll<HTMLElement>("section[id]"));
     if (sectionEls.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        if (visible.length === 0) return;
-        const topMost = visible.reduce((a, b) =>
-          a.boundingClientRect.top >= b.boundingClientRect.top ? a : b
-        );
-        const el = topMost.target as HTMLElement;
-        setTheme(el.dataset.theme === "dark" ? "dark" : "light");
-        setIsHero(el.id === sectionIds.hero);
-        setActiveSectionId(el.id);
-      },
-      { rootMargin: "-72px 0px -70% 0px", threshold: 0 }
-    );
+    let frameId = 0;
 
-    sectionEls.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const updateActiveSection = () => {
+      frameId = 0;
+      const navMarker = 96;
+      let activeSection = sectionEls[0];
+
+      for (const sectionEl of sectionEls) {
+        if (sectionEl.getBoundingClientRect().top <= navMarker) {
+          activeSection = sectionEl;
+        } else {
+          break;
+        }
+      }
+
+      const nextTheme = activeSection.dataset.theme === "dark" ? "dark" : "light";
+      setTheme((currentTheme) => (currentTheme === nextTheme ? currentTheme : nextTheme));
+      setIsHero((currentIsHero) =>
+        currentIsHero === (activeSection.id === sectionIds.hero)
+          ? currentIsHero
+          : activeSection.id === sectionIds.hero
+      );
+      setActiveSectionId((currentId) =>
+        currentId === activeSection.id ? currentId : activeSection.id
+      );
+    };
+
+    const scheduleUpdate = () => {
+      if (frameId === 0) frameId = window.requestAnimationFrame(updateActiveSection);
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      if (frameId !== 0) window.cancelAnimationFrame(frameId);
+    };
   }, []);
 
   return { theme, isHero, activeSectionId };

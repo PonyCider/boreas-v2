@@ -90,12 +90,17 @@ export function CardNav({
   const expandedTargetRef = useRef(false);
 
   const { scrollY } = useScroll();
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(
+    () => typeof window !== "undefined" && window.scrollY > 56
+  );
   const activeSectionName = activeSectionId ? sectionNameMap[activeSectionId] : null;
 
   useEffect(() => {
     const unsubscribe = scrollY.on("change", (latest) => {
-      setIsScrolled(latest > 40);
+      setIsScrolled((currentIsScrolled) => {
+        const nextIsScrolled = currentIsScrolled ? latest > 24 : latest > 56;
+        return currentIsScrolled === nextIsScrolled ? currentIsScrolled : nextIsScrolled;
+      });
     });
     return () => unsubscribe();
   }, [scrollY]);

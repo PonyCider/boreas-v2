@@ -17,8 +17,8 @@ import {
 
 const stackLayerStyles = [
   { x: 0, y: 0, scale: 1, opacity: 1, blur: 0, zIndex: 14 },
-  { x: 28, y: 10, scale: 0.96, opacity: 0.38, blur: 4, zIndex: 13 },
-  { x: 50, y: 18, scale: 0.925, opacity: 0.2, blur: 7, zIndex: 12 },
+  { x: 18, y: 8, scale: 0.97, opacity: 0.38, blur: 4, zIndex: 13 },
+  { x: 34, y: 14, scale: 0.94, opacity: 0.2, blur: 7, zIndex: 12 },
 ] as const;
 
 const SWIPE_OFFSET_THRESHOLD = 44;
@@ -50,20 +50,20 @@ function ConversationCard({
   return (
     <>
       <div
-        className={`flex items-center gap-3 px-4 py-3 ${
+        className={`flex items-center gap-2.5 px-3 py-2.5 ${
           isFrontCard ? "bg-foreground" : "bg-foreground/90"
         }`}
       >
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background/10">
-          <span className="text-[11px] font-semibold text-background">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background/10">
+          <span className="text-[10px] font-semibold text-background">
             {example.practice.initials}
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-semibold text-background/92">
+          <p className="truncate text-[12px] font-semibold text-background/92">
             {example.practice.name}
           </p>
-          <p className="truncate text-[11px] text-background/48">
+          <p className="truncate text-[10px] text-background/48">
             {isFrontCard ? "vía WhatsApp" : example.practice.channel}
           </p>
         </div>
@@ -72,16 +72,16 @@ function ConversationCard({
         ) : null}
       </div>
 
-      <div className="space-y-3 bg-surface/95 p-4">
+      <div className="space-y-2.5 bg-surface/95 p-3 sm:p-3.5">
         {example.messages.map((message, index) => {
           if (message.role === "patient") {
             return (
               <div key={index} className="flex justify-end">
-                <div className="max-w-[82%] rounded-lg rounded-tr-none bg-accent-soft px-3.5 py-2">
-                  <p className="text-[12.5px] leading-snug text-foreground">
+                <div className="max-w-[80%] rounded-lg rounded-tr-none bg-accent-soft px-3 py-1.5">
+                  <p className="text-[11.5px] leading-snug text-foreground">
                     {message.text}
                   </p>
-                  <p className="mt-0.5 text-right text-[10px] text-muted">
+                  <p className="mt-0.5 text-right text-[9px] text-muted">
                     {message.time}
                   </p>
                 </div>
@@ -92,16 +92,16 @@ function ConversationCard({
           if (message.role === "assistant") {
             return (
               <div key={index} className="flex items-start gap-2">
-                <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mint">
-                  <span className="text-[8px] font-bold text-white">IA</span>
+                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mint">
+                  <span className="text-[7px] font-bold text-white">IA</span>
                 </div>
-                <div className="max-w-[85%]">
-                  <div className="rounded-lg rounded-tl-none bg-elevated px-3.5 py-2">
-                    <p className="text-[12.5px] leading-snug text-foreground">
+                <div className="max-w-[82%]">
+                  <div className="rounded-lg rounded-tl-none bg-elevated px-3 py-1.5">
+                    <p className="text-[11.5px] leading-snug text-foreground">
                       {message.text}
                     </p>
                   </div>
-                  <p className="ml-1 mt-0.5 text-[10px] text-muted">
+                  <p className="ml-1 mt-0.5 text-[9px] text-muted">
                     {message.time} · Relevo
                   </p>
                 </div>
@@ -112,9 +112,9 @@ function ConversationCard({
           if (message.role === "handoff") {
             return (
               <div key={index} className="space-y-0.5">
-                <div className="flex items-center gap-2 py-0.5">
+                <div className="flex items-center gap-1.5 py-0.5">
                   <div className="h-px flex-1 bg-border" />
-                  <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.08em] text-mint">
+                  <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.08em] text-mint">
                     <svg
                       className="h-2.5 w-2.5"
                       fill="none"
@@ -133,7 +133,7 @@ function ConversationCard({
                   </span>
                   <div className="h-px flex-1 bg-border" />
                 </div>
-                <p className="text-center font-mono text-[10px] uppercase tracking-[0.06em] text-muted">
+                <p className="text-center font-mono text-[9px] uppercase tracking-[0.06em] text-muted">
                   {message.reason}
                 </p>
               </div>
@@ -145,32 +145,32 @@ function ConversationCard({
             return (
               <div key={index} className="flex items-start gap-2">
                 <div
-                  className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
                     isInternal ? "bg-clinical" : "bg-foreground"
                   }`}
                 >
                   <span
-                    className={`text-[8px] font-bold ${
+                    className={`text-[7px] font-bold ${
                       isInternal ? "text-foreground" : "text-background"
                     }`}
                   >
                     {message.initial}
                   </span>
                 </div>
-                <div className="max-w-[85%]">
+                <div className="max-w-[82%]">
                   <div
-                    className={`rounded-lg rounded-tl-none px-3.5 py-2 ${
+                    className={`rounded-lg rounded-tl-none px-3 py-1.5 ${
                       isInternal
                         ? "border border-dashed border-border bg-surface"
                         : "bg-elevated"
                     }`}
                   >
-                    <p className="text-[12.5px] leading-snug text-foreground">
+                    <p className="text-[11.5px] leading-snug text-foreground">
                       {message.text}
                     </p>
                   </div>
                   <p
-                    className={`ml-1 mt-0.5 text-[10px] font-medium ${
+                    className={`ml-1 mt-0.5 text-[9px] font-medium ${
                       isInternal ? "text-muted" : "text-mint"
                     }`}
                   >
@@ -199,7 +199,7 @@ function ConversationCard({
                     d="m4.5 12.75 6 6 9-13.5"
                   />
                 </svg>
-                <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-mint">
+                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-mint">
                   {message.text}
                 </span>
               </div>
@@ -413,7 +413,7 @@ export function RelevoExampleCarousel() {
         {activeExample.practice.channel}. {activeExample.messages.map(messageToText).join(" ")}
       </div>
 
-      <div className="min-w-0 lg:col-span-7">
+      <div className="min-w-0 lg:col-span-7 lg:flex lg:flex-col lg:items-end">
       <motion.button
         type="button"
         drag="x"
@@ -443,7 +443,7 @@ export function RelevoExampleCarousel() {
         }}
         aria-label="Conversación ilustrativa. Activa para ver el siguiente ejemplo"
         aria-disabled={stackPhase !== "idle"}
-        className="block w-full touch-pan-y cursor-grab rounded-[var(--radius-sm)] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-4 focus-visible:ring-offset-background active:cursor-grabbing"
+        className="block w-full max-w-[620px] touch-pan-y cursor-grab rounded-[var(--radius-sm)] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-4 focus-visible:ring-offset-background active:cursor-grabbing"
       >
         <div
           className="relative overflow-x-clip pr-10 transition-[height] duration-500 ease-out"
@@ -463,7 +463,7 @@ export function RelevoExampleCarousel() {
             const animatedStyle =
               previewIndex === 0
                 ? {
-                    x: -30 * direction,
+                    x: -24 * direction,
                     y: -2,
                     scale: 0.965,
                     opacity: 0,
@@ -495,7 +495,7 @@ export function RelevoExampleCarousel() {
         </div>
       </motion.button>
 
-      <div className="mt-4 flex items-center justify-between gap-4">
+      <div className="mt-4 flex w-full max-w-[620px] items-center justify-between gap-4">
         <div className="flex items-center gap-1.5" aria-label="Diapositivas">
           {relevoExamples.map((example, index) => (
             <button
