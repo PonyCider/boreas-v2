@@ -90,19 +90,23 @@ export function CardNav({
   const expandedTargetRef = useRef(false);
 
   const { scrollY } = useScroll();
-  const [isScrolled, setIsScrolled] = useState(
-    () => typeof window !== "undefined" && window.scrollY > 56
-  );
+  const [isScrolled, setIsScrolled] = useState(false);
   const activeSectionName = activeSectionId ? sectionNameMap[activeSectionId] : null;
 
   useEffect(() => {
+    const initialSyncFrame = window.requestAnimationFrame(() => {
+      setIsScrolled(window.scrollY > 56);
+    });
     const unsubscribe = scrollY.on("change", (latest) => {
       setIsScrolled((currentIsScrolled) => {
         const nextIsScrolled = currentIsScrolled ? latest > 24 : latest > 56;
         return currentIsScrolled === nextIsScrolled ? currentIsScrolled : nextIsScrolled;
       });
     });
-    return () => unsubscribe();
+    return () => {
+      window.cancelAnimationFrame(initialSyncFrame);
+      unsubscribe();
+    };
   }, [scrollY]);
 
   const calculateHeight = () => {
