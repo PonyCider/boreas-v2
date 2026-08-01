@@ -35,6 +35,9 @@ export const metadata: Metadata = {
   title: "Boreas | Presencia digital para especialistas de la salud",
   description:
     "Diseñamos la presencia digital de tu consultorio o práctica — psicólogos, nutriólogos, fisioterapeutas y médicos — con motores de conversión hechos a medida.",
+  icons: {
+    icon: "/brand/boreas-mark.png",
+  },
   openGraph: {
     title: "Boreas | Presencia digital para especialistas de la salud",
     description:

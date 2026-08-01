@@ -13,7 +13,10 @@ export function PricingSection() {
 
   function handleSelect(tier: Tier, config: PlanConfig) {
     setSelection({ tier, config });
-    document.getElementById("contacto")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth";
+    document.getElementById("contacto")?.scrollIntoView({ behavior, block: "start" });
   }
 
   return (
