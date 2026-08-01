@@ -99,8 +99,12 @@ el orden del funnel, puliendo una antes de pasar a la siguiente.
 - **Epic 4 — Social Proof:** testimonios inventados (marcados como ejemplo ilustrativo, mismo
   patrón que V3 usa en el hero — evita afirmar métricas falsas sin decirlo), carrusel infinito
   (Magic UI / React Bits).
-- **Epic 5 — Pricing/CTA final:** form con validación en tiempo real (zod) + animación de éxito,
-  backend Resend (email, sin Supabase).
+- **Epic 5 — Pricing/CTA final:** sección de pricing público con 4 paquetes (Esencial,
+  Profesional, Deluxe, Organizaciones) + 2 toggles por card (Entrega Express, Chatbot IA), y
+  form con validación en tiempo real (zod) + animación de éxito, backend Resend (email, sin
+  Supabase). El form recibe el paquete y los toggles seleccionados como contexto. Detalle
+  completo de paquetes, precios, escalera, tiempos de entrega y candados de alcance en
+  `2026-07-31-boreas-v4-pricing-design.md`.
 - **Epic 6 — Relevo (upsell):** port de V3, copy adaptado.
 - **Epic 7 — Footer:** port de V3.
 
@@ -120,9 +124,15 @@ quedar pulido → pasar al siguiente.
 - Español claro, "consultorio digital" como término (adaptado a "presencia digital"/vocabulario
   del especialista si aplica fuera de medicina — se decide por sección al escribir copy).
 - Un CTA primario por viewport.
-- Sin precio público, sin escasez semanal.
+- **Precio público sí** (regla de V3 derogada el 2026-07-31, ver
+  `2026-07-31-boreas-v4-pricing-design.md`). Sin escasez semanal: nada de countdowns, "quedan N
+  lugares", ni presión artificial de tiempo.
 - Toda estadística mostrada necesita fuente citable o badge de "ejemplo ilustrativo".
 - Sin glass/glow decorativo, sin gradient text, sin side-stripe borders, sin cards anidadas.
+- **Hairlines solo como límite estructural** (regla añadida el 2026-08-01 tras revisión visual):
+  una línea marca el borde de una sección o de una card, nunca separa ítems de una lista ni
+  párrafos dentro de un bloque. Separar con espacio y jerarquía tipográfica, no con líneas. Si un
+  bloque ya tiene borde o fondo propio, no lleva líneas internas encima.
 - Contraste de texto ≥4.5:1 cuerpo, ≥3:1 texto grande.
 - `prefers-reduced-motion` obligatorio en toda animación, con equivalente estático.
 
