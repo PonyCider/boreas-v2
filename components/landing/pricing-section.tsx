@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SectionFrame } from "./landing-sections";
+import { LeadForm } from "./pricing/lead-form";
 import { PlanCard } from "./pricing/plan-card";
 import { sectionIds } from "@/content/site";
 import { pricingFootnote, pricingHeading, tiers, type Tier } from "@/content/pricing";
@@ -35,14 +36,7 @@ export function PricingSection() {
         <p className="mt-8 max-w-3xl text-sm leading-relaxed text-clinical">{pricingFootnote}</p>
 
         <div id="contacto" className="mt-20 scroll-mt-28">
-          {/* Task 6 monta aquí <LeadForm selection={selection} />. */}
-          {selection && (
-            <p className="text-sm text-muted">
-              Elegiste {selection.tier.name}
-              {selection.config.express ? " con Entrega Express" : ""}
-              {selection.config.ia && selection.tier.allowsIa ? " y Chatbot IA" : ""}.
-            </p>
-          )}
+          <LeadForm selection={selection} />
         </div>
       </div>
     </SectionFrame>
