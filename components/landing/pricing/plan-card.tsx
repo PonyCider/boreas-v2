@@ -49,14 +49,14 @@ export function PlanCard({
         </p>
         <p className="text-xs text-clinical">Pago único</p>
 
-        <p className="mt-3 flex items-center gap-2 text-lg text-foreground">
+        <div className="mt-3 flex items-center gap-2 text-lg text-foreground">
           {tier.monthlyIsFrom ? `desde ${formatMxn(price.monthly)}` : formatMxn(price.monthly)}
           <span className="text-sm text-clinical">al mes</span>
           <InfoTooltip
             summary={mensualidadTooltip.summary}
             paragraphs={mensualidadTooltip.paragraphs}
           />
-        </p>
+        </div>
       </div>
 
       <ul className="mt-6 space-y-2 text-sm text-muted">
