@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@plugin "daisyui" {
+  themes: false;
+  prefix: "daisy-";
+}
 
 :root {
   /* Backgrounds */
@@ -10,16 +14,16 @@
   /* Text */
   --ink:         #1E1B18;
   --ink-muted:   #6C675E;
-  --clinical:    #9C978F;
+  --clinical:    #6E6860;
 
   /* Action — arcilla */
-  --accent:      #D2674A;
-  --accent-h:    #BA5238;
+  --accent:      #A94932;
+  --accent-h:    #8F3D2C;
   --accent-soft: rgba(210, 103, 74, 0.12);
 
   /* Acentos vivos */
   --c-amber:     #E2A33C;
-  --c-mint:      #4FB39A;
+  --c-mint:      #276C5B;
   --c-lav:       #7E86E8;
   --c-rose:      #E0617E;
 
@@ -48,14 +52,20 @@
   --radius-pill: 999px;
 }
 
-[data-theme="dark"], .dark {
+html {
+  /* Kills the top/bottom rubber-band bounce so the light body color never
+     flashes over the Hero's dark background mid-scroll. */
+  overscroll-behavior-y: none;
+}
+
+[data-theme="dark"] {
   --bg-deep:     #1B1916;
   --bg-surface:  #252119;
   --bg-elevated: #201E1A;
   --bg-void:     #131210;
   --ink:         #F5F1E8;
   --ink-muted:   #A8A192;
-  --clinical:    #706A5F;
+  --clinical:    #A8A192;
   --accent:      #E27F62;
   --accent-h:    #C9633C;
   --accent-soft: rgba(226, 127, 98, 0.18);
@@ -104,11 +114,38 @@ html {
 }
 
 body {
-  background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 70%, #FFF8EC) 0%, var(--bg-deep) 45%);
+  background: var(--bg-deep);
   color: var(--ink);
   font-family: var(--font-figtree), sans-serif;
   min-height: 100%;
   transition: background .28s, color .28s;
+}
+
+.bg-hero-glow {
+  background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 70%, #FFF8EC) 0%, var(--bg-deep) 50%);
+}
+
+[data-theme="dark"] .bg-hero-glow {
+  background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 48%, #FFF8EC) 0%, var(--bg-deep) 60%);
+}
+
+.pricing-texture {
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 14% 8%, color-mix(in srgb, var(--accent) 8%, transparent) 0, transparent 36%),
+    radial-gradient(circle at 86% 14%, color-mix(in srgb, var(--clinical) 7%, transparent) 0, transparent 34%),
+    linear-gradient(145deg, color-mix(in srgb, var(--bg-surface) 58%, transparent), color-mix(in srgb, var(--bg-elevated) 72%, transparent));
+}
+
+.pricing-texture::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.18'/%3E%3C/svg%3E");
+  content: "";
+  opacity: 0.025;
+  pointer-events: none;
 }
 
 a {
@@ -185,7 +222,6 @@ a {
   border-color: var(--ink);
 }
 
-/* Hero card cluster float animations */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-8px); }
@@ -211,18 +247,11 @@ a {
   }
 }
 
-/* Browser frame traffic-light dots (social proof mockup) */
-.browser-frame-chrome::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 1rem;
-  transform: translateY(-50%);
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 9999px;
-  background: oklch(0.65 0.18 25);
-  box-shadow:
-    0.9rem 0 0 oklch(0.72 0.16 85),
-    1.8rem 0 0 oklch(0.62 0.18 145);
+/* CardNav logo recolor — flips to white when the nav's wrapper carries
+   data-theme="dark" (Header sets this based on which section is under the
+   nav). The raster logo can't follow a CSS variable the way text/border
+   colors can, so this is a plain filter swap scoped to the same attribute
+   the rest of the per-section theming already uses. */
+[data-theme="dark"] .card-nav-container .logo {
+  filter: brightness(0) invert(1);
 }

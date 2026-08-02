@@ -1,37 +1,54 @@
 import type { Metadata } from "next";
-import { Newsreader, Figtree } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  style: ["normal", "italic"],
+const newsreader = localFont({
+  src: [
+    {
+      path: "./fonts/newsreader-latin.woff2",
+      weight: "300 600",
+      style: "normal",
+    },
+    {
+      path: "./fonts/newsreader-latin-italic.woff2",
+      weight: "300 600",
+      style: "italic",
+    },
+  ],
   variable: "--font-newsreader",
   display: "swap",
 });
 
-const figtree = Figtree({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+const figtree = localFont({
+  src: [
+    {
+      path: "./fonts/figtree-latin.woff2",
+      weight: "300 700",
+      style: "normal",
+    },
+  ],
   variable: "--font-figtree",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Boreas | Consultorio digital 24/7 para médicos",
+  title: "Boreas | Presencia digital para especialistas de la salud",
   description:
-    "Diseñamos tu consultorio digital profesional en 48 a 72 horas con reseñas de Google Maps, redacción médica y conexión directa a WhatsApp.",
+    "Diseñamos la presencia digital de tu consultorio o práctica — psicólogos, nutriólogos, fisioterapeutas y médicos — con motores de conversión hechos a medida.",
+  icons: {
+    icon: "/brand/boreas-mark.png",
+  },
   openGraph: {
-    title: "Boreas | Consultorio digital 24/7 para médicos",
+    title: "Boreas | Presencia digital para especialistas de la salud",
     description:
-      "Diseñamos tu consultorio digital profesional en 48 a 72 horas con reseñas de Google Maps, redacción médica y conexión directa a WhatsApp.",
+      "Diseñamos la presencia digital de tu consultorio o práctica — psicólogos, nutriólogos, fisioterapeutas y médicos — con motores de conversión hechos a medida.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Boreas | Consultorio digital 24/7 para médicos",
+    title: "Boreas | Presencia digital para especialistas de la salud",
     description:
-      "Diseñamos tu consultorio digital profesional en 48 a 72 horas con reseñas de Google Maps, redacción médica y conexión directa a WhatsApp.",
+      "Diseñamos la presencia digital de tu consultorio o práctica — psicólogos, nutriólogos, fisioterapeutas y médicos — con motores de conversión hechos a medida.",
   },
 };
 

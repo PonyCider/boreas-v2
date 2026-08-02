@@ -1,46 +1,103 @@
-import { SectionFrame } from "./boreas-landing-sections";
+"use client";
+
+import { motion, useReducedMotion } from "framer-motion";
+import { relevoContent } from "@/content/relevo";
+import { RelevoExampleCarousel } from "./relevo-example-carousel";
+import { RelevoFlowVisual } from "./relevo-flow-visual";
+import Particles from "@/components/ui/particles";
+import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
+import SpecularButton from "./specular-button";
 
 export function RelevoCuriositySection() {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <SectionFrame id="relevo" className="border-t border-line pb-24 sm:pb-28">
-      <div className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10">
-        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[1fr_0.85fr] lg:gap-20">
-          <div className="flex flex-col items-start text-left">
-            <p className="mb-4 text-sm font-medium text-accent">
-              Siguiente capa
-            </p>
-            <h2 className="text-[clamp(2rem,4.5vw,3.8rem)] font-semibold leading-tight text-foreground">
-              ¿Ya tienes tu página web?
-            </h2>
-            <span className="mt-4 block text-lg text-clinical">
-              Descubre cómo automatizar tus mensajes y agenda.
-            </span>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
-              Relevo es el asistente de IA de Boreas para WhatsApp. Contesta, califica y agenda cuando tu consultorio ya tiene demanda y necesita menos trabajo manual.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <a
-                href="https://relevo.chat"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-12 min-w-[12rem] items-center justify-center rounded-md border border-line px-6 py-3 text-base font-semibold text-foreground transition-all duration-300 hover:border-accent hover:text-accent active:translate-y-px"
-              >
-                Ir a Relevo.chat
-              </a>
-            </div>
+    <motion.div
+      className="relative mx-auto max-w-[1460px] px-4 sm:px-6 lg:px-10 overflow-hidden py-4"
+      initial={{ opacity: 1 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: reduceMotion ? 0 : 0.9, ease: "easeOut" }}
+    >
+      {/* Fondo de Partículas Visibles de IA */}
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-75">
+        <Particles
+          particleColors={["#E27F62", "#4FB39A", "#D4AF37", "#A8A192"]}
+          particleCount={220}
+          particleSpread={12}
+          speed={0.2}
+          particleBaseSize={130}
+          moveParticlesOnHover={true}
+          alphaParticles={true}
+        />
+      </div>
+
+      <div>
+        <div className="flex max-w-[1320px] flex-col items-start text-left">
+          <div className="mb-5">
+            <AnimatedShinyText className="border-accent/30 bg-surface/80 text-foreground">
+              {relevoContent.eyebrow}
+            </AnimatedShinyText>
           </div>
 
-          <div className="w-full border-l border-accent/40 pl-6">
-            <p className="text-sm font-medium text-accent">Ejemplo de WhatsApp</p>
-            <div className="mt-6 space-y-5 text-base leading-relaxed">
-              <p className="text-clinical">Paciente: ¿Tiene cita disponible mañana?</p>
-              <p className="text-foreground">Relevo: Hay espacios a las 10:00 AM y 4:30 PM. ¿Cuál prefieres?</p>
-              <p className="text-clinical">Paciente: A las 10:00 AM está perfecto.</p>
-              <p className="text-foreground">Relevo: Listo. Te envié la confirmación por este medio.</p>
-            </div>
+          <h2 className="max-w-[1280px] text-balance font-display text-[clamp(2rem,4.5vw,3.8rem)] font-normal leading-[1.12] tracking-[-0.010em]">
+            <span className="bg-gradient-to-r from-foreground via-foreground to-accent bg-clip-text text-transparent">
+              {relevoContent.heading}
+            </span>
+          </h2>
+
+          <p className="mt-4 text-lg font-medium text-clinical sm:text-xl">
+            {relevoContent.subheading}
+          </p>
+
+          <p className="mt-6 max-w-6xl text-base leading-relaxed text-muted sm:text-lg">
+            {relevoContent.body}
+          </p>
+
+          <div className="mt-8">
+            <a
+              href={relevoContent.ctaHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block"
+            >
+              <SpecularButton
+                size="md"
+                lineColor="var(--accent)"
+                baseColor="var(--c-surface)"
+                intensity={1.8}
+                shineSize={1.2}
+                autoAnimate={true}
+                followMouse={true}
+                className="font-semibold"
+              >
+                <span className="flex items-center gap-2.5">
+                  {relevoContent.ctaLabel}
+                  <svg
+                    className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.2}
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M17 7H8m9 0v9" />
+                  </svg>
+                </span>
+              </SpecularButton>
+            </a>
           </div>
         </div>
+
+        {/* Visual de Flujo con Orbs e Interacción de Línea Continua */}
+        <RelevoFlowVisual />
+
+        {/* Carrusel Interactivo de Ejemplos con Física 3D Tilt */}
+        <div className="mt-12 w-full min-w-0 lg:mt-16">
+          <RelevoExampleCarousel />
+        </div>
       </div>
-    </SectionFrame>
+    </motion.div>
   );
 }
+
