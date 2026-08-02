@@ -77,7 +77,7 @@ export const tiers: Tier[] = [
   {
     id: "deluxe",
     name: "Deluxe",
-    tagline: "Presencia completa, con dominio propio y chatbot opcional.",
+    tagline: "Presencia completa, con dominio propio y asistente IA opcional.",
     setup: 32900,
     monthly: 1490,
     monthlyIsFrom: false,
@@ -157,9 +157,18 @@ export const expressToggle = {
 };
 
 export const iaToggle = {
-  label: "Chatbot IA",
+  label: "Asistente IA",
   help: "Responde horarios, servicios y ubicación, y agenda citas.",
   unavailable: "Disponible desde Deluxe.",
+};
+
+export const iaTooltip = {
+  summary: "¿Qué hace el Asistente IA?",
+  paragraphs: [
+    "Atiende preguntas frecuentes sobre horarios, servicios y ubicación con la información de tu clínica.",
+    "También orienta al paciente para iniciar el proceso de agendar una cita.",
+    "No sustituye una valoración médica ni ofrece diagnósticos.",
+  ],
 };
 
 /** Nota bajo las cards. El reloj de entrega es del spec §10. */

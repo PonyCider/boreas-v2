@@ -8,6 +8,8 @@ import {
   type PanInfo,
 } from "framer-motion";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { ThinkingOrb } from "thinking-orbs";
+import { TiltedCard } from "@/components/ui/tilted-card";
 import {
   relevoContent,
   relevoExamples,
@@ -40,7 +42,7 @@ function messageToText(message: RelevoMessage): string {
   }
 }
 
-function ConversationCard({
+function CardInner({
   example,
   isFrontCard,
 }: {
@@ -48,13 +50,13 @@ function ConversationCard({
   isFrontCard: boolean;
 }) {
   return (
-    <>
+    <div className="relative h-full w-full rounded-[var(--radius-sm)] border border-line bg-surface p-5 sm:p-6 shadow-2xl backdrop-blur-sm transition-all duration-200">
       <div
-        className={`flex items-center gap-2.5 px-3 py-2.5 ${
+        className={`flex items-center gap-2.5 px-3 py-2.5 rounded-t-[var(--radius-sm)] ${
           isFrontCard ? "bg-foreground" : "bg-foreground/90"
         }`}
       >
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background/10">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background/10 border border-white/10">
           <span className="text-[10px] font-semibold text-background">
             {example.practice.initials}
           </span>
@@ -68,7 +70,10 @@ function ConversationCard({
           </p>
         </div>
         {isFrontCard ? (
-          <span className="h-2 w-2 rounded-full bg-mint" aria-hidden="true" />
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-mint animate-pulse" aria-hidden="true" />
+            <span className="hidden text-[9px] font-medium text-mint sm:inline">IA en línea</span>
+          </div>
         ) : null}
       </div>
 
@@ -77,7 +82,7 @@ function ConversationCard({
           if (message.role === "patient") {
             return (
               <div key={index} className="flex justify-end">
-                <div className="max-w-[80%] rounded-lg rounded-tr-none bg-accent-soft px-3 py-1.5">
+                <div className="max-w-[80%] rounded-lg rounded-tr-none bg-accent-soft px-3 py-1.5 shadow-xs">
                   <p className="text-[11.5px] leading-snug text-foreground">
                     {message.text}
                   </p>
@@ -92,17 +97,20 @@ function ConversationCard({
           if (message.role === "assistant") {
             return (
               <div key={index} className="flex items-start gap-2">
-                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-mint">
-                  <span className="text-[7px] font-bold text-white">IA</span>
+                <div className="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mint/20 border border-mint/40">
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none scale-75">
+                    <ThinkingOrb state="composing" size={20} />
+                  </div>
+                  <span className="relative z-10 text-[7.5px] font-extrabold text-mint">IA</span>
                 </div>
                 <div className="max-w-[82%]">
-                  <div className="rounded-lg rounded-tl-none bg-elevated px-3 py-1.5">
+                  <div className="rounded-lg rounded-tl-none bg-elevated border border-mint/20 px-3 py-1.5 shadow-xs">
                     <p className="text-[11.5px] leading-snug text-foreground">
                       {message.text}
                     </p>
                   </div>
-                  <p className="ml-1 mt-0.5 text-[9px] text-muted">
-                    {message.time} · Relevo
+                  <p className="ml-1 mt-0.5 text-[9px] font-medium text-mint/90">
+                    {message.time} · Relevo IA
                   </p>
                 </div>
               </div>
@@ -114,9 +122,9 @@ function ConversationCard({
               <div key={index} className="space-y-0.5">
                 <div className="flex items-center gap-1.5 py-0.5">
                   <div className="h-px flex-1 bg-border" />
-                  <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.08em] text-mint">
+                  <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.08em] text-mint font-semibold">
                     <svg
-                      className="h-2.5 w-2.5"
+                      className="h-2.5 w-2.5 animate-pulse"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -131,7 +139,6 @@ function ConversationCard({
                     </svg>
                     Relevo → {message.to}
                   </span>
-                  <div className="h-px flex-1 bg-border" />
                 </div>
                 <p className="text-center font-mono text-[9px] uppercase tracking-[0.06em] text-muted">
                   {message.reason}
@@ -199,16 +206,36 @@ function ConversationCard({
                     d="m4.5 12.75 6 6 9-13.5"
                   />
                 </svg>
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-mint">
-                  {message.text}
-                </span>
               </div>
             </div>
           );
         })}
       </div>
-    </>
+    </div>
   );
+}
+
+function ConversationCard({
+  example,
+  isFrontCard,
+}: {
+  example: RelevoExample;
+  isFrontCard: boolean;
+}) {
+  if (isFrontCard) {
+    return (
+      <TiltedCard
+        rotateAmplitude={12}
+        scaleOnHover={1.03}
+        glareEnable={true}
+        className="w-full"
+      >
+        <CardInner example={example} isFrontCard={isFrontCard} />
+      </TiltedCard>
+    );
+  }
+
+  return <CardInner example={example} isFrontCard={isFrontCard} />;
 }
 
 export function RelevoExampleCarousel() {

@@ -129,6 +129,25 @@ body {
   background: linear-gradient(160deg, color-mix(in oklch, var(--bg-deep) 48%, #FFF8EC) 0%, var(--bg-deep) 60%);
 }
 
+.pricing-texture {
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 14% 8%, color-mix(in srgb, var(--accent) 8%, transparent) 0, transparent 36%),
+    radial-gradient(circle at 86% 14%, color-mix(in srgb, var(--clinical) 7%, transparent) 0, transparent 34%),
+    linear-gradient(145deg, color-mix(in srgb, var(--bg-surface) 58%, transparent), color-mix(in srgb, var(--bg-elevated) 72%, transparent));
+}
+
+.pricing-texture::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.18'/%3E%3C/svg%3E");
+  content: "";
+  opacity: 0.025;
+  pointer-events: none;
+}
+
 a {
   color: inherit;
   text-decoration: none;

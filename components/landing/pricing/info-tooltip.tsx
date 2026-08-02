@@ -1,30 +1,35 @@
-/**
- * Divulgación con <details> nativo en vez de un popover con JS: accesible por
- * teclado y por lector de pantalla sin trabajo extra, y funciona sin hidratar.
- */
+"use client";
+
+import { HelpCircle } from "lucide-react";
+import { FloatingTooltip } from "@/components/unlumen-ui/floating-tooltip";
+
 export function InfoTooltip({
   summary,
   paragraphs,
+  dark = false,
 }: {
   summary: string;
   paragraphs: string[];
+  dark?: boolean;
 }) {
+  const descriptionText = paragraphs.join(" ");
+
   return (
-    <details className="group inline-block align-middle">
-      <summary
+    <FloatingTooltip.Trigger
+      content={summary}
+      description={descriptionText}
+      contentClassName="font-display text-base tracking-tight font-semibold text-foreground"
+      descriptionClassName="text-xs text-clinical opacity-90 leading-relaxed"
+    >
+      <button
+        type="button"
         aria-label={summary}
-        className="inline-flex h-5 w-5 cursor-pointer list-none items-center justify-center rounded-[999px] border border-line text-xs text-clinical transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&::-webkit-details-marker]:hidden"
+        className={`inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded-full transition-all hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+          dark ? "text-[#c7bbb2] hover:text-[#f29a7e]" : "text-clinical hover:text-accent"
+        }`}
       >
-        ?
-      </summary>
-      <div className="mt-3 rounded-[var(--radius-md)] border border-line bg-elevated p-4 text-sm leading-relaxed text-muted">
-        <p className="mb-2 font-medium text-foreground">{summary}</p>
-        {paragraphs.map((text) => (
-          <p key={text} className="mt-2 first:mt-0">
-            {text}
-          </p>
-        ))}
-      </div>
-    </details>
+        <HelpCircle className="h-4 w-4 shrink-0" />
+      </button>
+    </FloatingTooltip.Trigger>
   );
 }

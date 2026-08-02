@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   const detail = [
     `Paquete: ${tier.name}`,
     `Entrega Express: ${lead.express ? "sí" : "no"}`,
-    `Chatbot IA: ${lead.ia ? "sí" : "no"}`,
+    `Asistente IA: ${lead.ia ? "sí" : "no"}`,
     `Setup: ${price.setup === null ? "cotización" : formatMxn(price.setup)}`,
     `Mensualidad: ${formatMxn(price.monthly)}`,
     "",

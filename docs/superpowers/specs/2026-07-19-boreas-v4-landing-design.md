@@ -125,8 +125,12 @@ quedar pulido → pasar al siguiente.
   del especialista si aplica fuera de medicina — se decide por sección al escribir copy).
 - Un CTA primario por viewport.
 - **Precio público sí** (regla de V3 derogada el 2026-07-31, ver
-  `2026-07-31-boreas-v4-pricing-design.md`). Sin escasez semanal: nada de countdowns, "quedan N
-  lugares", ni presión artificial de tiempo.
+  `2026-07-31-boreas-v4-pricing-design.md`).
+- **Disponibilidad real sí, urgencia inventada no** (regla ajustada el 2026-08-01): el footer y el
+  pricing pueden declarar cuántos consultorios caben en el mes, siempre que el número sea la
+  capacidad real de entrega — hoy 3 al mes. Siguen prohibidos los countdowns, los "quedan N
+  lugares" que no corresponden a nada, y cualquier presión de tiempo fabricada: además de gastar
+  confianza, la información falsa sobre disponibilidad es materia de la LFPC art. 32.
 - Toda estadística mostrada necesita fuente citable o badge de "ejemplo ilustrativo".
 - Sin glass/glow decorativo, sin gradient text, sin side-stripe borders, sin cards anidadas.
 - **Hairlines solo como límite estructural** (regla añadida el 2026-08-01 tras revisión visual):

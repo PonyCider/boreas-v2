@@ -289,6 +289,28 @@ La ventaja competitiva de Boreas en la card no es la fecha: es el Minuto Boreas.
 - Todo el estado es cliente; el único punto de persistencia sigue siendo el envío del formulario
   vía Resend.
 
+## Deuda técnica conocida (auditoría del 2026-08-01)
+
+Hallazgos de la inspección posterior a la implementación. Ninguno bloquea publicar; se aceptan a
+conciencia y quedan aquí para retomarse.
+
+| # | Hallazgo | Dónde | Severidad |
+|---|---|---|---|
+| 1 | ~~**Los toggles no tienen indicador de foco de teclado.**~~ **CORREGIDO el 2026-08-01.** El input está `peer sr-only`, así que su anillo nativo medía 1px y era invisible; ahora el switch visible lleva `peer-focus-visible:outline-2 outline-offset-2`. El color es condicional: `var(--accent)` normalmente, y `#f29a7e` cuando la card está en modo Express (fondo `#181411`), donde el granate no contrastaría. Cambio puramente aditivo — solo se pinta con foco de teclado, nada cambia en reposo ni con ratón. | `plan-toggle.tsx:46-62` | ~~Importante~~ Resuelto |
+| 2 | **`dark:border-border` apunta a la señal equivocada.** El sitio tematiza con `[data-theme="dark"]` y no hay `@custom-variant dark` en `globals.css`, así que el `dark:` de Tailwind cae en su default (`prefers-color-scheme`) y se activa según el sistema operativo, no según el tema del sitio. Código muerto o incorrecto. | `plan-toggle.tsx:50` | Menor |
+| 3 | **Anillo de foco de los campos del formulario demasiado tenue.** `focus:outline-none focus:ring-2 focus:ring-accent/20` quita el anillo nativo y lo sustituye por uno al 20% de opacidad, por debajo del 3:1 que pide un indicador de foco. Además usa `focus:` en vez de `focus-visible:`, así que también aparece con ratón. | `lead-form.tsx:23` | Menor |
+| 4 | **La paleta de la card Express está hardcodeada.** ~15 hex literales (`#181411`, `#fff7ed`, `#c7bbb2`, `#f29a7e`, …). Es una paleta fija **intencional** — la card se oscurece a propósito para que se lea el GlitterWrap, y debe verse igual en ambos temas. El arreglo es solo nombrarlos en `globals.css` (`--express-bg`, `--express-ink`, …) con los mismos valores: queda pixel a pixel idéntico y deja documentado que es deliberado. Contraste verificado y correcto (9.75:1 y 8.46:1 sobre `#181411`). | `plan-card.tsx`, `plan-toggle.tsx` | Menor |
+| 5 | **`+$6,000` engañoso en el toggle de IA de Organizaciones.** El setup nunca se mueve de "Cotización" (`computePrice` corta en `setup === null`); solo cambia la mensualidad. Se lee como "la IA cuesta $6,000 fijos". Ocultar el delta cuando `setup` es null. | `plan-card.tsx:291` | Menor |
+| 6 | **`aria-live` envuelve el InfoTooltip.** Abrir el `<details>` de la mensualidad muta una región viva y puede anunciarse como actualización de precio. Mover el tooltip fuera del wrapper. | `plan-card.tsx:32-57` | Menor |
+| 7 | **El cambio de plazo de entrega no se anuncia.** El `<dl>` con "Entrega" queda fuera del `aria-live`, así que activar Express cambia "14 a 21 días" → "7 a 10 días" en silencio para lector de pantalla. | `plan-card.tsx:89-108` | Menor |
+| 8 | **El mapa del rate limit nunca purga.** Filtra timestamps viejos pero no borra las claves, así que crece una entrada por IP única durante la vida de la instancia. Fuga lenta y pequeña, pero sin techo. | `app/api/lead/route.ts:9` | Menor |
+| 9 | **Riesgo latente de contraste.** La sección de pricing hoy siempre renderiza en tema claro (`SectionFrame` sin prop `theme`), donde `text-white` sobre `--accent` (`#A94932`) da 5.70:1 y pasa AA. Si alguien le pasa `theme="dark"` como hacen las otras secciones, `--accent` cambia a `#E27F62` y el CTA cae a 2.82:1 en silencio. No es un defecto actual. | `pricing-section.tsx:34` | Nota |
+
+Verificado y correcto, para que nadie lo vuelva a auditar: los precios coinciden dígito a dígito
+con §2 y el test de invariante de la escalera sigue vigilándolos; el efecto Express (card oscura +
+GlitterWrap) funciona y respeta `prefers-reduced-motion`; el honeypot, la validación zod, el rate
+limit y el manejo de secretos del endpoint están intactos; `.env.example` solo tiene placeholders.
+
 ## Pendientes y dependencias
 
 | Pendiente | Bloquea | Notas |

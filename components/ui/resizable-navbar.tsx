@@ -149,15 +149,15 @@ export function NavbarLogo({
   className,
 }: NavbarLogoProps) {
   return (
-    <Link href={href} className={cn("flex items-center gap-2 shrink-0 group", className)}>
+    <Link href={href} className={cn("flex items-center justify-center gap-2 shrink-0 group", className)}>
       <Image
         src={src}
         alt={alt}
-        width={36}
-        height={26}
+        width={64}
+        height={28}
         priority
-        style={{ width: "auto" }}
-        className="h-7 w-auto transition-transform duration-300 group-hover:scale-105 logo"
+        style={{ width: "auto", height: "auto" }}
+        className="max-h-7 w-auto transition-transform duration-300 group-hover:scale-105 logo"
       />
     </Link>
   );

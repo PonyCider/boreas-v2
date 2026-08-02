@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { gsap } from "gsap";
 import { motion, useScroll } from "framer-motion";
+import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 
 export type CardNavLink = {
   label: string;
@@ -94,17 +95,17 @@ export function CardNav({
   const activeSectionName = activeSectionId ? sectionNameMap[activeSectionId] : null;
 
   useEffect(() => {
-    const initialSyncFrame = window.requestAnimationFrame(() => {
+    const animId = window.requestAnimationFrame(() => {
       setIsScrolled(window.scrollY > 56);
     });
     const unsubscribe = scrollY.on("change", (latest) => {
-      setIsScrolled((currentIsScrolled) => {
-        const nextIsScrolled = currentIsScrolled ? latest > 24 : latest > 56;
-        return currentIsScrolled === nextIsScrolled ? currentIsScrolled : nextIsScrolled;
+      setIsScrolled((current) => {
+        const next = current ? latest > 24 : latest > 56;
+        return current === next ? current : next;
       });
     });
     return () => {
-      window.cancelAnimationFrame(initialSyncFrame);
+      window.cancelAnimationFrame(animId);
       unsubscribe();
     };
   }, [scrollY]);
@@ -243,34 +244,19 @@ export function CardNav({
   return (
     <motion.div
       animate={{
-        maxWidth: isScrolled ? "740px" : "880px",
+        maxWidth: isScrolled ? "720px" : "860px",
       }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className={`card-nav-container fixed left-1/2 top-[1.2em] z-[99] w-[90%] -translate-x-1/2 md:top-[1.6em] ${className}`}
     >
       <nav
         ref={navRef}
-        className={`card-nav ${isExpanded ? "open" : ""} relative block h-[60px] overflow-hidden rounded-2xl p-0 backdrop-blur-xl border border-[var(--border)] transition-colors duration-300 ${
-          isScrolled ? "shadow-2xl bg-[var(--bg-surface)]/90" : "shadow-lg bg-[var(--bg-surface)]/80"
+        className={`card-nav ${isExpanded ? "open" : ""} relative block h-[60px] overflow-hidden rounded-2xl p-0 backdrop-blur-xl border border-[var(--border)] transition-all duration-300 ${
+          isScrolled ? "shadow-2xl bg-[var(--bg-surface)]/95" : "shadow-lg bg-[var(--bg-surface)]/85"
         } will-change-[height]`}
       >
         <div className="card-nav-top absolute inset-x-0 top-0 z-[2] flex h-[60px] items-center justify-between p-2 pl-[1.1rem]">
           <div className="order-2 md:order-none flex items-center gap-2.5">
-            {/* Indicador de Sección Activa (a la izquierda del hamburguesa) */}
-            {activeSectionName && (
-              <motion.span
-                key={activeSectionId}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -8 }}
-                transition={{ duration: 0.25 }}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--accent)] border border-[var(--accent)]/30 backdrop-blur-md"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
-                {activeSectionName}
-              </motion.span>
-            )}
-
             {/* Micro-interacción animada de Botón Hamburguesa */}
             <button
               onClick={toggleMenu}
@@ -303,35 +289,49 @@ export function CardNav({
                 />
               </div>
             </button>
+
+            {/* Pill Indicador de Sección Activa (lado derecho del botón hamburguesa) */}
+            {activeSectionName && (
+              <motion.span
+                key={activeSectionId}
+                initial={{ opacity: 0, x: -6 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -6 }}
+                transition={{ duration: 0.2 }}
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[var(--accent-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--accent)] border border-[var(--accent)]/30 backdrop-blur-md"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+                {activeSectionName}
+              </motion.span>
+            )}
           </div>
 
           <Link
             href="/"
             aria-label="Boreas — inicio"
-            className="logo-container order-1 flex items-center md:absolute md:left-1/2 md:top-1/2 md:order-none md:-translate-x-1/2 md:-translate-y-1/2"
+            className="logo-container order-1 flex items-center justify-center md:absolute md:left-1/2 md:top-1/2 md:order-none md:-translate-x-1/2 md:-translate-y-1/2"
           >
             <Image
               src={logo}
               alt={logoAlt}
-              width={38}
+              width={64}
               height={28}
               priority
-              style={{ width: "auto" }}
-              className="logo h-[28px] w-auto transition-[filter,transform] duration-300"
+              style={{ width: "auto", height: "auto" }}
+              className="logo max-h-[28px] w-auto transition-[filter,transform] duration-300 group-hover:scale-105"
             />
           </Link>
 
           {showCta && (
-            <motion.a
+            <HoverBorderGradient
+              as="a"
               href={ctaHref}
               onClick={onCtaClick}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.96 }}
-              className="card-nav-cta-button hidden h-[40px] items-center justify-center rounded-full border border-[var(--accent)]/40 px-5 text-xs font-semibold tracking-wide text-[#1E1B18] transition-all duration-300 shadow-md hover:shadow-lg hover:shadow-[var(--accent)]/25 md:inline-flex"
-              style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
+              containerClassName="hidden md:inline-flex rounded-full"
+              className="h-[38px] px-5 text-xs font-semibold tracking-wide border-0 shadow-md bg-[var(--accent)] text-[var(--bg-deep)] hover:text-[var(--bg-deep)] transition-transform duration-200 active:scale-95"
             >
-              {ctaLabel}
-            </motion.a>
+              <span>{ctaLabel}</span>
+            </HoverBorderGradient>
           )}
         </div>
 
@@ -367,3 +367,5 @@ export function CardNav({
     </motion.div>
   );
 }
+
+

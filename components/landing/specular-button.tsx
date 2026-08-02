@@ -224,14 +224,48 @@ const SpecularButton = forwardRef<HTMLButtonElement, SpecularButtonProps>(
       };
       window.addEventListener('pointermove', onPointerMove);
 
+const resolveToHex = (colorStr: string, element: HTMLElement | null): string => {
+  if (!colorStr) return '#ffffff';
+  const trimmed = colorStr.trim();
+  if (trimmed.startsWith('#')) return trimmed;
+
+  if (typeof window !== 'undefined') {
+    try {
+      const target = element || document.body;
+      const temp = document.createElement('div');
+      temp.style.color = trimmed;
+      target.appendChild(temp);
+      const computed = getComputedStyle(temp).color;
+      target.removeChild(temp);
+
+      const match = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (match) {
+        const r = parseInt(match[1], 10).toString(16).padStart(2, '0');
+        const g = parseInt(match[2], 10).toString(16).padStart(2, '0');
+        const b = parseInt(match[3], 10).toString(16).padStart(2, '0');
+        return `#${r}${g}${b}`;
+      }
+    } catch {
+      // fallback
+    }
+  }
+  return '#ffffff';
+};
+
       let angle = 2.4;
       let idleAngle = 2.4;
       let bright = 0;
       let last = performance.now();
       let raf = 0;
+      let frameCount = 0;
 
       const lineC = new Color();
       const baseC = new Color();
+
+      let lastLineProp = '';
+      let resolvedLineColor = '#ffffff';
+      let lastBaseProp = '';
+      let resolvedBaseColor = '#000000';
 
       const update = (now: number) => {
         raf = requestAnimationFrame(update);
@@ -249,8 +283,18 @@ const SpecularButton = forwardRef<HTMLButtonElement, SpecularButtonProps>(
         const brightTarget = p.autoAnimate ? 1 : proximityT;
         bright += (brightTarget - bright) * (1 - Math.exp(-dt * 8));
 
-        lineC.set(p.lineColor);
-        baseC.set(p.baseColor);
+        if (frameCount % 30 === 0 || p.lineColor !== lastLineProp) {
+          lastLineProp = p.lineColor;
+          resolvedLineColor = resolveToHex(p.lineColor, localRef.current);
+        }
+        if (frameCount % 30 === 0 || p.baseColor !== lastBaseProp) {
+          lastBaseProp = p.baseColor;
+          resolvedBaseColor = resolveToHex(p.baseColor, localRef.current);
+        }
+        frameCount++;
+
+        lineC.set(resolvedLineColor);
+        baseC.set(resolvedBaseColor);
         program.uniforms.uAngle.value = angle;
         program.uniforms.uRadius.value = Math.min(p.radius, Math.min(sizeRef.w, sizeRef.h) / 2) * dpr;
         program.uniforms.uLineColor.value = [lineC.r, lineC.g, lineC.b];

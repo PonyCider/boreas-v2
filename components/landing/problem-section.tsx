@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useInView } from "motion/react";
+import { useRef } from "react";
+import { useInView, useReducedMotion } from "motion/react";
 import { SectionFrame } from "./landing-sections";
 import SplitText from "./split-text";
 import { TextEffect } from "./text-effect";
@@ -40,14 +40,7 @@ function StaticOrRevealText({
 export function ProblemSection() {
   const textRef = useRef<HTMLDivElement>(null);
   const inView = useInView(textRef, { once: true, margin: "-100px" });
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const raf = requestAnimationFrame(() => {
-      setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    });
-    return () => cancelAnimationFrame(raf);
-  }, []);
+  const reducedMotion = !!useReducedMotion();
 
   return (
     <SectionFrame id={sectionIds.problema} theme="light" className="border-t border-line">
@@ -119,7 +112,7 @@ export function ProblemSection() {
             return (
               <p
                 key={point.emphasis}
-                className="border-b border-line py-5 text-[15px] leading-relaxed text-muted last:border-b-0"
+                className="max-w-3xl py-4 text-[15px] leading-relaxed text-muted"
               >
                 <StaticOrRevealText as="span" inView={inView} delay={base}>
                   {before}

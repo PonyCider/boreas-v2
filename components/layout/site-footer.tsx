@@ -36,7 +36,7 @@ export function SiteFooter() {
           {/* 2. Badge de disponibilidad más grande */}
           <div className="mb-5">
             <AnimatedShinyText className="text-sm px-4 py-1.5">
-              Disponible para 2 consultorios este mes
+              Disponible para 3 consultorios este mes
             </AnimatedShinyText>
           </div>
 
