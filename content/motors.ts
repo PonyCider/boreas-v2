@@ -22,11 +22,11 @@ export type Specialty = {
 
 export const specialties: Specialty[] = [
   { id: "todas", label: "Agendamiento", motor: "Para toda especialidad", status: "live" },
-  { id: "salud-mental", label: "Salud mental", motor: "Test de tamizaje", status: "soon" },
-  { id: "nutricion", label: "Nutrición", motor: "Calculadora metabólica", status: "soon" },
-  { id: "fisioterapia", label: "Fisioterapia", motor: "Evaluador de dolor", status: "soon" },
-  { id: "medicina-general", label: "Medicina general", motor: "Pre-triage", status: "soon" },
-  { id: "dental", label: "Dental", motor: "Simulador de sonrisa", status: "soon" },
+  { id: "salud-mental", label: "Salud mental", motor: "Test de tamizaje", status: "live" },
+  { id: "nutricion", label: "Nutrición", motor: "Calculadora metabólica", status: "live" },
+  { id: "fisioterapia", label: "Fisioterapia", motor: "Evaluador de dolor", status: "live" },
+  { id: "medicina-general", label: "Medicina general", motor: "Pre-triage", status: "live" },
+  { id: "dental", label: "Dental", motor: "Simulador de sonrisa", status: "live" },
 ];
 
 /** Lo que le llega al especialista cuando un paciente completa el motor. */
@@ -61,6 +61,142 @@ export const agendaMotor = {
     siguientePaso: "Ya está en tu calendario. No tuviste que contestar nada.",
   } satisfies SpecialistLead,
   leadNote: "Ejemplo ilustrativo",
+};
+
+export const tamizajeMotor = {
+  badge: "Motor · Salud mental y terapia",
+  title: "Test de tamizaje",
+  description:
+    "El paciente responde siete preguntas en menos de un minuto y recibe una lectura clara de cómo ha estado. Tú recibes ese contexto antes de la primera sesión.",
+  bullets: [
+    "Instrumento real, no un cuestionario inventado.",
+    "Resultado inmediato, sin pedirle sus datos antes.",
+    "En banda alta muestra la Línea de la Vida antes que cualquier CTA.",
+  ],
+  leadNote: "Generado con las respuestas que acabas de dar",
+  upsell: {
+    intro:
+      "Tu paquete incluye este motor. Con Profesional y Deluxe se suman los otros de tu especialidad:",
+    items: [
+      { nombre: "Diario emocional", que: "una bitácora breve que el paciente se lleva en PDF" },
+      { nombre: "Termómetro de burnout", que: "seis ítems que ubican qué se está agotando" },
+      { nombre: "Test de estilo de apego", que: "diez ítems para abrir la conversación de pareja" },
+    ],
+  },
+  crisis: {
+    titulo: "Si estás en crisis, esto va primero",
+    texto:
+      "Si estás pensando en hacerte daño o sientes que no puedes con esto ahora mismo, llama a la Línea de la Vida. Es gratuita, confidencial y atiende las 24 horas.",
+    telefono: "800 911 2000",
+    telefonoHref: "tel:8009112000",
+  },
+};
+
+export const nutricionMotor = {
+  badge: "Motor · Nutrición",
+  title: "Calculadora metabólica",
+  description:
+    "El paciente descubre cuánta energía gasta al día y por qué su plan anterior no funcionaba. Tú recibes el número con el que va a llegar a consulta.",
+  bullets: [
+    "Mifflin-St Jeor, la ecuación de referencia en consulta.",
+    "Valida rangos: un dedo resbalado no produce un número absurdo.",
+    "Deja claro que es estimación poblacional, no valoración.",
+  ],
+  leadNote: "Generado con los datos que acabas de capturar",
+  upsell: {
+    intro:
+      "Tu paquete incluye este motor. Con Profesional y Deluxe se suman los otros de tu especialidad:",
+    items: [
+      { nombre: "IMC y rango", que: "peso y estatura con lectura honesta del indicador" },
+      { nombre: "Evaluador de hábitos", que: "cinco preguntas que apuntan al hábito a corregir" },
+    ],
+  },
+};
+
+export const fisioterapiaMotor = {
+  badge: "Motor · Fisioterapia",
+  title: "Evaluador de dolor",
+  description:
+    "Cuatro preguntas ordenan al paciente entre lo que aguanta unos días y lo que necesita revisión hoy. Tú sabes a quién adelantar en la agenda.",
+  bullets: [
+    "Intensidad, tiempo, limitación y banderas rojas.",
+    "Las banderas neurológicas mandan a valoración médica, no a terapia.",
+    "Orientación declarada: no finge ser un instrumento validado.",
+  ],
+  leadNote: "Generado con las respuestas que acabas de dar",
+  upsell: {
+    intro:
+      "Tu paquete incluye este motor. Con Profesional y Deluxe se suman los otros de tu especialidad:",
+    items: [
+      { nombre: "Auto-test de movilidad", que: "cinco movimientos que revelan banderas rojas" },
+      { nombre: "Estimador de sesiones", que: "un rango realista de cuánto tomará recuperarse" },
+    ],
+  },
+  crisis: {
+    titulo: "Esto lo tiene que ver un médico antes que un fisioterapeuta",
+    texto:
+      "Lo que describes puede indicar compromiso de un nervio. No empieces terapia física sin una valoración médica: acude hoy mismo con un médico o a urgencias si empeora.",
+  },
+};
+
+export const medicinaGeneralMotor = {
+  badge: "Motor · Medicina general",
+  title: "Pre-triage",
+  description:
+    "Cinco preguntas que separan la consulta programada de la urgencia real. El paciente sabe qué hacer ahora; tú dejas de contestar mensajes para averiguarlo.",
+  bullets: [
+    "Prioridad baja, media o alta en menos de un minuto.",
+    "En prioridad alta manda al 911 antes que a tu consultorio.",
+    "Lista los síntomas de alarma en pantalla, no en letra chica.",
+  ],
+  leadNote: "Generado con las respuestas que acabas de dar",
+  upsell: {
+    intro:
+      "Tu paquete incluye este motor. Con Profesional y Deluxe se suman los otros de tu especialidad:",
+    items: [
+      { nombre: "Chequeos que te tocan", que: "estudios sugeridos según edad y sexo" },
+      { nombre: "Riesgo cardiometabólico", que: "una estimación que abre la conversación" },
+    ],
+  },
+  crisis: {
+    titulo: "Esto no espera: llama al 911",
+    texto:
+      "Tus respuestas describen señales que se atienden ahora, no mañana. Llama al 911 o acude a la sala de urgencias más cercana. Cualquiera de estos síntomas exige atención inmediata:",
+    telefono: "911",
+    telefonoHref: "tel:911",
+  },
+};
+
+export const dentalMotor = {
+  badge: "Motor · Dental",
+  title: "Simulador de sonrisa",
+  description:
+    "El paciente mueve dos controles y ve a dónde puede llegar su sonrisa. Ese es el momento en que decide agendar la valoración.",
+  bullets: [
+    "Render procedural: sin fotos de pacientes, sin derechos de imagen.",
+    "El aviso de que es una proyección está visible mientras juega.",
+    "Termina invitando a la valoración, no prometiendo un resultado.",
+  ],
+  leadNote: "Ejemplo ilustrativo",
+  disclaimer:
+    "Proyección ilustrativa. No es un resultado garantizado: el plan real sale de una valoración presencial.",
+  upsell: {
+    intro:
+      "Tu paquete incluye este motor. Con Profesional y Deluxe se suman los otros de tu especialidad:",
+    items: [
+      { nombre: "Cotizador de tratamiento", que: "un rango estimado antes de la primera llamada" },
+      { nombre: "¿Necesitas ortodoncia?", que: "cinco preguntas que filtran quién sí y quién no" },
+    ],
+  },
+  lead: {
+    titulo: "Interés en valoración — Ortodoncia estética",
+    senales: [
+      "Probó el simulador y llegó al máximo de alineación",
+      "Interés declarado: alineación y tono",
+      "Proyección ilustrativa, sin promesa de resultado",
+    ],
+    siguientePaso: "Llega sabiendo qué quiere cambiar. Tú defines si es posible.",
+  } satisfies SpecialistLead,
 };
 
 export const motorsPrivacyNote =

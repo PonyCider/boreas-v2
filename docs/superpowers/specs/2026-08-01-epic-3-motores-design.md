@@ -50,14 +50,14 @@ Catálogo (⭐ = se construye vivo en la landing de Boreas):
 
 | Categoría | Motor | Patrón | Entrada → salida | Resumen al especialista |
 |---|---|---|---|---|
-| **Salud mental y terapia** | ⭐ Test de tamizaje | quiz-banda | 7 ítems tipo GAD-7 (0–3) → banda tranquilidad / atención / acompañamiento | Banda + motivo declarado |
+| **Salud mental y terapia** | ⭐ Test de tamizaje | quiz-banda | GAD-7 completo, 7 ítems (0–3) → mínima / leve / moderada / severa | Banda y puntaje |
 | | Diario emocional | bitacora | emoción + intensidad + nota → diario descargable | Que completó el diario, sin contenido |
 | | Termómetro de burnout | quiz-banda | 6 ítems → dimensión de agotamiento dominante | Dimensión dominante |
 | | Test de estilo de apego | quiz-banda | 10 ítems → estilo (seguro / ansioso / evitativo) | Estilo resultante |
 | **Nutrición** | ⭐ Calculadora metabólica | calculadora | sexo, edad, peso, estatura, actividad → kcal de mantenimiento (Mifflin-St Jeor) | Rango calórico y objetivo declarado |
 | | IMC y rango | calculadora | peso + estatura → IMC y rango | IMC |
 | | Evaluador de hábitos | quiz-banda | 5 preguntas → puntaje + hábito a corregir primero | Hábito prioritario |
-| **Fisioterapia** | ⭐ Evaluador de dolor | quiz-banda | zona + intensidad EVA 0–10 + tipo + tiempo → prioridad | Zona, EVA y prioridad |
+| **Fisioterapia** | ⭐ Evaluador de dolor | quiz-banda | intensidad EVA + tiempo + limitación + banderas rojas → prioridad | Prioridad y si hubo banderas rojas |
 | | Auto-test de movilidad | quiz-banda | 5 movimientos autoevaluados → banderas rojas | Banderas rojas detectadas |
 | | Estimador de sesiones | calculadora | tipo de lesión + semanas de evolución → rango de sesiones | Lesión y rango estimado |
 | **Medicina general** | ⭐ Pre-triage | quiz-banda | 5 preguntas → prioridad baja / media / alta | Prioridad y síntoma principal |
@@ -224,14 +224,14 @@ bounce o elastic.
 | # | Subtarea | Estado |
 |---|---|---|
 | 3.1 | Sección + `MotorShell` + agendamiento Cal.com | Construido 2026-08-01, pendiente de pulir |
-| 3.2 | Selector Option Wheel (React Bits) en vez de los chips provisionales | Pendiente |
-| 3.3 | Test de tamizaje GAD-7 (salud mental) | Pendiente |
-| 3.4 | Calculadora metabólica (nutrición) | Pendiente |
-| 3.5 | Evaluador de dolor (fisioterapia) | Pendiente |
-| 3.6 | Pre-triage (medicina general) | Pendiente |
-| 3.7 | Simulador de sonrisa procedural (dental) | Pendiente |
+| 3.2 | Selector Option Wheel (React Bits) en vez de los chips provisionales | Construido 2026-08-01, pendiente de pulir |
+| 3.3 | Test de tamizaje GAD-7 (salud mental) | Construido 2026-08-01, pendiente de pulir |
+| 3.4 | Calculadora metabólica (nutrición) | Construido 2026-08-01, pendiente de pulir |
+| 3.5 | Evaluador de dolor (fisioterapia) | Construido 2026-08-01, pendiente de pulir |
+| 3.6 | Pre-triage (medicina general) | Construido 2026-08-01, pendiente de pulir |
+| 3.7 | Simulador de sonrisa procedural (dental) | Construido 2026-08-01, pendiente de pulir |
 | 3.8 | Fichas de los 11 motores de catálogo + menciones de upsell por categoría | Pendiente |
-| 3.9 | Página `/privacidad` y su enlace en el footer | Pendiente |
+| 3.9 | Página `/privacidad` y su enlace en el footer | Construido 2026-08-01, falta domicilio |
 
 Cada subtarea se pule visualmente con el usuario antes de pasar a la siguiente.
 
@@ -258,6 +258,14 @@ Cada subtarea se pule visualmente con el usuario antes de pasar a la siguiente.
 - **Proceso COFEPRIS:** el spec de pricing dice "revisión de copy vs. COFEPRIS" sin definir quién
   clasifica, quién tramita ni qué pasa si el cliente no tiene autorización. Se resuelve en el Epic
   de pricing, no aquí.
+- **Desincronización del selector (2026-08-01):** girar la rueda rápido hacia abajo y de vuelta
+  arriba rompe la transición — `AnimatePresence mode="wait"` encola salidas y el panel se queda en
+  el motor anterior mientras la rueda ya marca otro. Deuda aceptada. Arreglo probable: animación
+  solo de entrada, sin esperar a que termine la salida.
+- **Domicilio en el aviso de privacidad:** la LFPDPPP art. 16 fr. I exige domicilio del
+  responsable. Por decisión del titular (2026-08-01) se publica solo ciudad y estado, más el
+  correo como canal de contacto, para no exponer un domicilio particular. El aviso queda
+  incompleto a propósito; se cierra cuando exista buzón u oficina virtual.
 - **Escasez real, no inventada:** el footer anuncia disponibilidad limitada. Debe reflejar la
   capacidad real de entrega (3 consultorios al mes al 2026-08-01). Si el número deja de ser real,
   se actualiza o se quita: información falsa sobre disponibilidad es materia de la LFPC art. 32.

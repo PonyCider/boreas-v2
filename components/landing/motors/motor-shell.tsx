@@ -14,19 +14,23 @@ export function MotorShell({
   lead,
   leadNote,
   footnote,
+  upsell,
   children,
 }: {
   badge: string;
   title: string;
   description: string;
   bullets: string[];
-  lead: SpecialistLead;
+  /** `null` mientras el motor no haya producido resultado: la banda no se muestra. */
+  lead: SpecialistLead | null;
   leadNote: string;
   footnote?: string;
+  /** Los otros motores de la categoría: se mencionan, no se renderizan (spec §3). */
+  upsell?: { intro: string; items: { nombre: string; que: string }[] };
   children: ReactNode;
 }) {
   return (
-    <div className="mt-12 rounded-[16px] border border-line bg-surface">
+    <div className="overflow-hidden rounded-[16px] border border-line bg-surface">
       <div className="grid gap-10 p-6 sm:p-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12 lg:p-10">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-accent">{badge}</p>
@@ -52,35 +56,50 @@ export function MotorShell({
         <div className="min-w-0">{children}</div>
       </div>
 
-      <div className="bg-elevated p-6 sm:p-8 lg:p-10">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-clinical">
-              Lo que te llega a ti
-            </p>
-            <p className="mt-3 text-[15px] leading-relaxed text-muted">
-              El paciente ve su resultado. Tú recibes el contexto para llegar preparado.
-            </p>
-          </div>
+      {lead ? (
+        <div className="bg-elevated p-6 sm:p-8 lg:p-10">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-clinical">
+                Lo que te llega a ti
+              </p>
+              <p className="mt-3 text-[15px] leading-relaxed text-muted">
+                El paciente ve su resultado. Tú recibes el contexto para llegar preparado.
+              </p>
+            </div>
 
-          <div className="min-w-0 rounded-[10px] border border-dashed border-border bg-surface p-5 sm:p-6">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-clinical">
-              {leadNote}
-            </p>
-            <p className="mt-4 font-display text-lg font-normal leading-snug text-foreground">
-              {lead.titulo}
-            </p>
-            <ul className="mt-4 space-y-2">
-              {lead.senales.map((senal) => (
-                <li key={senal} className="text-sm leading-relaxed text-muted">
-                  {senal}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 text-sm leading-relaxed text-foreground">{lead.siguientePaso}</p>
+            <div className="min-w-0 rounded-[10px] border border-dashed border-border bg-surface p-5 sm:p-6">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-clinical">
+                {leadNote}
+              </p>
+              <p className="mt-4 font-display text-lg font-normal leading-snug text-foreground">
+                {lead.titulo}
+              </p>
+              <ul className="mt-4 space-y-2">
+                {lead.senales.map((senal) => (
+                  <li key={senal} className="text-sm leading-relaxed text-muted">
+                    {senal}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-5 text-sm leading-relaxed text-foreground">{lead.siguientePaso}</p>
+            </div>
           </div>
         </div>
-      </div>
+      ) : null}
+
+      {upsell ? (
+        <div className="bg-void px-6 py-6 sm:px-8 lg:px-10">
+          <p className="text-[15px] leading-relaxed text-muted">{upsell.intro}</p>
+          <ul className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-x-8">
+            {upsell.items.map((item) => (
+              <li key={item.nombre} className="text-sm leading-relaxed text-clinical">
+                <span className="font-medium text-foreground">{item.nombre}</span> — {item.que}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }

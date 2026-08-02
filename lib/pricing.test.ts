@@ -1,7 +1,7 @@
 // lib/pricing.test.ts
 import { describe, it, expect } from "vitest";
 import { getTier, IA_MONTHLY, IA_SETUP } from "@/content/pricing";
-import { computePrice, formatMxn } from "@/lib/pricing";
+import { computeCheckoutPrice, computePrice, formatMxn } from "@/lib/pricing";
 
 const plain = { express: false, ia: false };
 
@@ -60,5 +60,43 @@ describe("formatMxn", () => {
   it("formatea con separador de miles y sin decimales", () => {
     expect(formatMxn(12900)).toBe("$12,900");
     expect(formatMxn(590)).toBe("$590");
+  });
+});
+
+describe("computeCheckoutPrice", () => {
+  it("cobra exactamente 50% de la inversión inicial", () => {
+    expect(computeCheckoutPrice(getTier("profesional"), plain)).toEqual({
+      setup: 19900,
+      deposit: 9950,
+      monthly: 890,
+    });
+  });
+
+  it("incluye Express en el anticipo", () => {
+    expect(
+      computeCheckoutPrice(getTier("profesional"), { express: true, ia: false }),
+    ).toEqual({ setup: 32900, deposit: 16450, monthly: 890 });
+  });
+
+  it("incluye la instalación de IA, pero excluye su mensualidad del anticipo", () => {
+    expect(computeCheckoutPrice(getTier("deluxe"), { express: false, ia: true })).toEqual({
+      setup: 38900,
+      deposit: 19450,
+      monthly: 1890,
+    });
+  });
+
+  it("incluye Express e IA juntos", () => {
+    expect(computeCheckoutPrice(getTier("deluxe"), { express: true, ia: true })).toEqual({
+      setup: 51900,
+      deposit: 25950,
+      monthly: 1890,
+    });
+  });
+
+  it("rechaza Organizaciones porque requiere cotización", () => {
+    expect(() =>
+      computeCheckoutPrice(getTier("organizaciones"), { express: false, ia: true }),
+    ).toThrow("requiere cotización");
   });
 });

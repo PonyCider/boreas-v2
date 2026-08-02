@@ -12,6 +12,12 @@ export type Selection = { tier: Tier; config: PlanConfig };
 /** setup null = bajo cotización (Organizaciones). */
 export type ComputedPrice = { setup: number | null; monthly: number };
 
+export type CheckoutPrice = {
+  setup: number;
+  deposit: number;
+  monthly: number;
+};
+
 export function computePrice(tier: Tier, config: PlanConfig): ComputedPrice {
   // Los toggles se ignoran silenciosamente donde el paquete no los permite:
   // la UI no los ofrece ahí, y así un estado viejo nunca produce un precio falso.
@@ -22,6 +28,24 @@ export function computePrice(tier: Tier, config: PlanConfig): ComputedPrice {
     tier.setup === null ? null : tier.setup + expressFee + (iaOn ? IA_SETUP : 0);
 
   return { setup, monthly: tier.monthly + (iaOn ? IA_MONTHLY : 0) };
+}
+
+/**
+ * El anticipo es siempre 50% de la inversión inicial. La mensualidad se
+ * devuelve como contexto, pero nunca participa en el cobro de Checkout Pro.
+ */
+export function computeCheckoutPrice(tier: Tier, config: PlanConfig): CheckoutPrice {
+  const price = computePrice(tier, config);
+
+  if (price.setup === null) {
+    throw new Error(`El paquete ${tier.id} requiere cotización`);
+  }
+
+  return {
+    setup: price.setup,
+    deposit: price.setup / 2,
+    monthly: price.monthly,
+  };
 }
 
 const mxn = new Intl.NumberFormat("es-MX", {

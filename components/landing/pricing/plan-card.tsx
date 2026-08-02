@@ -20,7 +20,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { DiaTextReveal } from "@/components/magicui/dia-text-reveal";
 import { AnimatedPrice } from "./animated-price";
 
-type SelectPlan = (tier: Tier, config: PlanConfig) => void;
+type SelectPlan = (tier: Tier, config: PlanConfig, trigger: HTMLButtonElement) => void;
 
 function PricePanel({ tier, config }: { tier: Tier; config: PlanConfig }) {
   const price = computePrice(tier, config);
@@ -276,7 +276,7 @@ export function PlanCard({ tier, onSelect }: { tier: Tier; onSelect: SelectPlan 
 
       <button
         type="button"
-        onClick={() => onSelect(tier, config)}
+        onClick={(event) => onSelect(tier, config, event.currentTarget)}
         className={`relative z-10 mt-6 w-full rounded-[var(--radius-pill)] px-5 py-3 text-sm font-semibold transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.98] ${
           config.express
             ? "bg-[#a94932] text-white shadow-lg shadow-black/20 ring-1 ring-inset ring-[#f29a7e]/55 hover:bg-[#c45f44]"
@@ -359,7 +359,7 @@ export function OrganizationPlanCard({
 
           <button
             type="button"
-            onClick={() => onSelect(tier, config)}
+            onClick={(event) => onSelect(tier, config, event.currentTarget)}
             className="mt-6 w-full rounded-[var(--radius-pill)] border border-line px-5 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:border-accent hover:bg-accent-soft/30 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.98] xl:mt-auto"
           >
             {tier.ctaLabel}
