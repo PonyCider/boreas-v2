@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const newsreader = localFont({
@@ -64,6 +65,7 @@ export default function RootLayout({
     >
       <body className="min-h-full bg-background text-foreground selection:bg-[var(--accent-soft)] selection:text-foreground">
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
