@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MotorShell } from "./motor-shell";
+import { MOTOR_PANEL, MotorShell } from "./motor-shell";
 import type { SpecialistLead } from "@/content/motors";
 import { bandForScore, maxScore, scoreQuiz, type QuizBand, type QuizQuestion } from "@/lib/motors/quiz";
 
@@ -78,7 +78,7 @@ export function QuizMotor({
       upsell={upsell}
       footnote={footnote}
     >
-      <div className="rounded-[10px] border border-line bg-elevated p-6 sm:p-8">
+      <div className={MOTOR_PANEL}>
         {done && band ? (
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.14em] text-clinical">
@@ -119,7 +119,7 @@ export function QuizMotor({
             <button
               type="button"
               onClick={() => setAnswers([])}
-              className="mt-6 rounded-[999px] border border-border px-5 py-2.5 text-sm font-medium text-foreground"
+              className="mt-6 rounded-[999px] border border-border px-5 py-2.5 text-sm font-medium text-foreground transition-colors duration-150 hover:border-accent hover:bg-accent-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               Responder de nuevo
             </button>
@@ -140,9 +140,12 @@ export function QuizMotor({
 
             <div className="mt-6 flex flex-col gap-2">
               {question.options.map((option) => (
+                // El radio nativo va oculto: con auto-avance nunca queda marcado, así que
+                // su punto no informa nada y el control del sistema es lo que abarata la
+                // pieza. El círculo dibujado solo indica que la fila es clickeable.
                 <label
                   key={option.label}
-                  className="flex cursor-pointer items-center gap-3 rounded-[10px] border border-border bg-surface px-4 py-3 text-[15px] text-foreground has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-accent"
+                  className="group flex cursor-pointer items-center gap-3 rounded-[10px] bg-surface px-4 py-3 text-[15px] text-foreground ring-1 ring-border transition-colors duration-150 hover:bg-accent-soft hover:ring-accent has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent"
                 >
                   <input
                     type="radio"
@@ -150,7 +153,11 @@ export function QuizMotor({
                     value={option.value}
                     checked={false}
                     onChange={() => setAnswers((prev) => [...prev, option.value])}
-                    className="h-4 w-4 shrink-0 accent-[var(--accent)]"
+                    className="sr-only"
+                  />
+                  <span
+                    aria-hidden
+                    className="h-[15px] w-[15px] shrink-0 rounded-full ring-1 ring-border transition-colors duration-150 group-hover:bg-accent group-hover:ring-accent"
                   />
                   {option.label}
                 </label>

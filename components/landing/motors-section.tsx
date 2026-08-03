@@ -7,10 +7,10 @@ import SplitText from "./split-text";
 import OptionWheel from "@/components/ui/option-wheel";
 import { AgendaCalMotor } from "./motors/agenda-cal";
 import { CalculadoraMetabolicaMotor } from "./motors/calculadora-metabolica";
+import { CotizadorDentalMotor } from "./motors/cotizador-dental";
 import { EvaluadorDolorMotor } from "./motors/evaluador-dolor";
 import { MotorTransition } from "./motors/motor-transition";
 import { PreTriageMotor } from "./motors/pre-triage";
-import { SimuladorSonrisaMotor } from "./motors/simulador-sonrisa";
 import { TamizajeGad7Motor } from "./motors/tamizaje-gad7";
 import { sectionIds } from "@/content/site";
 import {
@@ -28,7 +28,7 @@ const MOTORES: Record<SpecialtyId, () => React.JSX.Element> = {
   nutricion: CalculadoraMetabolicaMotor,
   fisioterapia: EvaluadorDolorMotor,
   "medicina-general": PreTriageMotor,
-  dental: SimuladorSonrisaMotor,
+  dental: CotizadorDentalMotor,
 };
 
 export function MotorsSection() {

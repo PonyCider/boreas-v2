@@ -1,5 +1,6 @@
 import { AgendaCalMotor } from "@/components/landing/motors/agenda-cal";
 import { CalculadoraMetabolicaMotor } from "@/components/landing/motors/calculadora-metabolica";
+import { CotizadorDentalMotor } from "@/components/landing/motors/cotizador-dental";
 import { EvaluadorDolorMotor } from "@/components/landing/motors/evaluador-dolor";
 import { PreTriageMotor } from "@/components/landing/motors/pre-triage";
 import { SimuladorSonrisaMotor } from "@/components/landing/motors/simulador-sonrisa";
@@ -17,8 +18,12 @@ export default function MotoresPreview() {
         <CalculadoraMetabolicaMotor />
         <EvaluadorDolorMotor />
         <PreTriageMotor />
-        <SimuladorSonrisaMotor />
+        <CotizadorDentalMotor />
         <AgendaCalMotor />
+
+        {/* Ya no es el motor estelar de dental (pasó a ortodoncia en el catálogo), pero se
+            queda montado aquí para poder seguirlo puliendo. */}
+        <SimuladorSonrisaMotor />
       </div>
     </main>
   );

@@ -63,9 +63,10 @@ Catálogo (⭐ = se construye vivo en la landing de Boreas):
 | **Medicina general** | ⭐ Pre-triage | quiz-banda | 5 preguntas → prioridad baja / media / alta | Prioridad y síntoma principal |
 | | Chequeos que te tocan | calculadora | edad + sexo → lista de estudios sugeridos | Estudios sugeridos |
 | | Riesgo cardiometabólico | calculadora | IMC + presión + hábitos → nivel de riesgo | Nivel de riesgo |
-| **Dental** | ⭐ Simulador de sonrisa | simulador | slider de alineación y tono → antes/después procedural | Interés declarado |
-| | Cotizador de tratamiento | calculadora | tratamiento + número de piezas → rango estimado | Tratamiento consultado |
-| | ¿Necesitas ortodoncia? | quiz-banda | 5 preguntas → recomendación de valoración | Recomendación resultante |
+| **Dental** | ⭐ Cotizador de tratamiento | calculadora | tratamiento elegido → rango, visitas y qué incluye | Tratamiento consultado y rango que vio |
+| | Triage dental | quiz-banda | dolor, sangrado o pieza rota → hoy / esta semana / programada | Urgencia y síntoma principal |
+| | Primera cita sin sorpresas | recorrido | motivo + nivel de miedo → paso a paso de la visita | Motivo y temor declarado |
+| **Ortodoncia** | ⭐ Simulador de sonrisa | simulador | slider de alineación y tono → antes/después procedural | Interés declarado |
 | **Todas** | ⭐ Agendamiento | embed | disponibilidad real → cita confirmada | Cita en el calendario |
 
 Salud mental y terapia van fusionadas (una sola categoría con 4 motores): son el mismo comprador
@@ -163,7 +164,13 @@ Innegociables en los 17 motores:
   datos autorreportados, no sustituye medición clínica ni estudios de laboratorio.
 - **IMC** se presenta como indicador poblacional, nunca como veredicto de salud.
 - **Cotizador dental:** los rangos son estimados y así se rotulan; la cotización real sale de la
-  valoración presencial. Aplica la misma regla en los sitios de clientes.
+  valoración presencial. Aplica la misma regla en los sitios de clientes. Los rangos de la landing
+  son **de referencia nacional para consultorio privado en México (agosto 2026)**, no los de un
+  consultorio en particular, y el motor lo dice en pantalla — publicar un rango sin esa aclaración
+  lo convierte en oferta a ojos del paciente, que es justo lo que castiga el art. 32 de la LFPC.
+  Las fuentes de cada rango están citadas en la cabecera de `lib/motors/cotizador-dental.ts`.
+  Mérida corre por debajo de la capital (las fuentes ubican ciudades medias en torno al 60-70% del
+  precio de CDMX), así que los rangos abren bajo a propósito.
 - Los motores de especialidad de la landing no envían ni guardan nada, y la sección lo declara.
   El agendamiento es la excepción declarada (§5).
 
@@ -229,7 +236,9 @@ bounce o elastic.
 | 3.4 | Calculadora metabólica (nutrición) | Construido 2026-08-01, pendiente de pulir |
 | 3.5 | Evaluador de dolor (fisioterapia) | Construido 2026-08-01, pendiente de pulir |
 | 3.6 | Pre-triage (medicina general) | Construido 2026-08-01, pendiente de pulir |
-| 3.7 | Simulador de sonrisa procedural (dental) | Construido 2026-08-01, pendiente de pulir |
+| 3.7 | Simulador de sonrisa procedural | Construido 2026-08-01. Reclasificado a ortodoncia el 2026-08-03 |
+| 3.10 | Cotizador dental (nuevo estelar de dental) | Construido 2026-08-03 |
+| 3.11 | Controles con shadcn tematizados y materialidad con acento | Construido 2026-08-03 |
 | 3.8 | Fichas de los 11 motores de catálogo + menciones de upsell por categoría | Pendiente |
 | 3.9 | Página `/privacidad` y su enlace en el footer | Construido 2026-08-01, falta domicilio |
 
@@ -242,13 +251,56 @@ Cada subtarea se pule visualmente con el usuario antes de pasar a la siguiente.
   captura real).
 - Fotos de pacientes reales en el simulador dental — es procedural por decisión, no por falta de
   material: evita derechos de imagen, datos sensibles de terceros y promesas clínicas falsas.
+- **Imágenes de personas como antes/después (decidido el 2026-08-03).** Se evaluó generar caras
+  con IA para darle aire premium al motor dental y se descartó. Como *ambiente* una imagen
+  generada no tiene problema: no hay persona real, no hace falta model release. Como *resultado*
+  sí lo tiene, y no es formalismo: un "después" generado es un resultado fabricado, presentarlo
+  como lo que el tratamiento logra es información engañosa bajo el art. 32 de la LFPC, y la
+  publicidad de servicios de salud cae bajo COFEPRIS, que es donde el antes/después está
+  vigilado. Un disclaimer no arregla que la pieza central sea falsa. Encima, esto se replica en
+  el sitio de cada cliente: o cada dentista pone fotos propias con consentimiento de sus
+  pacientes, o todos comparten la misma cara de IA.
+- **Subir la foto del paciente al simulador.** Procesar una cara es dato personal sensible bajo
+  la LFPDPPP (art. 3 fr. V) y exige consentimiento expreso por escrito, aunque el procesamiento
+  ocurra solo en el navegador. Fuera de alcance.
+
+### 12. Cambio de motor estelar en dental (2026-08-03)
+
+El simulador de sonrisa dejó de ser el motor estelar de dental y pasó al catálogo como motor de
+**ortodoncia**. Su lugar lo toma el **cotizador de tratamiento**.
+
+Por qué: el simulador solo sirve al segmento estético, que es una fracción del consultorio dental,
+y ataca el cuarto motivo por el que un paciente no agenda. Los tres de arriba —no saber cuánto va a
+costar, miedo, y no saber si lo suyo es urgente— quedaban sin cubrir. El precio es el único que es
+universal a todo consultorio dental sin importar el tratamiento, y es literalmente la pregunta que
+detiene la llamada. El cotizador además produce el mejor lead de los cuatro: llega alguien que ya
+sabe el rango, las visitas y qué incluye, así que la llamada es para agendar y no para negociar.
+
+Efecto colateral aceptado: la sección se queda **sin ningún motor gráfico**. Un render de dientes
+falso es un "wow" que se paga con credibilidad, y la credibilidad es todo el posicionamiento de
+Boreas. Triage dental y "primera cita sin sorpresas" quedan como los otros dos motores de la
+categoría, mencionados como upsell de Profesional y Deluxe.
+
+Decisión de patrón: el cotizador es el **segundo** motor tipo calculadora. Un cuarto quiz-banda
+(que es lo que habría sido el triage dental) dejaba la sección con cuatro quizzes de seis motores
+y se leía repetitiva.
+
+Se cotiza **un tratamiento a la vez**, no varios sumables: un total grande espanta al paciente
+antes de que hable con nadie, que es lo contrario de lo que hace el motor.
 
 ## Pendientes conocidos
 
 - El evento de Cal.com embebido es `/demo`. Si más adelante conviene un evento dedicado para
   tráfico de landing (distinta duración o distintas preguntas de reserva), es un cambio de una
   línea en `content/motors.ts`.
-- Los 11 motores de ficha no tienen copy final; se escribe cuando el primer cliente contrate uno.
+- Los motores de ficha no tienen copy final; se escribe cuando el primer cliente contrate uno.
+- **Rangos del cotizador con fecha de caducidad.** Son precios de mercado consultados el
+  2026-08-03. Envejecen. Conviene revisarlos una vez al año o cuando un dentista comente que están
+  fuera de lugar.
+- **Simulador de sonrisa sin categoría propia en la rueda.** Ortodoncia no es una de las cinco
+  especialidades del selector, así que el simulador queda construido pero sin lugar en la landing;
+  vive en `/motores-preview` y en el catálogo. Decidir si ortodoncia merece su propia entrada o si
+  se queda como sub-especialidad de dental.
 - **Supersesión del spec padre:** la tabla de motores de
   `2026-07-19-boreas-v4-landing-design.md` §3 quedó obsoleta (listaba 5 motores y otra mezcla de
   categorías). Este documento es la autoridad, pero el spec padre todavía no lo dice. Pendiente de

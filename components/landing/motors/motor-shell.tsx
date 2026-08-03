@@ -2,6 +2,14 @@ import type { ReactNode } from "react";
 import type { SpecialistLead } from "@/content/motors";
 
 /**
+ * Panel donde vive la demo de cada motor. `--bg-elevated` es más oscuro que `--bg-surface`
+ * en el tema oscuro, así que esto no es una elevación sino un hueco: se vende con filo
+ * superior iluminado y sombra interior en vez de con un borde de un pixel.
+ */
+export const MOTOR_PANEL =
+  "rounded-[14px] bg-elevated p-6 shadow-[inset_0_1px_0_0_var(--line),inset_0_10px_24px_-14px_rgb(0_0_0/0.55)] sm:p-8";
+
+/**
  * Marco compartido por todos los motores: contexto a la izquierda, demo viva a la
  * derecha, y debajo la segunda cara — lo que le llega al especialista. Esa segunda
  * cara es la venta: el motor no es un juguete, es una máquina de citas.
@@ -30,7 +38,14 @@ export function MotorShell({
   children: ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-[16px] border border-line bg-surface">
+    // La carta se levanta con sombra y un aro de un pixel en vez de un borde duro, y el
+    // halo de acento la despega del fondo sin pintarla de color.
+    <div className="relative isolate overflow-hidden rounded-[18px] bg-surface shadow-[0_1px_2px_rgb(0_0_0/0.18),0_28px_64px_-32px_rgb(0_0_0/0.55)] ring-1 ring-line">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-72 w-[min(720px,95%)] -translate-x-1/2 rounded-full bg-accent opacity-[0.09] blur-[90px]"
+      />
+
       <div className="grid gap-10 p-6 sm:p-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12 lg:p-10">
         <div>
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-accent">{badge}</p>

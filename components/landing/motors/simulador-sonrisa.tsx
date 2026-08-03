@@ -1,8 +1,9 @@
 "use client";
 
 import { useId, useState } from "react";
-import { MotorShell } from "./motor-shell";
-import { dentalMotor } from "@/content/motors";
+import { MOTOR_PANEL, MotorShell } from "./motor-shell";
+import { Slider } from "@/components/ui/slider";
+import { simuladorSonrisaMotor } from "@/content/motors";
 
 /**
  * Simulador de sonrisa 100% procedural: SVG generado con dos controles, sin fotos de
@@ -43,11 +44,11 @@ export function SimuladorSonrisaMotor() {
 
   return (
     <MotorShell
-      {...dentalMotor}
-      lead={tocado ? dentalMotor.lead : null}
-      footnote={dentalMotor.disclaimer}
+      {...simuladorSonrisaMotor}
+      lead={tocado ? simuladorSonrisaMotor.lead : null}
+      footnote={simuladorSonrisaMotor.disclaimer}
     >
-      <div className="rounded-[10px] border border-line bg-elevated p-6 sm:p-8">
+      <div className={MOTOR_PANEL}>
         <svg
           viewBox="0 0 134 60"
           role="img"
@@ -76,40 +77,40 @@ export function SimuladorSonrisaMotor() {
           })}
         </svg>
 
-        <p className="mt-4 text-xs leading-relaxed text-clinical">{dentalMotor.disclaimer}</p>
+        <p className="mt-4 text-xs leading-relaxed text-clinical">{simuladorSonrisaMotor.disclaimer}</p>
 
         <div className="mt-6 space-y-5">
           <div>
-            <label htmlFor={alineacionId} className="flex justify-between text-sm text-foreground">
+            <p id={alineacionId} className="flex justify-between text-sm text-foreground">
               <span>Alineación</span>
               <span className="text-clinical">{alineacion}%</span>
-            </label>
-            <input
-              id={alineacionId}
-              type="range"
+            </p>
+            <Slider
+              thumbLabel="Alineación"
+              aria-describedby={alineacionId}
               min={0}
               max={100}
               step={1}
-              value={alineacion}
-              onChange={(event) => setAlineacion(Number(event.target.value))}
-              className="mt-2 w-full accent-[var(--accent)]"
+              value={[alineacion]}
+              onValueChange={([valor]) => setAlineacion(valor)}
+              className="mt-3"
             />
           </div>
 
           <div>
-            <label htmlFor={tonoId} className="flex justify-between text-sm text-foreground">
+            <p id={tonoId} className="flex justify-between text-sm text-foreground">
               <span>Tono</span>
               <span className="text-clinical">{tono}%</span>
-            </label>
-            <input
-              id={tonoId}
-              type="range"
+            </p>
+            <Slider
+              thumbLabel="Tono"
+              aria-describedby={tonoId}
               min={0}
               max={100}
               step={1}
-              value={tono}
-              onChange={(event) => setTono(Number(event.target.value))}
-              className="mt-2 w-full accent-[var(--accent)]"
+              value={[tono]}
+              onValueChange={([valor]) => setTono(valor)}
+              className="mt-3"
             />
           </div>
         </div>

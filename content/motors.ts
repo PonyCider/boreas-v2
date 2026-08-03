@@ -26,7 +26,7 @@ export const specialties: Specialty[] = [
   { id: "nutricion", label: "Nutrición", motor: "Calculadora metabólica", status: "live" },
   { id: "fisioterapia", label: "Fisioterapia", motor: "Evaluador de dolor", status: "live" },
   { id: "medicina-general", label: "Medicina general", motor: "Pre-triage", status: "live" },
-  { id: "dental", label: "Dental", motor: "Simulador de sonrisa", status: "live" },
+  { id: "dental", label: "Dental", motor: "Cotizador de tratamiento", status: "live" },
 ];
 
 /** Lo que le llega al especialista cuando un paciente completa el motor. */
@@ -167,8 +167,49 @@ export const medicinaGeneralMotor = {
   },
 };
 
+/**
+ * Motor estelar de dental. Sustituyó al simulador de sonrisa el 2026-08-03: el simulador
+ * solo sirve a ortodoncia, que es una fracción del consultorio dental, mientras que "¿cuánto
+ * me va a costar?" es el bloqueo de todo paciente dental sin importar el tratamiento.
+ */
 export const dentalMotor = {
   badge: "Motor · Dental",
+  title: "Cotizador de tratamiento",
+  description:
+    "La pregunta que detiene la llamada es cuánto va a costar. El paciente la contesta solo, en tu página, y llega con el precio ya asumido.",
+  bullets: [
+    "Rango, número de visitas y qué incluye, por tratamiento.",
+    "Rango de referencia, no oferta: el precio final sale de la valoración.",
+    "Cada consultorio carga sus propios números.",
+  ],
+  leadNote: "Generado con el tratamiento que elegiste",
+  upsell: {
+    intro:
+      "Tu paquete incluye este motor. Con Profesional y Deluxe se suman los otros de tu especialidad:",
+    items: [
+      {
+        nombre: "Triage dental",
+        que: "separa la urgencia de hoy de la cita que puede esperar",
+      },
+      {
+        nombre: "Primera cita sin sorpresas",
+        que: "el paso a paso para el paciente que le teme al dentista",
+      },
+      {
+        nombre: "Simulador de sonrisa",
+        que: "para consultorios de ortodoncia: proyección de alineación y tono",
+      },
+    ],
+  },
+};
+
+/**
+ * El simulador de sonrisa dejó de ser el motor estelar de dental, pero sigue construido y
+ * vive en el catálogo como motor de ortodoncia. Su contenido se separa aquí para que el
+ * componente siga compilando sin colgarse de `dentalMotor`.
+ */
+export const simuladorSonrisaMotor = {
+  badge: "Motor · Ortodoncia",
   title: "Simulador de sonrisa",
   description:
     "El paciente mueve dos controles y ve a dónde puede llegar su sonrisa. Ese es el momento en que decide agendar la valoración.",
@@ -180,14 +221,6 @@ export const dentalMotor = {
   leadNote: "Ejemplo ilustrativo",
   disclaimer:
     "Proyección ilustrativa. No es un resultado garantizado: el plan real sale de una valoración presencial.",
-  upsell: {
-    intro:
-      "Tu paquete incluye este motor. Con Profesional y Deluxe se suman los otros de tu especialidad:",
-    items: [
-      { nombre: "Cotizador de tratamiento", que: "un rango estimado antes de la primera llamada" },
-      { nombre: "¿Necesitas ortodoncia?", que: "cinco preguntas que filtran quién sí y quién no" },
-    ],
-  },
   lead: {
     titulo: "Interés en valoración — Ortodoncia estética",
     senales: [

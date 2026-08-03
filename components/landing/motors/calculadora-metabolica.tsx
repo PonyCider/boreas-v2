@@ -1,7 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { MotorShell } from "./motor-shell";
+import { MOTOR_PANEL, MotorShell } from "./motor-shell";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { nutricionMotor } from "@/content/motors";
 import {
   CAMPOS,
@@ -64,7 +71,7 @@ export function CalculadoraMetabolicaMotor() {
     >
       <form
         onSubmit={onSubmit}
-        className="rounded-[10px] border border-line bg-elevated p-6 sm:p-8"
+        className={MOTOR_PANEL}
         noValidate
       >
         <fieldset>
@@ -75,10 +82,10 @@ export function CalculadoraMetabolicaMotor() {
             {(["mujer", "hombre"] as Sexo[]).map((opcion) => (
               <label
                 key={opcion}
-                className={`flex cursor-pointer items-center gap-2 rounded-[999px] border px-4 py-2 text-sm capitalize ${
+                className={`flex cursor-pointer items-center gap-2 rounded-[999px] border px-4 py-2 text-sm capitalize transition-colors duration-150 has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent ${
                   sexo === opcion
                     ? "border-accent bg-accent-soft text-foreground"
-                    : "border-border text-muted"
+                    : "border-border text-muted hover:border-line hover:text-foreground"
                 }`}
               >
                 <input
@@ -117,8 +124,10 @@ export function CalculadoraMetabolicaMotor() {
                 onChange={(event) =>
                   setValores((prev) => ({ ...prev, [campo]: event.target.value }))
                 }
-                className={`mt-2 w-full rounded-[10px] border bg-surface px-4 py-2.5 text-[15px] text-foreground outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent ${
-                  errores[campo] ? "border-danger" : "border-border"
+                // Las flechitas del spinner nativo son lo que delata un formulario sin
+                // trabajar: se ocultan y el teclado numérico sigue igual.
+                className={`mt-2 w-full appearance-none rounded-[10px] border bg-surface px-4 py-2.5 text-[15px] text-foreground outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${
+                  errores[campo] ? "border-danger" : "border-border hover:border-line"
                 }`}
               />
               {errores[campo] ? (
@@ -137,23 +146,23 @@ export function CalculadoraMetabolicaMotor() {
           >
             Nivel de actividad
           </label>
-          <select
-            id="metabolica-actividad"
-            value={actividad}
-            onChange={(event) => setActividad(event.target.value)}
-            className="mt-2 w-full rounded-[10px] border border-border bg-surface px-4 py-2.5 text-[15px] text-foreground outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
-          >
-            {NIVELES_ACTIVIDAD.map((nivel) => (
-              <option key={nivel.id} value={nivel.id}>
-                {nivel.label}
-              </option>
-            ))}
-          </select>
+          <Select value={actividad} onValueChange={setActividad}>
+            <SelectTrigger id="metabolica-actividad" className="mt-2">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {NIVELES_ACTIVIDAD.map((nivel) => (
+                <SelectItem key={nivel.id} value={nivel.id}>
+                  {nivel.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <button
           type="submit"
-          className="mt-6 rounded-[999px] bg-accent px-5 py-2.5 text-sm font-medium text-white"
+          className="mt-6 rounded-[999px] bg-accent px-5 py-2.5 text-sm font-medium text-white shadow-[0_2px_10px_-3px_var(--accent)] transition-colors duration-150 hover:bg-[var(--accent-h)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           Calcular
         </button>
