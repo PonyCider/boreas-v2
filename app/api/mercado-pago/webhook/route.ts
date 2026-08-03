@@ -34,7 +34,14 @@ export async function POST(request: Request) {
       secret,
     });
   } catch (error) {
-    if (!(error instanceof InvalidWebhookSignatureError)) {
+    if (error instanceof InvalidWebhookSignatureError) {
+      console.warn("Firma de Mercado Pago rechazada", {
+        reason: error.reason,
+        requestIdPresent: Boolean(request.headers.get("x-request-id")),
+        signaturePresent: Boolean(request.headers.get("x-signature")),
+        dataIdPresent: Boolean(dataId),
+      });
+    } else {
       console.error("No se pudo validar la firma de Mercado Pago", error);
     }
     return NextResponse.json({ ok: false }, { status: 401 });
