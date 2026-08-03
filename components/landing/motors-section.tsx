@@ -1,45 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { SectionFrame } from "./landing-sections";
 import SplitText from "./split-text";
+import OptionWheel from "@/components/ui/option-wheel";
 import { AgendaCalMotor } from "./motors/agenda-cal";
+import { CalculadoraMetabolicaMotor } from "./motors/calculadora-metabolica";
+import { EvaluadorDolorMotor } from "./motors/evaluador-dolor";
+import { MotorTransition } from "./motors/motor-transition";
+import { PreTriageMotor } from "./motors/pre-triage";
+import { SimuladorSonrisaMotor } from "./motors/simulador-sonrisa";
+import { TamizajeGad7Motor } from "./motors/tamizaje-gad7";
 import { sectionIds } from "@/content/site";
-import { motorsHeading, motorsPrivacyNote, specialties } from "@/content/motors";
+import {
+  motorsHeading,
+  motorsPrivacyNote,
+  specialties,
+  type SpecialtyId,
+} from "@/content/motors";
 
-/**
- * Los chips son etiquetas, no tabs: hoy solo un motor está vivo. Cuando haya dos o
- * más se convierten en un tablist real (role=tab + navegación con flechas).
- */
-function SpecialtyChips() {
-  return (
-    <ul className="mt-10 flex flex-wrap gap-2">
-      {specialties.map((specialty) => {
-        const live = specialty.status === "live";
-        return (
-          <li key={specialty.id}>
-            <span
-              aria-current={live ? "true" : undefined}
-              className={`inline-flex items-baseline gap-2 rounded-[999px] border px-4 py-2 text-sm ${
-                live
-                  ? "border-accent bg-accent-soft text-foreground"
-                  : "border-line text-clinical"
-              }`}
-            >
-              {specialty.label}
-              <span className="text-xs text-clinical">
-                {live ? specialty.motor : "Pronto"}
-              </span>
-            </span>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
+const wheelItems = specialties.map((specialty) => specialty.label);
+
+const MOTORES: Record<SpecialtyId, () => React.JSX.Element> = {
+  todas: AgendaCalMotor,
+  "salud-mental": TamizajeGad7Motor,
+  nutricion: CalculadoraMetabolicaMotor,
+  fisioterapia: EvaluadorDolorMotor,
+  "medicina-general": PreTriageMotor,
+  dental: SimuladorSonrisaMotor,
+};
 
 export function MotorsSection() {
   const reducedMotion = !!useReducedMotion();
+  const [activeId, setActiveId] = useState<SpecialtyId>(specialties[0].id);
+  const ActiveMotor = MOTORES[activeId];
 
   return (
     <SectionFrame id={sectionIds.motores} theme="dark" className="border-t border-line bg-background">
@@ -62,9 +57,33 @@ export function MotorsSection() {
 
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted">{motorsHeading.body}</p>
 
-        <SpecialtyChips />
+        <div className="mt-12 grid gap-8 lg:grid-cols-[380px_minmax(0,1fr)] lg:gap-12">
+          {/* La rueda necesita `inset` para que la curva quepa: con valores chicos los
+              ítems de los extremos se salen del contenedor y `overflow: hidden` los corta. */}
+          <div className="h-[320px] lg:h-[440px]">
+            <OptionWheel
+              items={wheelItems}
+              defaultSelected={0}
+              onChange={(index) => setActiveId(specialties[index].id)}
+              textColor="var(--ink-muted)"
+              activeColor="var(--ink)"
+              side="left"
+              fontSize={2}
+              spacing={1.4}
+              inset={64}
+              // Sin animación de inercia cuando el sistema pide movimiento reducido.
+              smoothing={reducedMotion ? 0 : 200}
+            />
+          </div>
 
-        <AgendaCalMotor />
+          <div className="min-w-0">
+            {/* El motor va montado uno a la vez: cambiar de especialidad desmonta el
+                anterior y su estado se reinicia solo. */}
+            <MotorTransition motorKey={activeId}>
+              <ActiveMotor />
+            </MotorTransition>
+          </div>
+        </div>
 
         <p className="mt-6 text-xs text-clinical">{motorsPrivacyNote}</p>
       </div>

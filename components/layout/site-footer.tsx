@@ -115,7 +115,12 @@ export function SiteFooter() {
 
         {/* 1. Bottom Section: Copyright & Social Links Dock (X, Instagram, Facebook, WhatsApp - TODO notas) */}
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row text-xs text-[#A8A192]">
-          <p>© {new Date().getFullYear()} Boreas. Todos los derechos reservados.</p>
+          <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+            <span>© {new Date().getFullYear()} Boreas. Todos los derechos reservados.</span>
+            <a href="/privacidad" className="underline underline-offset-4 hover:text-[#F5F1E8]">
+              Aviso de privacidad
+            </a>
+          </p>
 
           <Dock>
             {/* TODO: Conectar URL oficial de X (Twitter) */}

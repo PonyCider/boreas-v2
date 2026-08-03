@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useInView, useReducedMotion } from "motion/react";
 import { Info } from "lucide-react";
 import { SectionFrame } from "./landing-sections";
-import { LeadForm } from "./pricing/lead-form";
+import { CheckoutModal } from "./pricing/checkout-modal";
 import { OrganizationPlanCard, PlanCard } from "./pricing/plan-card";
 import SplitText from "./split-text";
 import { TextEffect } from "./text-effect";
@@ -18,16 +18,16 @@ const organizationTier = tiers.find((tier) => tier.id === "organizaciones");
 
 export function PricingSection() {
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const checkoutTriggerRef = useRef<HTMLButtonElement | null>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const inView = useInView(sectionRef, { once: true, margin: "-100px" });
   const reducedMotion = !!useReducedMotion();
 
-  function handleSelect(tier: Tier, config: PlanConfig) {
+  function handleSelect(tier: Tier, config: PlanConfig, trigger: HTMLButtonElement) {
+    checkoutTriggerRef.current = trigger;
     setSelection({ tier, config });
-    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      ? "auto"
-      : "smooth";
-    document.getElementById("contacto")?.scrollIntoView({ behavior, block: "start" });
+    setCheckoutOpen(true);
   }
 
   return (
@@ -83,12 +83,15 @@ export function PricingSection() {
             </div>
           </div>
 
-          <div id="contacto" className="mt-20 scroll-mt-28">
-            <LeadForm selection={selection} />
-          </div>
         </div>
+
+        <CheckoutModal
+          selection={selection}
+          open={checkoutOpen}
+          onOpenChange={setCheckoutOpen}
+          returnFocusRef={checkoutTriggerRef}
+        />
       </FloatingTooltip.Provider>
     </SectionFrame>
   );
 }
-
