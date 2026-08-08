@@ -7,7 +7,14 @@ import {
   useReducedMotion,
   type PanInfo,
 } from "framer-motion";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { ThinkingOrb } from "thinking-orbs";
 import { TiltedCard } from "@/components/ui/tilted-card";
 import {
@@ -25,7 +32,10 @@ const stackLayerStyles = [
 
 const SWIPE_OFFSET_THRESHOLD = 44;
 const SWIPE_VELOCITY_THRESHOLD = 420;
-const AUTO_ADVANCE_DELAY = 6000;
+const AUTO_ADVANCE_DELAY = 11000;
+const FIRST_REPLY_DELAY = 800;
+const TYPING_DURATION = 650;
+const MESSAGE_GAP = 520;
 
 function messageToText(message: RelevoMessage): string {
   switch (message.role) {
@@ -42,15 +52,181 @@ function messageToText(message: RelevoMessage): string {
   }
 }
 
+function messageLength(message: RelevoMessage): number {
+  if ("text" in message) return message.text.length;
+  return message.reason.length;
+}
+
+function AnimatedMessage({
+  children,
+  shouldAnimate,
+}: {
+  children: ReactNode;
+  shouldAnimate: boolean;
+}) {
+  return (
+    <motion.div
+      initial={shouldAnimate ? { opacity: 0, scale: 0.9, y: 7 } : false}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 420, damping: 28, mass: 0.85 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function RelevoAvatar() {
+  return (
+    <div className="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full border border-mint/40 bg-mint/20">
+      <div className="pointer-events-none absolute inset-0 flex scale-[0.72] items-center justify-center">
+        <ThinkingOrb state="composing" size={20} />
+      </div>
+    </div>
+  );
+}
+
+function PatientAvatar() {
+  return (
+    <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-accent/25 bg-accent-soft text-accent">
+      <svg
+        className="h-3 w-3"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        strokeWidth={1.8}
+        aria-hidden="true"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0" />
+      </svg>
+    </div>
+  );
+}
+
+function SpecialistAvatar({ isInternal = false }: { isInternal?: boolean }) {
+  return (
+    <div
+      className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+        isInternal ? "bg-clinical text-foreground" : "bg-foreground text-background"
+      }`}
+    >
+      <svg
+        className="h-3 w-3"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        strokeWidth={1.8}
+        aria-hidden="true"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 13.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM4.5 21a7.5 7.5 0 0 1 15 0" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M18 3v4.5M15.75 5.25h4.5" />
+      </svg>
+    </div>
+  );
+}
+
+function TypingBubble({ message }: { message: RelevoMessage | null }) {
+  if (!message || (message.role !== "assistant" && message.role !== "specialist")) {
+    return null;
+  }
+
+  const isAssistant = message.role === "assistant";
+  const isInternal = message.role === "specialist" && message.isInternalContext;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.88, y: 6 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.92, y: 4 }}
+      className="flex items-start gap-2"
+      aria-hidden="true"
+    >
+      {isAssistant ? (
+        <RelevoAvatar />
+      ) : (
+        <SpecialistAvatar isInternal={isInternal} />
+      )}
+
+      <div className="inline-flex items-center gap-1 rounded-[18px] rounded-bl-[5px] border border-mint/20 bg-elevated px-3.5 py-2.5 shadow-xs">
+        {[0, 1, 2].map((dot) => (
+          <motion.span
+            key={dot}
+            className="h-1.5 w-1.5 rounded-full bg-mint"
+            animate={{ y: [0, -3, 0], opacity: [0.35, 1, 0.35] }}
+            transition={{
+              duration: 0.72,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "easeInOut",
+              delay: dot * 0.14,
+            }}
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 function CardInner({
   example,
   isFrontCard,
+  animateConversation,
+  reduceMotion,
 }: {
   example: RelevoExample;
   isFrontCard: boolean;
+  animateConversation: boolean;
+  reduceMotion: boolean;
 }) {
+  const [visibleCount, setVisibleCount] = useState(
+    animateConversation && !reduceMotion ? 1 : example.messages.length
+  );
+  const [typingMessage, setTypingMessage] = useState<RelevoMessage | null>(null);
+
+  useEffect(() => {
+    if (!animateConversation || reduceMotion) {
+      const syncTimer = window.setTimeout(() => {
+        setVisibleCount(example.messages.length);
+        setTypingMessage(null);
+      }, 0);
+      return () => window.clearTimeout(syncTimer);
+    }
+
+    let nextIndex = 1;
+    let timer: number | undefined;
+
+    const queueNextMessage = () => {
+      if (nextIndex >= example.messages.length) return;
+
+      const nextMessage = example.messages[nextIndex];
+      const showsTyping =
+        nextMessage.role === "assistant" || nextMessage.role === "specialist";
+
+      if (showsTyping) setTypingMessage(nextMessage);
+
+      timer = window.setTimeout(
+        () => {
+          setTypingMessage(null);
+          setVisibleCount(nextIndex + 1);
+
+          const readingPause = Math.min(
+            1150,
+            Math.max(MESSAGE_GAP, messageLength(nextMessage) * 10)
+          );
+
+          nextIndex += 1;
+          timer = window.setTimeout(queueNextMessage, readingPause);
+        },
+        showsTyping ? TYPING_DURATION : MESSAGE_GAP
+      );
+    };
+
+    timer = window.setTimeout(queueNextMessage, FIRST_REPLY_DELAY);
+    return () => {
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
+  }, [animateConversation, example, reduceMotion]);
+
   return (
-    <div className="relative h-full w-full rounded-[var(--radius-sm)] border border-line bg-surface p-5 sm:p-6 shadow-2xl backdrop-blur-sm transition-all duration-200">
+    <div className="relative flex h-full w-full flex-col rounded-[var(--radius-sm)] border border-line bg-surface p-5 shadow-2xl backdrop-blur-sm transition-all duration-200 sm:p-6">
       <div
         className={`flex items-center gap-2.5 px-3 py-2.5 rounded-t-[var(--radius-sm)] ${
           isFrontCard ? "bg-foreground" : "bg-foreground/90"
@@ -77,139 +253,151 @@ function CardInner({
         ) : null}
       </div>
 
-      <div className="space-y-2.5 bg-surface/95 p-3 sm:p-3.5">
-        {example.messages.map((message, index) => {
+      <div className="flex-1 space-y-2.5 bg-surface/95 p-3 sm:p-3.5">
+        {example.messages.slice(0, visibleCount).map((message, index) => {
           if (message.role === "patient") {
             return (
-              <div key={index} className="flex justify-end">
-                <div className="max-w-[80%] rounded-lg rounded-tr-none bg-accent-soft px-3 py-1.5 shadow-xs">
-                  <p className="text-[11.5px] leading-snug text-foreground">
-                    {message.text}
-                  </p>
-                  <p className="mt-0.5 text-right text-[9px] text-muted">
-                    {message.time}
-                  </p>
+              <AnimatedMessage
+                key={index}
+                shouldAnimate={animateConversation && index > 0 && !reduceMotion}
+              >
+                <div className="flex items-start justify-end gap-2">
+                  <div className="max-w-[80%] rounded-[18px] rounded-br-[5px] bg-accent-soft px-3 py-2 shadow-xs">
+                    <p className="text-[11.5px] leading-snug text-foreground">
+                      {message.text}
+                    </p>
+                    <p className="mt-0.5 text-right text-[9px] text-muted">
+                      {message.time}
+                    </p>
+                  </div>
+                  <PatientAvatar />
                 </div>
-              </div>
+              </AnimatedMessage>
             );
           }
 
           if (message.role === "assistant") {
             return (
-              <div key={index} className="flex items-start gap-2">
-                <div className="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mint/20 border border-mint/40">
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none scale-75">
-                    <ThinkingOrb state="composing" size={20} />
-                  </div>
-                  <span className="relative z-10 text-[7.5px] font-extrabold text-mint">IA</span>
-                </div>
-                <div className="max-w-[82%]">
-                  <div className="rounded-lg rounded-tl-none bg-elevated border border-mint/20 px-3 py-1.5 shadow-xs">
-                    <p className="text-[11.5px] leading-snug text-foreground">
-                      {message.text}
+              <AnimatedMessage
+                key={index}
+                shouldAnimate={animateConversation && index > 0 && !reduceMotion}
+              >
+                <div className="flex items-start gap-2">
+                  <RelevoAvatar />
+                  <div className="max-w-[82%]">
+                    <div className="rounded-[18px] rounded-bl-[5px] border border-mint/20 bg-elevated px-3 py-2 shadow-xs">
+                      <p className="text-[11.5px] leading-snug text-foreground">
+                        {message.text}
+                      </p>
+                    </div>
+                    <p className="ml-1 mt-0.5 text-[9px] font-medium text-mint/90">
+                      {message.time} · Relevo IA
                     </p>
                   </div>
-                  <p className="ml-1 mt-0.5 text-[9px] font-medium text-mint/90">
-                    {message.time} · Relevo IA
-                  </p>
                 </div>
-              </div>
+              </AnimatedMessage>
             );
           }
 
           if (message.role === "handoff") {
             return (
-              <div key={index} className="space-y-0.5">
-                <div className="flex items-center gap-1.5 py-0.5">
-                  <div className="h-px flex-1 bg-border" />
-                  <span className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.08em] text-mint font-semibold">
-                    <svg
-                      className="h-2.5 w-2.5 animate-pulse"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2.5}
-                      aria-hidden="true"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5M16.5 3 21 7.5m0 0L16.5 12M21 7.5H7.5"
-                      />
-                    </svg>
-                    Relevo → {message.to}
-                  </span>
+              <AnimatedMessage
+                key={index}
+                shouldAnimate={animateConversation && index > 0 && !reduceMotion}
+              >
+                <div className="space-y-0.5 py-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-[0.08em] text-mint">
+                      <svg
+                        className="h-2.5 w-2.5 animate-pulse"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2.5}
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5M16.5 3 21 7.5m0 0L16.5 12M21 7.5H7.5"
+                        />
+                      </svg>
+                      Relevo → {message.to}
+                    </span>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
+                  <p className="text-center font-mono text-[8.5px] uppercase tracking-[0.06em] text-muted">
+                    Contexto compartido · {message.reason}
+                  </p>
                 </div>
-                <p className="text-center font-mono text-[9px] uppercase tracking-[0.06em] text-muted">
-                  {message.reason}
-                </p>
-              </div>
+              </AnimatedMessage>
             );
           }
 
           if (message.role === "specialist") {
             const isInternal = message.isInternalContext;
             return (
-              <div key={index} className="flex items-start gap-2">
-                <div
-                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
-                    isInternal ? "bg-clinical" : "bg-foreground"
-                  }`}
-                >
-                  <span
-                    className={`text-[7px] font-bold ${
-                      isInternal ? "text-foreground" : "text-background"
-                    }`}
-                  >
-                    {message.initial}
-                  </span>
-                </div>
-                <div className="max-w-[82%]">
-                  <div
-                    className={`rounded-lg rounded-tl-none px-3 py-1.5 ${
-                      isInternal
-                        ? "border border-dashed border-border bg-surface"
-                        : "bg-elevated"
-                    }`}
-                  >
-                    <p className="text-[11.5px] leading-snug text-foreground">
-                      {message.text}
+              <AnimatedMessage
+                key={index}
+                shouldAnimate={animateConversation && index > 0 && !reduceMotion}
+              >
+                <div className="flex items-start gap-2">
+                  <SpecialistAvatar isInternal={isInternal} />
+                  <div className="max-w-[82%]">
+                    <div
+                      className={`rounded-[18px] rounded-bl-[5px] px-3 py-2 ${
+                        isInternal
+                          ? "border border-dashed border-border bg-surface"
+                          : "bg-elevated"
+                      }`}
+                    >
+                      <p className="text-[11.5px] leading-snug text-foreground">
+                        {message.text}
+                      </p>
+                    </div>
+                    <p
+                      className={`ml-1 mt-0.5 text-[9px] font-medium ${
+                        isInternal ? "text-muted" : "text-mint"
+                      }`}
+                    >
+                      {message.time} · {message.name}
+                      {isInternal ? " · equipo médico" : ""} · tomó el relevo
                     </p>
                   </div>
-                  <p
-                    className={`ml-1 mt-0.5 text-[9px] font-medium ${
-                      isInternal ? "text-muted" : "text-mint"
-                    }`}
-                  >
-                    {message.time} · {message.name}
-                    {isInternal ? " · equipo médico" : " · Equipo"}
-                  </p>
                 </div>
-              </div>
+              </AnimatedMessage>
             );
           }
 
           return (
-            <div key={index} className="flex justify-center pt-1">
-              <div className="flex items-center gap-1.5 rounded-full bg-mint/10 px-3 py-1">
-                <svg
-                  className="h-3 w-3 text-mint"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2.5}
-                  aria-hidden="true"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m4.5 12.75 6 6 9-13.5"
-                  />
-                </svg>
+            <AnimatedMessage
+              key={index}
+              shouldAnimate={animateConversation && index > 0 && !reduceMotion}
+            >
+              <div className="flex justify-center pt-1">
+                <div className="flex items-center gap-1.5 rounded-full bg-mint/10 px-3 py-1">
+                  <svg
+                    className="h-3 w-3 text-mint"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m4.5 12.75 6 6 9-13.5"
+                    />
+                  </svg>
+                </div>
               </div>
-            </div>
+            </AnimatedMessage>
           );
         })}
+
+        <TypingBubble message={typingMessage} />
       </div>
     </div>
   );
@@ -218,9 +406,13 @@ function CardInner({
 function ConversationCard({
   example,
   isFrontCard,
+  animateConversation = false,
+  reduceMotion = false,
 }: {
   example: RelevoExample;
   isFrontCard: boolean;
+  animateConversation?: boolean;
+  reduceMotion?: boolean;
 }) {
   if (isFrontCard) {
     return (
@@ -228,14 +420,26 @@ function ConversationCard({
         rotateAmplitude={12}
         scaleOnHover={1.03}
         glareEnable={true}
-        className="w-full"
+        className="h-full w-full"
       >
-        <CardInner example={example} isFrontCard={isFrontCard} />
+        <CardInner
+          example={example}
+          isFrontCard={isFrontCard}
+          animateConversation={animateConversation}
+          reduceMotion={reduceMotion}
+        />
       </TiltedCard>
     );
   }
 
-  return <CardInner example={example} isFrontCard={isFrontCard} />;
+  return (
+    <CardInner
+      example={example}
+      isFrontCard={isFrontCard}
+      animateConversation={animateConversation}
+      reduceMotion={reduceMotion}
+    />
+  );
 }
 
 export function RelevoExampleCarousel() {
@@ -505,7 +709,7 @@ export function RelevoExampleCarousel() {
               <div
                 key={`${example.practice.name}-${previewIndex}-${activeIndex}`}
                 aria-hidden="true"
-                className="pointer-events-none absolute left-0 right-10 top-0 overflow-hidden rounded-[var(--radius-sm)] border border-line transition-[transform,opacity,filter] duration-500"
+                className="pointer-events-none absolute left-0 right-10 top-0 h-full overflow-hidden rounded-[var(--radius-sm)] border border-line transition-[transform,opacity,filter] duration-500"
                 style={{
                   transform: `translate3d(${layerStyle.x}px, ${layerStyle.y}px, 0) scale(${layerStyle.scale})`,
                   opacity: layerStyle.opacity,
@@ -515,7 +719,12 @@ export function RelevoExampleCarousel() {
                   boxShadow: isFrontCard ? "var(--shadow)" : "var(--shadow-sm)",
                 }}
               >
-                <ConversationCard example={example} isFrontCard={isFrontCard} />
+                <ConversationCard
+                  example={example}
+                  isFrontCard={isFrontCard}
+                  animateConversation={isFrontCard}
+                  reduceMotion={Boolean(reduceMotion)}
+                />
               </div>
             );
           })}
