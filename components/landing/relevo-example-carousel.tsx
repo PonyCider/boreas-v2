@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AnimatePresence,
   animate,
   motion,
   useMotionValue,
@@ -23,12 +24,6 @@ import {
   type RelevoExample,
   type RelevoMessage,
 } from "@/content/relevo";
-
-const stackLayerStyles = [
-  { x: 0, y: 0, scale: 1, opacity: 1, blur: 0, zIndex: 14 },
-  { x: 18, y: 8, scale: 0.97, opacity: 0.38, blur: 4, zIndex: 13 },
-  { x: 34, y: 14, scale: 0.94, opacity: 0.2, blur: 7, zIndex: 12 },
-] as const;
 
 const SWIPE_OFFSET_THRESHOLD = 44;
 const SWIPE_VELOCITY_THRESHOLD = 420;
@@ -445,8 +440,7 @@ function ConversationCard({
 export function RelevoExampleCarousel() {
   const reduceMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [stackPhase, setStackPhase] = useState<"idle" | "shifting">("idle");
-  const [textPhase, setTextPhase] = useState<"idle" | "out" | "preEnter">("idle");
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [direction, setDirection] = useState<1 | -1>(1);
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
   const [isAutoPaused, setIsAutoPaused] = useState(false);
@@ -477,37 +471,26 @@ export function RelevoExampleCarousel() {
   }, []);
 
   const activeExample = relevoExamples[activeIndex];
-  const orderedExamples = relevoExamples.map(
-    (_, index) => relevoExamples[(activeIndex + index) % relevoExamples.length]
-  );
-  const stackExamples = orderedExamples.slice(0, 3);
   const [contextBefore, contextAfter] = activeExample.context.text.split(
     activeExample.context.emphasis
   );
 
   const goTo = useCallback(
     (index: number, nextDirection: 1 | -1 = 1) => {
-      if (stackPhase !== "idle" || index === activeIndex) return;
+      if (isTransitioning || index === activeIndex) return;
 
       setDirection(nextDirection);
       if (reduceMotion) {
         setActiveIndex(index);
-        setTextPhase("idle");
         return;
       }
 
-      setStackPhase("shifting");
-      setTextPhase("out");
-      const swapTimer = window.setTimeout(() => {
-        setActiveIndex(index);
-        setStackPhase("idle");
-        setTextPhase("preEnter");
-        const enterTimer = window.setTimeout(() => setTextPhase("idle"), 24);
-        timersRef.current.push(enterTimer);
-      }, 320);
-      timersRef.current.push(swapTimer);
+      setIsTransitioning(true);
+      setActiveIndex(index);
+      const transitionTimer = window.setTimeout(() => setIsTransitioning(false), 620);
+      timersRef.current.push(transitionTimer);
     },
-    [activeIndex, reduceMotion, stackPhase]
+    [activeIndex, isTransitioning, reduceMotion]
   );
 
   const nextExample = useCallback(() => {
@@ -564,7 +547,7 @@ export function RelevoExampleCarousel() {
               onClick={() => goTo(index, index >= activeIndex ? 1 : -1)}
               aria-label={`Ver ejemplo de ${example.chipLabel}`}
               aria-selected={activeIndex === index}
-              disabled={stackPhase !== "idle"}
+              disabled={isTransitioning}
               className={`inline-flex items-center gap-1 rounded-[var(--radius-pill)] px-2.5 py-1 text-[11px] font-medium transition-colors disabled:cursor-default ${
                 activeIndex === index
                   ? "bg-mint/10 text-mint ring-1 ring-mint/30"
@@ -577,18 +560,23 @@ export function RelevoExampleCarousel() {
           ))}
         </div>
 
-        <div
-          className="mt-6 transition-[opacity,transform] duration-500"
-          style={{
-            opacity: textPhase === "idle" ? 1 : 0,
-            transform:
-              textPhase === "out"
-                ? `translate3d(${-16 * direction}px,0,0)`
-                : textPhase === "preEnter"
-                  ? `translate3d(${8 * direction}px,0,0)`
-                  : "translate3d(0,0,0)",
-          }}
-        >
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={activeExample.practice.name}
+            className="mt-6"
+            initial={
+              reduceMotion
+                ? false
+                : { opacity: 0, x: 10 * direction }
+            }
+            animate={{ opacity: 1, x: 0 }}
+            exit={
+              reduceMotion
+                ? { opacity: 1 }
+                : { opacity: 0, x: -10 * direction }
+            }
+            transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+          >
           <div className="flex items-center justify-between gap-4">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted">
               {relevoContent.exampleLabel}
@@ -636,7 +624,8 @@ export function RelevoExampleCarousel() {
               </p>
             </div>
           </div>
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">
@@ -673,7 +662,7 @@ export function RelevoExampleCarousel() {
           }
         }}
         aria-label="Conversación ilustrativa. Activa para ver el siguiente ejemplo"
-        aria-disabled={stackPhase !== "idle"}
+        aria-disabled={isTransitioning}
         className="block w-full max-w-[620px] touch-pan-y cursor-grab rounded-[var(--radius-sm)] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-4 focus-visible:ring-offset-background active:cursor-grabbing"
       >
         <div
@@ -689,45 +678,52 @@ export function RelevoExampleCarousel() {
             </div>
           </div>
 
-          {stackExamples.map((example, previewIndex) => {
-            const restingStyle = stackLayerStyles[previewIndex];
-            const animatedStyle =
-              previewIndex === 0
-                ? {
-                    x: -24 * direction,
-                    y: -2,
-                    scale: 0.965,
-                    opacity: 0,
-                    blur: 5,
-                    zIndex: 15,
-                  }
-                : stackLayerStyles[previewIndex - 1];
-            const layerStyle = stackPhase === "shifting" ? animatedStyle : restingStyle;
-            const isFrontCard = previewIndex === 0;
+          <div
+            className="pointer-events-none absolute bottom-2 left-5 right-5 top-2 rounded-[var(--radius-sm)] border border-line/60 bg-surface/65 shadow-sm"
+            style={{ transform: "translate3d(24px, 10px, 0) scale(0.955)" }}
+            aria-hidden="true"
+          />
+          <div
+            className="pointer-events-none absolute bottom-1 left-3 right-7 top-1 rounded-[var(--radius-sm)] border border-line/75 bg-surface/80 shadow-sm"
+            style={{ transform: "translate3d(13px, 6px, 0) scale(0.978)" }}
+            aria-hidden="true"
+          />
 
-            return (
-              <div
-                key={`${example.practice.name}-${previewIndex}-${activeIndex}`}
-                aria-hidden="true"
-                className="pointer-events-none absolute left-0 right-10 top-0 h-full overflow-hidden rounded-[var(--radius-sm)] border border-line transition-[transform,opacity,filter] duration-500"
-                style={{
-                  transform: `translate3d(${layerStyle.x}px, ${layerStyle.y}px, 0) scale(${layerStyle.scale})`,
-                  opacity: layerStyle.opacity,
-                  zIndex: layerStyle.zIndex,
-                  filter: `blur(${layerStyle.blur}px)`,
-                  transformOrigin: "top left",
-                  boxShadow: isFrontCard ? "var(--shadow)" : "var(--shadow-sm)",
-                }}
-              >
-                <ConversationCard
-                  example={example}
-                  isFrontCard={isFrontCard}
-                  animateConversation={isFrontCard}
-                  reduceMotion={Boolean(reduceMotion)}
-                />
-              </div>
-            );
-          })}
+          <AnimatePresence initial={false} mode="wait">
+            <motion.div
+              key={activeExample.practice.name}
+              className="pointer-events-none absolute left-0 right-10 top-0 h-full overflow-hidden rounded-[var(--radius-sm)] border border-line"
+              initial={
+                reduceMotion
+                  ? false
+                  : {
+                      opacity: 0,
+                      x: 14 * direction,
+                      scale: 0.995,
+                    }
+              }
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={
+                reduceMotion
+                  ? { opacity: 1 }
+                  : {
+                      opacity: 0,
+                      x: -16 * direction,
+                      scale: 0.99,
+                    }
+              }
+              transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+              style={{ boxShadow: "var(--shadow)" }}
+              aria-hidden="true"
+            >
+              <ConversationCard
+                example={activeExample}
+                isFrontCard
+                animateConversation
+                reduceMotion={Boolean(reduceMotion)}
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
       </motion.button>
 
@@ -738,7 +734,7 @@ export function RelevoExampleCarousel() {
               key={example.practice.name}
               type="button"
               onClick={() => goTo(index, index >= activeIndex ? 1 : -1)}
-              disabled={stackPhase !== "idle"}
+              disabled={isTransitioning}
               aria-label={`Ir al ejemplo ${index + 1}: ${example.chipLabel}`}
               aria-current={activeIndex === index ? "true" : undefined}
               className={`rounded-full transition-[width,background-color] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
@@ -752,7 +748,7 @@ export function RelevoExampleCarousel() {
           <button
             type="button"
             onClick={previousExample}
-            disabled={stackPhase !== "idle"}
+            disabled={isTransitioning}
             aria-label="Ver ejemplo anterior"
             className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
           >
@@ -773,7 +769,7 @@ export function RelevoExampleCarousel() {
           <button
             type="button"
             onClick={nextExample}
-            disabled={stackPhase !== "idle"}
+            disabled={isTransitioning}
             aria-label="Ver siguiente ejemplo"
             className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
           >
