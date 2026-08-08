@@ -3,24 +3,25 @@ import { Resend } from "resend";
 import { getTier } from "@/content/pricing";
 import { leadSchema } from "@/lib/lead-schema";
 import { computePrice, formatMxn } from "@/lib/pricing";
-
-const RATE_LIMIT = 5;
-const WINDOW_MS = 60 * 60 * 1000;
-const hits = new Map<string, number[]>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((timestamp) => now - timestamp < WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  return recent.length > RATE_LIMIT;
-}
+import { logEvent } from "@/lib/server/log";
+import { checkRateLimit } from "@/lib/server/rate-limit";
 
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "desconocido";
 
-  if (rateLimited(ip)) {
-    return NextResponse.json({ ok: false }, { status: 429 });
+  try {
+    const rateLimit = await checkRateLimit(`lead:${ip}`, { limit: 5, windowMs: 60 * 60 * 1000 });
+    if (rateLimit.limited) {
+      return NextResponse.json(
+        { ok: false, code: "RATE_LIMITED" },
+        { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } },
+      );
+    }
+  } catch (error) {
+    logEvent("error", "lead_rate_limit_unavailable", {
+      error: error instanceof Error ? error.name : "UnknownError",
+    });
+    return NextResponse.json({ ok: false, code: "SERVICE_UNAVAILABLE" }, { status: 503 });
   }
 
   const parsed = leadSchema.safeParse(await request.json().catch(() => null));

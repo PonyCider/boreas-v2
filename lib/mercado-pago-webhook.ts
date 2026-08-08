@@ -19,6 +19,22 @@ const metadataSchema = z.object({
   especialidad: z.string().optional(),
 });
 
+export type PaymentVerificationCode =
+  | "FOREIGN_REFERENCE"
+  | "CURRENCY_MISMATCH"
+  | "INVALID_METADATA"
+  | "AMOUNT_MISMATCH";
+
+export class PaymentVerificationError extends Error {
+  constructor(
+    public readonly code: PaymentVerificationCode,
+    message: string,
+  ) {
+    super(message);
+    this.name = "PaymentVerificationError";
+  }
+}
+
 type VerifiablePayment = Pick<
   PaymentResponse,
   | "id"
@@ -27,26 +43,37 @@ type VerifiablePayment = Pick<
   | "transaction_amount"
   | "status"
   | "status_detail"
+  | "date_last_updated"
   | "metadata"
   | "payer"
 >;
 
 export function parseAndVerifyBoreasPayment(payment: VerifiablePayment) {
   if (!payment.id || !payment.external_reference?.startsWith("BOR-")) {
-    throw new Error("El pago no pertenece a una referencia Boreas válida");
+    throw new PaymentVerificationError(
+      "FOREIGN_REFERENCE",
+      "El pago no pertenece a una referencia Boreas válida",
+    );
   }
 
   if (payment.currency_id !== "MXN") {
-    throw new Error("La moneda del pago no coincide");
+    throw new PaymentVerificationError("CURRENCY_MISMATCH", "La moneda del pago no coincide");
   }
 
-  const metadata = metadataSchema.parse(payment.metadata);
+  const parsedMetadata = metadataSchema.safeParse(payment.metadata);
+  if (!parsedMetadata.success) {
+    throw new PaymentVerificationError("INVALID_METADATA", "La metadata del pago no es válida");
+  }
+  const metadata = parsedMetadata.data;
   const tier = getTier(metadata.tier_id);
   const config = { express: metadata.express, ia: metadata.ia };
   const price = computeCheckoutPrice(tier, config);
 
   if (payment.transaction_amount !== price.deposit) {
-    throw new Error("El monto del pago no coincide con el anticipo esperado");
+    throw new PaymentVerificationError(
+      "AMOUNT_MISMATCH",
+      "El monto del pago no coincide con el anticipo esperado",
+    );
   }
 
   return {
@@ -54,6 +81,7 @@ export function parseAndVerifyBoreasPayment(payment: VerifiablePayment) {
     reference: payment.external_reference,
     status: payment.status || "unknown",
     statusDetail: payment.status_detail,
+    paymentUpdatedAt: payment.date_last_updated ? new Date(payment.date_last_updated) : new Date(),
     tier,
     config,
     price,

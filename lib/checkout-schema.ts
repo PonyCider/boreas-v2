@@ -1,12 +1,10 @@
 import { z } from "zod";
+import { internationalPhoneSchema } from "@/lib/phone-schema";
 
 const contactFields = {
   nombre: z.string().trim().min(2, "Escribe tu nombre").max(80),
   email: z.email("Revisa tu correo").max(120),
-  telefono: z
-    .string()
-    .transform((value) => value.replace(/\D/g, ""))
-    .refine((digits) => digits.length === 10, "El teléfono debe tener 10 dígitos"),
+  telefono: internationalPhoneSchema,
   especialidad: z.string().trim().min(2, "Dinos tu especialidad").max(80),
   website: z.string().max(0, "Envío rechazado"),
 };
@@ -14,6 +12,7 @@ const contactFields = {
 export const checkoutSchema = z
   .object({
     ...contactFields,
+    attemptId: z.uuid("El intento de checkout no es válido"),
     tierId: z.enum(["esencial", "profesional", "deluxe"]),
     express: z.boolean(),
     ia: z.boolean(),

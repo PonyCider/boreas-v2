@@ -24,7 +24,7 @@ export function InfoTooltip({
       <button
         type="button"
         aria-label={summary}
-        className={`inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded-full transition-all hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+        className={`inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full transition-all hover:scale-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
           dark ? "text-[#c7bbb2] hover:text-[#f29a7e]" : "text-clinical hover:text-accent"
         }`}
       >

@@ -2,9 +2,10 @@ import { describe, expect, it } from "vitest";
 import { checkoutSchema } from "@/lib/checkout-schema";
 
 const valid = {
+  attemptId: "00000000-0000-4000-8000-000000000001",
   nombre: "Dra. María González",
   email: "maria@consultorio.mx",
-  telefono: "55 1234 5678",
+  telefono: "+52 55 1234 5678",
   especialidad: "Dermatología",
   website: "",
   tierId: "deluxe" as const,
@@ -14,7 +15,15 @@ const valid = {
 
 describe("checkoutSchema", () => {
   it("normaliza el teléfono", () => {
-    expect(checkoutSchema.parse(valid).telefono).toBe("5512345678");
+    expect(checkoutSchema.parse(valid).telefono).toBe("+525512345678");
+  });
+
+  it("acepta espacios, guiones y paréntesis en el teléfono", () => {
+    const parsed = checkoutSchema.parse({
+      ...valid,
+      telefono: "+52 (55) 1234-5678",
+    });
+    expect(parsed.telefono).toBe("+525512345678");
   });
 
   it("rechaza un monto enviado por el navegador", () => {

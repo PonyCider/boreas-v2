@@ -2,6 +2,12 @@ import { Resend } from "resend";
 import type { Tier } from "@/content/pricing";
 import type { CheckoutInput } from "@/lib/checkout-schema";
 import { formatMxn, type CheckoutPrice } from "@/lib/pricing";
+import {
+  claimEmailDelivery,
+  markEmailFailed,
+  markEmailSent,
+} from "@/lib/db/checkout-repository";
+import { logEvent } from "@/lib/server/log";
 
 function emailConfig() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -125,4 +131,81 @@ export async function sendPaymentStatusEmail({
   );
 
   if (error) throw error;
+}
+
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Error desconocido";
+}
+
+export async function sendRecordedCheckoutStartedEmail({
+  orderId,
+  reference,
+  preferenceId,
+  input,
+  tier,
+  price,
+}: {
+  orderId: string;
+  reference: string;
+  preferenceId: string;
+  input: CheckoutInput;
+  tier: Tier;
+  price: CheckoutPrice;
+}) {
+  const dedupeKey = `checkout-started/${reference}`;
+  const deliveryId = await claimEmailDelivery({
+    orderId,
+    reference,
+    type: "checkout_started",
+    dedupeKey,
+  });
+  if (!deliveryId) return;
+
+  try {
+    await sendCheckoutStartedEmail({ reference, preferenceId, input, tier, price });
+    await markEmailSent(deliveryId);
+  } catch (error) {
+    await markEmailFailed(deliveryId, errorMessage(error));
+    logEvent("error", "checkout_email_failed", { reference, type: "checkout_started" });
+  }
+}
+
+export async function sendRecordedPaymentStatusEmail({
+  orderId,
+  reference,
+  paymentId,
+  status,
+  statusDetail,
+  tier,
+  express,
+  ia,
+  price,
+  contact,
+}: Parameters<typeof sendPaymentStatusEmail>[0] & { orderId: string }) {
+  const dedupeKey = `payment/${paymentId}/${status}`;
+  const deliveryId = await claimEmailDelivery({
+    orderId,
+    reference,
+    type: `payment_${status}`,
+    dedupeKey,
+  });
+  if (!deliveryId) return;
+
+  try {
+    await sendPaymentStatusEmail({
+      reference,
+      paymentId,
+      status,
+      statusDetail,
+      tier,
+      express,
+      ia,
+      price,
+      contact,
+    });
+    await markEmailSent(deliveryId);
+  } catch (error) {
+    await markEmailFailed(deliveryId, errorMessage(error));
+    logEvent("error", "checkout_email_failed", { reference, paymentId, status });
+  }
 }

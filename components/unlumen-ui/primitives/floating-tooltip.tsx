@@ -1,20 +1,17 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   AnimatePresence,
   motion,
   useMotionValue,
-  useSpring,
-  useVelocity,
-  useTransform,
 } from "motion/react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-const floatingTooltipVariants = cva("ml-4 mt-4 font-medium z-50", {
+const floatingTooltipVariants = cva("z-50 max-w-[min(20rem,calc(100vw-1.5rem))] font-medium", {
   variants: {
     variant: {
       default: "bg-primary text-background dark:bg-white",
@@ -39,6 +36,7 @@ interface TooltipContextType {
     descriptionClassName?: string,
   ) => void;
   setIsActive: (active: boolean) => void;
+  setAnchorPosition: (rect: DOMRect) => void;
 }
 
 const TooltipContext = createContext<TooltipContextType | null>(null);
@@ -55,45 +53,28 @@ export function FloatingTooltipProvider({
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
-  const springConfig = { damping: 45, stiffness: 750 };
-  const smoothX = useSpring(x, springConfig);
-  const smoothY = useSpring(y, springConfig);
-
-  const velocityX = useVelocity(smoothX);
-  const velocityY = useVelocity(smoothY);
-
-  const scaleX = useTransform(velocityX, [-1000, 0, 1000], [0.9, 1, 1.15]);
-  const scaleY = useTransform(velocityY, [-1000, 0, 1000], [1.15, 1, 0.9]);
-
-  const skewX = useTransform(velocityX, [-1000, 0, 1000], [-3, 0, 3]);
-  const skewY = useTransform(velocityY, [-1000, 0, 1000], [-3, 0, 3]);
-
   const [isActive, setIsActive] = useState(false);
   const [content, setContent] = useState("");
   const [description, setDescription] = useState("");
   const [contentClassName, setContentClassName] = useState("");
   const [descriptionClassName, setDescriptionClassName] = useState("");
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  const setAnchorPosition = useCallback((rect: DOMRect) => {
     if (typeof window === "undefined") return;
+    const bounds = tooltipRef.current?.getBoundingClientRect();
+    const width = bounds?.width ?? Math.min(320, window.innerWidth - 24);
+    const height = bounds?.height ?? 104;
+    const gutter = 24;
+    const offset = 10;
+    let left = rect.left + rect.width / 2 - width / 2;
+    let top = rect.bottom + offset;
 
-    const getZoom = () => {
-      const htmlElement = document.documentElement;
-      const computedZoom = window.getComputedStyle(htmlElement).zoom;
-      return computedZoom ? parseFloat(computedZoom) : 1;
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const zoom = getZoom();
-      x.set(e.clientX / zoom);
-      y.set(e.clientY / zoom);
-    };
-
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-    };
+    if (top + height + gutter > window.innerHeight) top = rect.top - height - offset;
+    left = Math.max(gutter, Math.min(left, window.innerWidth - width - gutter));
+    top = Math.max(gutter, Math.min(top, window.innerHeight - height - gutter));
+    x.set(left);
+    y.set(top);
   }, [x, y]);
 
   const handleSetContent = (
@@ -110,7 +91,7 @@ export function FloatingTooltipProvider({
 
   return (
     <TooltipContext.Provider
-      value={{ setContent: handleSetContent, setIsActive }}
+      value={{ setContent: handleSetContent, setIsActive, setAnchorPosition }}
     >
       {children}
       {typeof document !== "undefined" &&
@@ -118,10 +99,11 @@ export function FloatingTooltipProvider({
           <AnimatePresence>
             {isActive && content && (
               <motion.div
+                ref={tooltipRef}
                 className="pointer-events-none fixed z-[9999]"
                 style={{
-                  top: smoothY,
-                  left: smoothX,
+                  top: y,
+                  left: x,
                 }}
                 initial={{
                   opacity: 0,
@@ -146,12 +128,6 @@ export function FloatingTooltipProvider({
                     floatingTooltipVariants({ variant, size }),
                     className,
                   )}
-                  style={{
-                    scaleX,
-                    scaleY,
-                    skewX,
-                    skewY,
-                  }}
                   transition={{
                     layout: {
                       type: "spring",
@@ -217,10 +193,12 @@ export function FloatingTooltipTrigger({
     );
   }
 
-  const { setContent, setIsActive } = context;
+  const { setContent, setIsActive, setAnchorPosition } = context;
+  const triggerRef = useRef<HTMLDivElement>(null);
 
-  const handleMouseEnter = () => {
+  const showTooltip = () => {
     setContent(content, description, contentClassName, descriptionClassName);
+    if (triggerRef.current) setAnchorPosition(triggerRef.current.getBoundingClientRect());
     setIsActive(true);
   };
 
@@ -229,7 +207,17 @@ export function FloatingTooltipTrigger({
   };
 
   return (
-    <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className="inline-block">
+    <div
+      ref={triggerRef}
+      onMouseEnter={showTooltip}
+      onMouseLeave={handleMouseLeave}
+      onFocusCapture={showTooltip}
+      onBlurCapture={handleMouseLeave}
+      onPointerDown={(event) => {
+        if (event.pointerType === "touch") showTooltip();
+      }}
+      className="inline-block"
+    >
       {children}
     </div>
   );

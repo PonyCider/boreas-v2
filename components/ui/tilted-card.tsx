@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, type ReactNode } from "react";
-import { motion, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export interface TiltedCardProps {
@@ -51,6 +51,7 @@ export function TiltedCard({
   const rotateX = useSpring(useMotionValue(0), springConfig);
   const rotateY = useSpring(useMotionValue(0), springConfig);
   const scale = useSpring(1, springConfig);
+  const glareBackground = useMotionTemplate`radial-gradient(circle 280px at ${x}px ${y}px, rgba(255, 255, 255, 0.22), transparent 80%)`;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (reduceMotion || !ref.current) return;
@@ -130,11 +131,9 @@ export function TiltedCard({
         ) : null}
 
         {glareEnable && !reduceMotion && isHovered ? (
-          <div
+          <motion.div
             className="pointer-events-none absolute inset-0 rounded-[var(--radius-sm)] transition-opacity duration-200"
-            style={{
-              background: `radial-gradient(circle 280px at ${x.get()}px ${y.get()}px, rgba(255, 255, 255, 0.22), transparent 80%)`,
-            }}
+            style={{ background: glareBackground }}
           />
         ) : null}
 

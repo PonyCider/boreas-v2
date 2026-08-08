@@ -233,6 +233,16 @@ a {
   50%       { opacity: 0.35; }
 }
 
+@keyframes checkout-button-sheen {
+  0% { left: -7rem; }
+  64%, 100% { left: calc(100% + 7rem); }
+}
+
+.checkout-button-sheen {
+  left: -7rem;
+  animation: checkout-button-sheen 5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

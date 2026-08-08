@@ -4,7 +4,7 @@ import { leadSchema } from "@/lib/lead-schema";
 const valid = {
   nombre: "Ana Ruiz",
   email: "ana@consultorio.mx",
-  telefono: "5512345678",
+  telefono: "+525512345678",
   especialidad: "Psicología",
   mensaje: "",
   paquete: "profesional",
@@ -22,14 +22,14 @@ describe("leadSchema", () => {
     expect(leadSchema.safeParse({ ...valid, email: "ana@" }).success).toBe(false);
   });
 
-  it("rechaza teléfono que no tenga 10 dígitos", () => {
+  it("rechaza un teléfono internacional demasiado corto", () => {
     expect(leadSchema.safeParse({ ...valid, telefono: "551234" }).success).toBe(false);
   });
 
-  it("acepta teléfono con espacios y guiones", () => {
-    const parsed = leadSchema.safeParse({ ...valid, telefono: "55 1234-5678" });
+  it("normaliza teléfono internacional con espacios, guiones y paréntesis", () => {
+    const parsed = leadSchema.safeParse({ ...valid, telefono: "+52 (55) 1234-5678" });
     expect(parsed.success).toBe(true);
-    if (parsed.success) expect(parsed.data.telefono).toBe("5512345678");
+    if (parsed.success) expect(parsed.data.telefono).toBe("+525512345678");
   });
 
   it("rechaza un paquete que no existe", () => {
