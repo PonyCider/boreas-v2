@@ -33,6 +33,13 @@ export type RelevoExample = {
   messages: RelevoMessage[];
 };
 
+export type RelevoTestimonial = {
+  quote: string;
+  author: string;
+  role: string;
+  initials: string;
+};
+
 export const relevoContent = {
   eyebrow: "Siguiente capa",
   heading:
@@ -45,6 +52,28 @@ export const relevoContent = {
   exampleLabel: "Ejemplo ilustrativo",
   interactionHint: "Explora otro ejemplo",
 } as const;
+
+// Contenido provisional: sustituir por testimonios autorizados antes de publicar.
+export const relevoTestimonials: RelevoTestimonial[] = [
+  {
+    quote: "Las preguntas frecuentes se resuelven sin interrumpir cada consulta.",
+    author: "Especialista beta 01",
+    role: "Odontología · provisional",
+    initials: "E1",
+  },
+  {
+    quote: "Cuando intervengo, la conversación ya llega con el contexto ordenado.",
+    author: "Especialista beta 02",
+    role: "Psicología · provisional",
+    initials: "E2",
+  },
+  {
+    quote: "El paciente recibe respuesta y mi equipo conserva el control.",
+    author: "Especialista beta 03",
+    role: "Nutrición · provisional",
+    initials: "E3",
+  },
+];
 
 export const relevoExamples: RelevoExample[] = [
   {

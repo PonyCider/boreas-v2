@@ -3,7 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { relevoContent } from "@/content/relevo";
 import { RelevoExampleCarousel } from "./relevo-example-carousel";
-import { RelevoFlowVisual } from "./relevo-flow-visual";
+import { RelevoTestimonials } from "./relevo-testimonials";
 import Particles from "@/components/ui/particles";
 
 export function RelevoCuriositySection() {
@@ -89,7 +89,7 @@ export function RelevoCuriositySection() {
           </motion.p>
 
           <motion.div
-            className="mt-8"
+            className="mt-8 grid w-full max-w-6xl items-center gap-8 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-10"
             initial={reduceMotion ? false : { opacity: 0, y: 18, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-80px" }}
@@ -118,14 +118,13 @@ export function RelevoCuriositySection() {
                 </svg>
               </span>
             </motion.a>
+
+            <RelevoTestimonials />
           </motion.div>
         </div>
 
-        {/* Visual de Flujo con Orbs e Interacción de Línea Continua */}
-        <RelevoFlowVisual />
-
         {/* Carrusel Interactivo de Ejemplos con Física 3D Tilt */}
-        <div className="mt-12 w-full min-w-0 lg:mt-16">
+        <div className="mt-14 w-full min-w-0 lg:mt-20">
           <RelevoExampleCarousel />
         </div>
       </div>
