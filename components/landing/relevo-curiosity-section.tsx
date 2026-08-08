@@ -11,8 +11,8 @@ export function RelevoCuriositySection() {
   const headingAccent = "Relevo responde por ti.";
   const headingLead = relevoContent.heading.replace(headingAccent, "").trim();
   const revealTransition = {
-    duration: reduceMotion ? 0 : 0.72,
-    ease: [0.22, 1, 0.36, 1] as const,
+    duration: reduceMotion ? 0 : 1.05,
+    ease: [0.16, 1, 0.3, 1] as const,
   };
 
   return (
@@ -43,7 +43,7 @@ export function RelevoCuriositySection() {
             initial={reduceMotion ? false : { opacity: 0, y: 12, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={revealTransition}
+            transition={{ ...revealTransition, duration: reduceMotion ? 0 : 0.85 }}
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent-soft px-3.5 py-1.5 text-[12px] font-semibold text-foreground shadow-[0_8px_24px_rgba(80,48,37,0.08)]">
               <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_0_4px_var(--accent-soft)]" aria-hidden="true" />
@@ -56,11 +56,11 @@ export function RelevoCuriositySection() {
             initial={
               reduceMotion
                 ? false
-                : { opacity: 0, y: 30, filter: "blur(12px)", clipPath: "inset(0 0 55% 0)" }
+                : { opacity: 0, y: 38, filter: "blur(14px)", clipPath: "inset(0 0 68% 0)" }
             }
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", clipPath: "inset(0 0 0% 0)" }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ ...revealTransition, delay: reduceMotion ? 0 : 0.08 }}
+            transition={{ ...revealTransition, duration: reduceMotion ? 0 : 1.2, delay: reduceMotion ? 0 : 0.18 }}
           >
             {headingLead}{" "}
             <span className="text-accent">
@@ -73,7 +73,7 @@ export function RelevoCuriositySection() {
             initial={reduceMotion ? false : { opacity: 0, y: 20, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ ...revealTransition, delay: reduceMotion ? 0 : 0.18 }}
+            transition={{ ...revealTransition, delay: reduceMotion ? 0 : 0.62 }}
           >
             {relevoContent.subheading}
           </motion.p>
@@ -83,7 +83,7 @@ export function RelevoCuriositySection() {
             initial={reduceMotion ? false : { opacity: 0, y: 20, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ ...revealTransition, delay: reduceMotion ? 0 : 0.27 }}
+            transition={{ ...revealTransition, delay: reduceMotion ? 0 : 0.86 }}
           >
             {relevoContent.body}
           </motion.p>
@@ -93,7 +93,7 @@ export function RelevoCuriositySection() {
             initial={reduceMotion ? false : { opacity: 0, y: 18, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ ...revealTransition, delay: reduceMotion ? 0 : 0.36 }}
+            transition={{ ...revealTransition, delay: reduceMotion ? 0 : 1.08 }}
           >
             <motion.a
               href={relevoContent.ctaHref}
