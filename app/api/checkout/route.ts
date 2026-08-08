@@ -13,6 +13,7 @@ import { createCheckoutPreference } from "@/lib/mercado-pago";
 import { computeCheckoutPrice } from "@/lib/pricing";
 import { logEvent } from "@/lib/server/log";
 import { checkRateLimit } from "@/lib/server/rate-limit";
+import { resolveCheckoutUrls } from "@/lib/server/checkout-urls";
 
 export const runtime = "nodejs";
 
@@ -51,7 +52,11 @@ export async function POST(request: Request) {
   const tier = getTier(input.tierId);
   const price = computeCheckoutPrice(tier, { express: input.express, ia: input.ia });
   const reference = `BOR-${input.attemptId}`;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+  const { returnSiteUrl, webhookSiteUrl } = resolveCheckoutUrls(request.url, {
+    vercelEnv: process.env.VERCEL_ENV,
+    vercelProjectProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    configuredSiteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+  });
   let order: Awaited<ReturnType<typeof createOrGetCheckoutOrder>> | undefined;
 
   try {
@@ -68,7 +73,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, checkoutUrl: order.checkoutUrl, reference });
     }
 
-    const preference = await createCheckoutPreference({ reference, siteUrl, input, tier, price });
+    const preference = await createCheckoutPreference({
+      reference,
+      siteUrl: returnSiteUrl,
+      webhookSiteUrl,
+      input,
+      tier,
+      price,
+    });
     order = await saveCheckoutPreference({
       orderId: order.id,
       preferenceId: preference.id,

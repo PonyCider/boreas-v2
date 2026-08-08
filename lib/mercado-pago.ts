@@ -16,17 +16,20 @@ function client() {
 export async function createCheckoutPreference({
   reference,
   siteUrl,
+  webhookSiteUrl,
   input,
   tier,
   price,
 }: {
   reference: string;
   siteUrl: string;
+  webhookSiteUrl?: string;
   input: CheckoutInput;
   tier: Tier;
   price: CheckoutPrice;
 }) {
   const baseUrl = siteUrl.replace(/\/$/, "");
+  const webhookBaseUrl = (webhookSiteUrl || siteUrl).replace(/\/$/, "");
   const preference = new Preference(client());
   const displayName = tier.id === "deluxe" && input.ia ? "Deluxe+" : tier.name;
 
@@ -69,7 +72,7 @@ export async function createCheckoutPreference({
         failure: `${baseUrl}/checkout/error`,
       },
       auto_return: "approved",
-      notification_url: `${baseUrl}/api/mercado-pago/webhook`,
+      notification_url: `${webhookBaseUrl}/api/mercado-pago/webhook`,
     },
     requestOptions: { idempotencyKey: reference },
   });
