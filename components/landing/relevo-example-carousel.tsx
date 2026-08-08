@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  AnimatePresence,
   animate,
   motion,
   useMotionValue,
@@ -28,7 +27,7 @@ import {
 const SWIPE_OFFSET_THRESHOLD = 44;
 const SWIPE_VELOCITY_THRESHOLD = 420;
 const AUTO_ADVANCE_DELAY = 11000;
-const FIRST_REPLY_DELAY = 800;
+const FIRST_REPLY_DELAY = 320;
 const TYPING_DURATION = 650;
 const MESSAGE_GAP = 520;
 
@@ -487,7 +486,7 @@ export function RelevoExampleCarousel() {
 
       setIsTransitioning(true);
       setActiveIndex(index);
-      const transitionTimer = window.setTimeout(() => setIsTransitioning(false), 620);
+      const transitionTimer = window.setTimeout(() => setIsTransitioning(false), 360);
       timersRef.current.push(transitionTimer);
     },
     [activeIndex, isTransitioning, reduceMotion]
@@ -560,23 +559,13 @@ export function RelevoExampleCarousel() {
           ))}
         </div>
 
-        <AnimatePresence initial={false} mode="wait">
-          <motion.div
-            key={activeExample.practice.name}
-            className="mt-6"
-            initial={
-              reduceMotion
-                ? false
-                : { opacity: 0, x: 10 * direction }
-            }
-            animate={{ opacity: 1, x: 0 }}
-            exit={
-              reduceMotion
-                ? { opacity: 1 }
-                : { opacity: 0, x: -10 * direction }
-            }
-            transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
-          >
+        <motion.div
+          key={activeExample.practice.name}
+          className="mt-6"
+          initial={reduceMotion ? false : { x: 10 * direction }}
+          animate={{ x: 0 }}
+          transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+        >
           <div className="flex items-center justify-between gap-4">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted">
               {relevoContent.exampleLabel}
@@ -624,8 +613,7 @@ export function RelevoExampleCarousel() {
               </p>
             </div>
           </div>
-          </motion.div>
-        </AnimatePresence>
+        </motion.div>
       </div>
 
       <div className="sr-only" aria-live="polite" aria-atomic="true">
@@ -689,41 +677,29 @@ export function RelevoExampleCarousel() {
             aria-hidden="true"
           />
 
-          <AnimatePresence initial={false} mode="wait">
-            <motion.div
-              key={activeExample.practice.name}
-              className="pointer-events-none absolute left-0 right-10 top-0 h-full overflow-hidden rounded-[var(--radius-sm)] border border-line"
-              initial={
-                reduceMotion
-                  ? false
-                  : {
-                      opacity: 0,
-                      x: 14 * direction,
-                      scale: 0.995,
-                    }
-              }
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={
-                reduceMotion
-                  ? { opacity: 1 }
-                  : {
-                      opacity: 0,
-                      x: -16 * direction,
-                      scale: 0.99,
-                    }
-              }
-              transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
-              style={{ boxShadow: "var(--shadow)" }}
-              aria-hidden="true"
-            >
-              <ConversationCard
-                example={activeExample}
-                isFrontCard
-                animateConversation
-                reduceMotion={Boolean(reduceMotion)}
-              />
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={activeExample.practice.name}
+            className="pointer-events-none absolute left-0 right-10 top-0 h-full overflow-hidden rounded-[var(--radius-sm)] border border-line"
+            initial={
+              reduceMotion
+                ? false
+                : {
+                    x: 14 * direction,
+                    scale: 0.995,
+                  }
+            }
+            animate={{ x: 0, scale: 1 }}
+            transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+            style={{ boxShadow: "var(--shadow)" }}
+            aria-hidden="true"
+          >
+            <ConversationCard
+              example={activeExample}
+              isFrontCard
+              animateConversation
+              reduceMotion={Boolean(reduceMotion)}
+            />
+          </motion.div>
         </div>
       </motion.button>
 
