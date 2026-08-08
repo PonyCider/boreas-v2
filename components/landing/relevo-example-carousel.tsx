@@ -13,6 +13,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import { ThinkingOrb } from "thinking-orbs";
@@ -30,6 +31,58 @@ const AUTO_ADVANCE_DELAY = 11000;
 const FIRST_REPLY_DELAY = 320;
 const TYPING_DURATION = 650;
 const MESSAGE_GAP = 520;
+
+type ChatThemeProperties = CSSProperties & {
+  "--chat-header": string;
+  "--chat-accent": string;
+  "--chat-accent-strong": string;
+  "--chat-canvas": string;
+  "--chat-patient": string;
+  "--chat-assistant": string;
+};
+
+const SPECIALTY_THEMES: Record<string, ChatThemeProperties> = {
+  Psicología: {
+    "--chat-header": "#493C48",
+    "--chat-accent": "#D7B6CF",
+    "--chat-accent-strong": "#77506F",
+    "--chat-canvas": "#F8F2F6",
+    "--chat-patient": "#F1DFE9",
+    "--chat-assistant": "#FFF9FC",
+  },
+  Nutrición: {
+    "--chat-header": "#35483D",
+    "--chat-accent": "#B8D1AE",
+    "--chat-accent-strong": "#4E7654",
+    "--chat-canvas": "#F3F7EF",
+    "--chat-patient": "#E2ECD9",
+    "--chat-assistant": "#FBFDF9",
+  },
+  Fisioterapia: {
+    "--chat-header": "#354954",
+    "--chat-accent": "#B2CBD7",
+    "--chat-accent-strong": "#4C7385",
+    "--chat-canvas": "#F0F5F7",
+    "--chat-patient": "#DDEAF0",
+    "--chat-assistant": "#FAFCFD",
+  },
+  Dental: {
+    "--chat-header": "#503B32",
+    "--chat-accent": "#E2B49B",
+    "--chat-accent-strong": "#985F45",
+    "--chat-canvas": "#F8F2ED",
+    "--chat-patient": "#F2DED3",
+    "--chat-assistant": "#FFFAF7",
+  },
+  Medicina: {
+    "--chat-header": "#304743",
+    "--chat-accent": "#A8CEC5",
+    "--chat-accent-strong": "#41786D",
+    "--chat-canvas": "#EFF5F3",
+    "--chat-patient": "#DBEAE6",
+    "--chat-assistant": "#FAFDFC",
+  },
+};
 
 function messageToText(message: RelevoMessage): string {
   switch (message.role) {
@@ -71,7 +124,13 @@ function AnimatedMessage({
 
 function RelevoAvatar() {
   return (
-    <div className="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full border border-mint/40 bg-mint/20">
+    <div
+      className="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full border"
+      style={{
+        borderColor: "color-mix(in srgb, var(--chat-accent-strong) 32%, transparent)",
+        backgroundColor: "color-mix(in srgb, var(--chat-accent) 36%, white)",
+      }}
+    >
       <div className="pointer-events-none absolute inset-0 flex scale-[0.72] items-center justify-center">
         <ThinkingOrb state="composing" size={20} />
       </div>
@@ -81,7 +140,14 @@ function RelevoAvatar() {
 
 function PatientAvatar() {
   return (
-    <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-accent/25 bg-accent-soft text-accent">
+    <div
+      className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border"
+      style={{
+        borderColor: "color-mix(in srgb, var(--chat-accent-strong) 30%, transparent)",
+        backgroundColor: "var(--chat-patient)",
+        color: "var(--chat-accent-strong)",
+      }}
+    >
       <svg
         className="h-3 w-3"
         fill="none"
@@ -140,11 +206,18 @@ function TypingBubble({ message }: { message: RelevoMessage | null }) {
         <SpecialistAvatar isInternal={isInternal} />
       )}
 
-      <div className="inline-flex items-center gap-1 rounded-[18px] rounded-bl-[5px] border border-mint/20 bg-elevated px-3.5 py-2.5 shadow-xs">
+      <div
+        className="inline-flex items-center gap-1 rounded-[18px] rounded-bl-[5px] border px-3.5 py-2.5 shadow-xs"
+        style={{
+          borderColor: "color-mix(in srgb, var(--chat-accent-strong) 22%, transparent)",
+          backgroundColor: "var(--chat-assistant)",
+        }}
+      >
         {[0, 1, 2].map((dot) => (
           <motion.span
             key={dot}
-            className="h-1.5 w-1.5 rounded-full bg-mint"
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: "var(--chat-accent-strong)" }}
             animate={{ y: [0, -3, 0], opacity: [0.35, 1, 0.35] }}
             transition={{
               duration: 0.72,
@@ -174,6 +247,7 @@ function CardInner({
     animateConversation && !reduceMotion ? 1 : example.messages.length
   );
   const [typingMessage, setTypingMessage] = useState<RelevoMessage | null>(null);
+  const chatTheme = SPECIALTY_THEMES[example.chipLabel] ?? SPECIALTY_THEMES.Medicina;
 
   useEffect(() => {
     if (!animateConversation || reduceMotion) {
@@ -220,43 +294,86 @@ function CardInner({
   }, [animateConversation, example, reduceMotion]);
 
   return (
-    <div className="relative flex h-full w-full flex-col rounded-[var(--radius-sm)] border border-line bg-surface p-5 shadow-2xl backdrop-blur-sm transition-all duration-200 sm:p-6">
+    <div
+      className="relative flex h-full w-full flex-col rounded-[var(--radius-sm)] border border-line bg-surface p-4 shadow-2xl transition-all duration-200 sm:p-5"
+      style={chatTheme}
+    >
       <div
-        className={`flex items-center gap-2.5 px-3 py-2.5 rounded-t-[var(--radius-sm)] ${
-          isFrontCard ? "bg-foreground" : "bg-foreground/90"
-        }`}
+        className="relative flex items-center gap-2.5 overflow-hidden rounded-t-[var(--radius-sm)] px-3 py-2.5"
+        style={{
+          backgroundColor: "var(--chat-header)",
+          opacity: isFrontCard ? 1 : 0.94,
+          boxShadow: "inset 0 -1px rgba(255,255,255,0.1)",
+        }}
       >
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-background/10 border border-white/10">
-          <span className="text-[10px] font-semibold text-background">
+        <span
+          className="pointer-events-none absolute -right-5 -top-10 h-24 w-24 rounded-full opacity-25 blur-xl"
+          style={{ backgroundColor: "var(--chat-accent)" }}
+          aria-hidden="true"
+        />
+        <div
+          className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/15"
+          style={{ backgroundColor: "var(--chat-accent)" }}
+        >
+          <span className="text-[10px] font-semibold" style={{ color: "var(--chat-header)" }}>
             {example.practice.initials}
           </span>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[12px] font-semibold text-background/92">
+        <div className="relative min-w-0 flex-1">
+          <p className="truncate text-[12px] font-semibold text-white/95">
             {example.practice.name}
           </p>
-          <p className="truncate text-[10px] text-background/48">
+          <p className="truncate text-[10px] text-white/60">
             {isFrontCard ? "vía WhatsApp" : example.practice.channel}
           </p>
         </div>
         {isFrontCard ? (
-          <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-mint animate-pulse" aria-hidden="true" />
-            <span className="hidden text-[9px] font-medium text-mint sm:inline">IA en línea</span>
+          <div className="relative flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.07] px-2 py-1">
+            <span
+              className="h-1.5 w-1.5 animate-pulse rounded-full"
+              style={{ backgroundColor: "var(--chat-accent)" }}
+              aria-hidden="true"
+            />
+            <span className="text-[8.5px] font-medium text-white/80">IA en línea</span>
           </div>
         ) : null}
       </div>
 
-      <div className="flex-1 space-y-2.5 bg-surface/95 p-3 sm:p-3.5">
-        {example.messages.slice(0, visibleCount).map((message, index) => {
-          if (message.role === "patient") {
+      <div
+        className="relative flex-1 overflow-hidden rounded-b-[var(--radius-sm)] p-3 sm:p-3.5"
+        style={{ backgroundColor: "var(--chat-canvas)" }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-55"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, color-mix(in srgb, var(--chat-accent-strong) 20%, transparent) 0 0.8px, transparent 0.9px)",
+            backgroundSize: "18px 18px",
+          }}
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -bottom-20 -left-12 h-44 w-44 rounded-full opacity-20 blur-3xl"
+          style={{ backgroundColor: "var(--chat-accent)" }}
+          aria-hidden="true"
+        />
+
+        <div className="relative z-10 space-y-2.5">
+          {example.messages.slice(0, visibleCount).map((message, index) => {
+            if (message.role === "patient") {
             return (
               <AnimatedMessage
                 key={index}
                 shouldAnimate={animateConversation && index > 0 && !reduceMotion}
               >
                 <div className="flex items-start justify-end gap-2">
-                  <div className="max-w-[80%] rounded-[18px] rounded-br-[5px] bg-accent-soft px-3 py-2 shadow-xs">
+                  <div
+                    className="max-w-[80%] rounded-[18px] rounded-br-[5px] border px-3 py-2 shadow-[0_4px_14px_rgba(45,38,33,0.06)]"
+                    style={{
+                      borderColor: "color-mix(in srgb, var(--chat-accent-strong) 13%, transparent)",
+                      backgroundColor: "var(--chat-patient)",
+                    }}
+                  >
                     <p className="text-[11.5px] leading-snug text-foreground">
                       {message.text}
                     </p>
@@ -270,7 +387,7 @@ function CardInner({
             );
           }
 
-          if (message.role === "assistant") {
+            if (message.role === "assistant") {
             return (
               <AnimatedMessage
                 key={index}
@@ -279,12 +396,21 @@ function CardInner({
                 <div className="flex items-start gap-2">
                   <RelevoAvatar />
                   <div className="max-w-[82%]">
-                    <div className="rounded-[18px] rounded-bl-[5px] border border-mint/20 bg-elevated px-3 py-2 shadow-xs">
+                    <div
+                      className="rounded-[18px] rounded-bl-[5px] border px-3 py-2 shadow-[0_4px_14px_rgba(45,38,33,0.055)]"
+                      style={{
+                        borderColor: "color-mix(in srgb, var(--chat-accent-strong) 18%, transparent)",
+                        backgroundColor: "var(--chat-assistant)",
+                      }}
+                    >
                       <p className="text-[11.5px] leading-snug text-foreground">
                         {message.text}
                       </p>
                     </div>
-                    <p className="ml-1 mt-0.5 text-[9px] font-medium text-mint/90">
+                    <p
+                      className="ml-1 mt-0.5 text-[9px] font-medium"
+                      style={{ color: "var(--chat-accent-strong)" }}
+                    >
                       {message.time} · Relevo IA
                     </p>
                   </div>
@@ -293,7 +419,7 @@ function CardInner({
             );
           }
 
-          if (message.role === "handoff") {
+            if (message.role === "handoff") {
             return (
               <AnimatedMessage
                 key={index}
@@ -301,8 +427,17 @@ function CardInner({
               >
                 <div className="space-y-0.5 py-0.5">
                   <div className="flex items-center gap-1.5">
-                    <div className="h-px flex-1 bg-border" />
-                    <span className="flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-[0.08em] text-mint">
+                    <div
+                      className="h-px flex-1"
+                      style={{
+                        backgroundColor:
+                          "color-mix(in srgb, var(--chat-accent-strong) 25%, transparent)",
+                      }}
+                    />
+                    <span
+                      className="flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-[0.08em]"
+                      style={{ color: "var(--chat-accent-strong)" }}
+                    >
                       <svg
                         className="h-2.5 w-2.5 animate-pulse"
                         fill="none"
@@ -319,7 +454,13 @@ function CardInner({
                       </svg>
                       Relevo → {message.to}
                     </span>
-                    <div className="h-px flex-1 bg-border" />
+                    <div
+                      className="h-px flex-1"
+                      style={{
+                        backgroundColor:
+                          "color-mix(in srgb, var(--chat-accent-strong) 25%, transparent)",
+                      }}
+                    />
                   </div>
                   <p className="text-center font-mono text-[8.5px] uppercase tracking-[0.06em] text-muted">
                     Contexto compartido · {message.reason}
@@ -329,7 +470,7 @@ function CardInner({
             );
           }
 
-          if (message.role === "specialist") {
+            if (message.role === "specialist") {
             const isInternal = message.isInternalContext;
             return (
               <AnimatedMessage
@@ -343,8 +484,17 @@ function CardInner({
                       className={`rounded-[18px] rounded-bl-[5px] px-3 py-2 ${
                         isInternal
                           ? "border border-dashed border-border bg-surface"
-                          : "bg-elevated"
+                          : "border"
                       }`}
+                      style={
+                        isInternal
+                          ? undefined
+                          : {
+                              borderColor: "color-mix(in srgb, var(--chat-accent-strong) 18%, transparent)",
+                              backgroundColor: "var(--chat-assistant)",
+                              boxShadow: "0 4px 14px rgba(45,38,33,0.055)",
+                            }
+                      }
                     >
                       <p className="text-[11.5px] leading-snug text-foreground">
                         {message.text}
@@ -352,8 +502,9 @@ function CardInner({
                     </div>
                     <p
                       className={`ml-1 mt-0.5 text-[9px] font-medium ${
-                        isInternal ? "text-muted" : "text-mint"
+                        isInternal ? "text-muted" : ""
                       }`}
+                      style={isInternal ? undefined : { color: "var(--chat-accent-strong)" }}
                     >
                       {message.time} · {message.name}
                       {isInternal ? " · equipo médico" : ""} · tomó el relevo
@@ -364,34 +515,44 @@ function CardInner({
             );
           }
 
-          return (
-            <AnimatedMessage
-              key={index}
-              shouldAnimate={animateConversation && index > 0 && !reduceMotion}
-            >
-              <div className="flex justify-center pt-1">
-                <div className="flex items-center gap-1.5 rounded-full bg-mint/10 px-3 py-1">
-                  <svg
-                    className="h-3 w-3 text-mint"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    aria-hidden="true"
+            return (
+              <AnimatedMessage
+                key={index}
+                shouldAnimate={animateConversation && index > 0 && !reduceMotion}
+              >
+                <div className="flex justify-center pt-1">
+                  <div
+                    className="flex items-center gap-1.5 rounded-full border px-3 py-1"
+                    style={{
+                      borderColor:
+                        "color-mix(in srgb, var(--chat-accent-strong) 20%, transparent)",
+                      backgroundColor:
+                        "color-mix(in srgb, var(--chat-accent) 24%, white)",
+                    }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m4.5 12.75 6 6 9-13.5"
-                    />
-                  </svg>
+                    <svg
+                      className="h-3 w-3"
+                      style={{ color: "var(--chat-accent-strong)" }}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2.5}
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m4.5 12.75 6 6 9-13.5"
+                      />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-            </AnimatedMessage>
-          );
-        })}
+              </AnimatedMessage>
+            );
+          })}
 
-        <TypingBubble message={typingMessage} />
+          <TypingBubble message={typingMessage} />
+        </div>
       </div>
     </div>
   );
