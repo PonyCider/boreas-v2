@@ -1,4 +1,4 @@
-import { SectionFrame } from "./landing-sections";
+import { SectionFrame } from "./section-frame";
 import { sectionIds, sectionStubs } from "@/content/site";
 
 export function SocialProofSection() {

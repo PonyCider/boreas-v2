@@ -10,47 +10,50 @@ export interface AvatarCirclesProps {
 }
 
 const DEFAULT_AVATARS = [
-  "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=120&h=120&q=80",
-  "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=120&h=120&q=80",
-  "https://images.unsplash.com/photo-1594824813571-2153349aed06?auto=format&fit=crop&w=120&h=120&q=80",
-  "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=120&h=120&q=80",
+  "/testimonials/specialist-01.jpg",
+  "/testimonials/specialist-02.jpg",
+  "/testimonials/specialist-03.jpg",
+  "/testimonials/specialist-04.jpg",
 ];
 
 export function AvatarCircles({
   className,
   avatarUrls = DEFAULT_AVATARS,
-  text = "5.0 ★ · +120 especialistas confían en Boreas",
+  text = "+120 especialistas confían en Boreas",
 }: AvatarCirclesProps) {
   return (
-    <div className={cn("flex flex-wrap items-center gap-3.5", className)}>
-      <div className="flex -space-x-3 rtl:space-x-reverse">
+    <div className={cn("inline-flex max-w-full items-center gap-3", className)}>
+      <div className="flex shrink-0 -space-x-2.5 rtl:space-x-reverse">
         {avatarUrls.map((url, index) => (
           // These URLs may be supplied by consumers at runtime. Keeping a
           // native image preserves that API without requiring host allowlists.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             key={index}
-            className="h-10 w-10 rounded-full border-2 border-[#1B1916] object-cover shadow-md transition-transform hover:scale-110"
+            className="size-9 rounded-full border-2 border-[#1B1916] object-cover shadow-md transition-transform hover:scale-110 sm:size-10"
             src={url}
             width={40}
             height={40}
+            decoding="async"
             alt={`Especialista ${index + 1}`}
           />
         ))}
       </div>
-      <div className="flex flex-col gap-0.5">
-        <div className="flex items-center gap-1">
+      <div className="min-w-0 text-left">
+        <div className="flex items-center gap-0.5" role="img" aria-label="5 de 5 estrellas">
           {Array.from({ length: 5 }).map((_, i) => (
             <span
               key={i}
-              className="text-sm text-[#E2A33C]"
+              className="text-xs text-[#E2A33C] sm:text-sm"
               style={{ color: "var(--rating-gold, #E2A33C)" }}
+              aria-hidden="true"
             >
               ★
             </span>
           ))}
+          <span className="ml-1 text-xs font-semibold tabular-nums text-white/90">5.0</span>
         </div>
-        <span className="text-xs sm:text-sm font-medium text-white/85 tracking-tight">
+        <span className="mt-0.5 block text-pretty text-[11px] font-medium leading-snug text-white/70 sm:text-xs">
           {text}
         </span>
       </div>

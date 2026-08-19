@@ -1,17 +1,22 @@
 "use client";
 
-import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   AnimatePresence,
   motion,
   useMotionValue,
+  useSpring,
+  useTransform,
+  useVelocity,
 } from "motion/react";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-const floatingTooltipVariants = cva("z-50 max-w-[min(20rem,calc(100vw-1.5rem))] font-medium", {
+const floatingTooltipVariants = cva(
+  "z-50 mt-4 ml-4 max-w-[min(20rem,calc(100vw-1.5rem))] font-medium",
+  {
   variants: {
     variant: {
       default: "bg-primary text-background dark:bg-white",
@@ -26,7 +31,8 @@ const floatingTooltipVariants = cva("z-50 max-w-[min(20rem,calc(100vw-1.5rem))] 
     variant: "default",
     size: "md",
   },
-});
+  },
+);
 
 interface TooltipContextType {
   setContent: (
@@ -53,12 +59,44 @@ export function FloatingTooltipProvider({
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
+  const springConfig = { damping: 45, stiffness: 750 };
+  const smoothX = useSpring(x, springConfig);
+  const smoothY = useSpring(y, springConfig);
+  const velocityX = useVelocity(smoothX);
+  const velocityY = useVelocity(smoothY);
+  const scaleX = useTransform(velocityX, [-1000, 0, 1000], [0.9, 1, 1.15]);
+  const scaleY = useTransform(velocityY, [-1000, 0, 1000], [1.15, 1, 0.9]);
+  const skewX = useTransform(velocityX, [-1000, 0, 1000], [-3, 0, 3]);
+  const skewY = useTransform(velocityY, [-1000, 0, 1000], [-3, 0, 3]);
+
   const [isActive, setIsActive] = useState(false);
   const [content, setContent] = useState("");
   const [description, setDescription] = useState("");
   const [contentClassName, setContentClassName] = useState("");
   const [descriptionClassName, setDescriptionClassName] = useState("");
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const zoomRef = useRef(1);
+
+  useEffect(() => {
+    const updateZoom = () => {
+      const computedZoom = window.getComputedStyle(document.documentElement).zoom;
+      zoomRef.current = computedZoom ? Number.parseFloat(computedZoom) : 1;
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const zoom = zoomRef.current;
+      x.set(event.clientX / zoom);
+      y.set(event.clientY / zoom);
+    };
+
+    updateZoom();
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("resize", updateZoom, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("resize", updateZoom);
+    };
+  }, [x, y]);
 
   const setAnchorPosition = useCallback((rect: DOMRect) => {
     if (typeof window === "undefined") return;
@@ -102,8 +140,8 @@ export function FloatingTooltipProvider({
                 ref={tooltipRef}
                 className="pointer-events-none fixed z-[9999]"
                 style={{
-                  top: y,
-                  left: x,
+                  top: smoothY,
+                  left: smoothX,
                 }}
                 initial={{
                   opacity: 0,
@@ -128,6 +166,7 @@ export function FloatingTooltipProvider({
                     floatingTooltipVariants({ variant, size }),
                     className,
                   )}
+                  style={{ scaleX, scaleY, skewX, skewY }}
                   transition={{
                     layout: {
                       type: "spring",
@@ -196,9 +235,11 @@ export function FloatingTooltipTrigger({
   const { setContent, setIsActive, setAnchorPosition } = context;
   const triggerRef = useRef<HTMLDivElement>(null);
 
-  const showTooltip = () => {
+  const showTooltip = (anchorToTrigger = false) => {
     setContent(content, description, contentClassName, descriptionClassName);
-    if (triggerRef.current) setAnchorPosition(triggerRef.current.getBoundingClientRect());
+    if (anchorToTrigger && triggerRef.current) {
+      setAnchorPosition(triggerRef.current.getBoundingClientRect());
+    }
     setIsActive(true);
   };
 
@@ -209,12 +250,12 @@ export function FloatingTooltipTrigger({
   return (
     <div
       ref={triggerRef}
-      onMouseEnter={showTooltip}
+      onMouseEnter={() => showTooltip(false)}
       onMouseLeave={handleMouseLeave}
-      onFocusCapture={showTooltip}
+      onFocusCapture={() => showTooltip(true)}
       onBlurCapture={handleMouseLeave}
       onPointerDown={(event) => {
-        if (event.pointerType === "touch") showTooltip();
+        if (event.pointerType === "touch") showTooltip(true);
       }}
       className="inline-block"
     >

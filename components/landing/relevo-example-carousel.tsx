@@ -600,6 +600,7 @@ function ConversationCard({
 export function RelevoExampleCarousel() {
   const reduceMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [outgoingIndex, setOutgoingIndex] = useState<number | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [direction, setDirection] = useState<1 | -1>(1);
   const [containerHeight, setContainerHeight] = useState<number | null>(null);
@@ -631,6 +632,7 @@ export function RelevoExampleCarousel() {
   }, []);
 
   const activeExample = relevoExamples[activeIndex];
+  const outgoingExample = outgoingIndex === null ? null : relevoExamples[outgoingIndex];
   const [contextBefore, contextAfter] = activeExample.context.text.split(
     activeExample.context.emphasis
   );
@@ -641,13 +643,18 @@ export function RelevoExampleCarousel() {
 
       setDirection(nextDirection);
       if (reduceMotion) {
+        setOutgoingIndex(null);
         setActiveIndex(index);
         return;
       }
 
       setIsTransitioning(true);
+      setOutgoingIndex(activeIndex);
       setActiveIndex(index);
-      const transitionTimer = window.setTimeout(() => setIsTransitioning(false), 360);
+      const transitionTimer = window.setTimeout(() => {
+        setOutgoingIndex(null);
+        setIsTransitioning(false);
+      }, 420);
       timersRef.current.push(transitionTimer);
     },
     [activeIndex, isTransitioning, reduceMotion]
@@ -785,7 +792,7 @@ export function RelevoExampleCarousel() {
       <div className="min-w-0 lg:col-span-7 lg:flex lg:flex-col lg:items-end">
       <motion.button
         type="button"
-        drag="x"
+        drag={reduceMotion ? false : "x"}
         dragConstraints={{ left: -56, right: 56 }}
         dragElastic={0}
         dragMomentum={false}
@@ -845,12 +852,13 @@ export function RelevoExampleCarousel() {
               reduceMotion
                 ? false
                 : {
-                    x: 14 * direction,
-                    scale: 0.995,
+                    x: 18 * direction,
+                    y: 6,
+                    scale: 0.978,
                   }
             }
-            animate={{ x: 0, scale: 1 }}
-            transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+            animate={{ x: 0, y: 0, scale: 1 }}
+            transition={{ duration: reduceMotion ? 0 : 0.42, ease: [0.22, 1, 0.36, 1] }}
             style={{ boxShadow: "var(--shadow)" }}
             aria-hidden="true"
           >
@@ -861,6 +869,20 @@ export function RelevoExampleCarousel() {
               reduceMotion={Boolean(reduceMotion)}
             />
           </motion.div>
+
+          {outgoingExample && (
+            <motion.div
+              key={`outgoing-${outgoingExample.practice.name}`}
+              className="pointer-events-none absolute left-0 right-10 top-0 h-full overflow-hidden rounded-[var(--radius-sm)] border border-line"
+              initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+              animate={{ x: -36 * direction, y: -2, scale: 0.965, opacity: 0 }}
+              transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
+              style={{ boxShadow: "var(--shadow)" }}
+              aria-hidden="true"
+            >
+              <ConversationCard example={outgoingExample} isFrontCard />
+            </motion.div>
+          )}
         </div>
       </motion.button>
 

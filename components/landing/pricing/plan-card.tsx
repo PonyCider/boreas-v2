@@ -175,7 +175,6 @@ export function PlanCard({ tier, onSelect }: { tier: Tier; onSelect: SelectPlan 
           repeat={true}
           repeatDelay={4}
           startOnView={true}
-          revealFromTransparent={false}
           className="font-bold tracking-tight"
         />
         {tier.id === "deluxe" && (

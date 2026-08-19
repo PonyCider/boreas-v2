@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
-import { SectionFrame } from "./landing-sections";
+import { SectionFrame } from "./section-frame";
 import LightRays from "./light-rays";
 import SpecularButton from "./specular-button";
 import { InteractiveHoverButton } from "./interactive-hover-button";

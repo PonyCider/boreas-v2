@@ -54,7 +54,8 @@ export default function Particles({
       renderer.setSize(width, height);
       camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
     }
-    window.addEventListener("resize", resize);
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
     resize();
 
     const count = particleCount;
@@ -171,11 +172,10 @@ export default function Particles({
       mouseY = -y * 2;
     };
 
-    if (moveParticlesOnHover) {
-      window.addEventListener("mousemove", handleMouseMove);
-    }
+    let animationFrameId = 0;
+    let isIntersecting = false;
+    let listeningForMouse = false;
 
-    let animationFrameId: number;
     function update(t: number) {
       animationFrameId = requestAnimationFrame(update);
       const time = t * 0.001;
@@ -190,17 +190,42 @@ export default function Particles({
       renderer.render({ scene: particlesMesh, camera });
     }
 
-    animationFrameId = requestAnimationFrame(update);
+    const setMouseListening = (active: boolean) => {
+      if (!moveParticlesOnHover || listeningForMouse === active) return;
+      listeningForMouse = active;
+      if (active) window.addEventListener("mousemove", handleMouseMove, { passive: true });
+      else window.removeEventListener("mousemove", handleMouseMove);
+    };
+
+    const syncActivity = () => {
+      const shouldRun = isIntersecting && !document.hidden;
+      setMouseListening(shouldRun);
+
+      if (shouldRun && animationFrameId === 0) {
+        animationFrameId = requestAnimationFrame(update);
+      } else if (!shouldRun && animationFrameId !== 0) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = 0;
+      }
+    };
+
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isIntersecting = entry.isIntersecting;
+      syncActivity();
+    });
+    visibilityObserver.observe(container);
+    document.addEventListener("visibilitychange", syncActivity);
 
     return () => {
-      window.removeEventListener("resize", resize);
-      if (moveParticlesOnHover) {
-        window.removeEventListener("mousemove", handleMouseMove);
-      }
-      cancelAnimationFrame(animationFrameId);
+      resizeObserver.disconnect();
+      visibilityObserver.disconnect();
+      document.removeEventListener("visibilitychange", syncActivity);
+      setMouseListening(false);
+      if (animationFrameId !== 0) cancelAnimationFrame(animationFrameId);
       if (container && gl.canvas.parentNode === container) {
         container.removeChild(gl.canvas);
       }
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
   }, [
     particleColors,

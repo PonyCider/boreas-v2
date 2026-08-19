@@ -1,10 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRef, useState } from "react";
 import { useInView, useReducedMotion } from "motion/react";
 import { Info } from "lucide-react";
-import { SectionFrame } from "./landing-sections";
-import { CheckoutModal } from "./pricing/checkout-modal";
+import { SectionFrame } from "./section-frame";
 import { OrganizationPlanCard, PlanCard } from "./pricing/plan-card";
 import SplitText from "./split-text";
 import { TextEffect } from "./text-effect";
@@ -15,6 +15,8 @@ import type { PlanConfig, Selection } from "@/lib/pricing";
 
 const mainTiers = tiers.filter((tier) => tier.id !== "organizaciones");
 const organizationTier = tiers.find((tier) => tier.id === "organizaciones");
+const loadCheckoutModal = () => import("./pricing/checkout-modal");
+const CheckoutModal = dynamic(() => loadCheckoutModal().then((module) => module.CheckoutModal));
 
 export function PricingSection() {
   const [selection, setSelection] = useState<Selection | null>(null);
@@ -64,7 +66,12 @@ export function PricingSection() {
             </p>
           </div>
 
-          <div className="pricing-texture relative mt-12 rounded-[calc(var(--radius-xl)+0.5rem)] border border-line/70 p-4 sm:p-6 lg:p-8">
+          <div
+            className="pricing-texture relative mt-12 rounded-[calc(var(--radius-xl)+0.5rem)] border border-line/70 p-4 sm:p-6 lg:p-8"
+            onPointerEnter={() => void loadCheckoutModal()}
+            onFocusCapture={() => void loadCheckoutModal()}
+            onTouchStart={() => void loadCheckoutModal()}
+          >
             <div className="relative z-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {mainTiers.map((tier) => (
                 <PlanCard key={tier.id} tier={tier} onSelect={handleSelect} />
@@ -85,12 +92,14 @@ export function PricingSection() {
 
         </div>
 
-        <CheckoutModal
-          selection={selection}
-          open={checkoutOpen}
-          onOpenChange={setCheckoutOpen}
-          returnFocusRef={checkoutTriggerRef}
-        />
+        {selection && (
+          <CheckoutModal
+            selection={selection}
+            open={checkoutOpen}
+            onOpenChange={setCheckoutOpen}
+            returnFocusRef={checkoutTriggerRef}
+          />
+        )}
       </FloatingTooltip.Provider>
     </SectionFrame>
   );

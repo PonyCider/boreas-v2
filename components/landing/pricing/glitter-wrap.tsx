@@ -207,8 +207,27 @@ export function GlitterWrap({ active }: { active: boolean }) {
     };
 
     const resizeObserver = new ResizeObserver((entries) => resize(entries[0]));
+    const loop = (time: number) => {
+      const deltaSeconds = (time - previousTime) / 1000;
+      previousTime = time;
+      drawFrame(deltaSeconds);
+      frameId = requestAnimationFrame(loop);
+    };
+
+    const syncActivity = () => {
+      const shouldRun = visible && !document.hidden;
+      if (shouldRun && frameId === 0) {
+        previousTime = performance.now();
+        frameId = requestAnimationFrame(loop);
+      } else if (!shouldRun && frameId !== 0) {
+        cancelAnimationFrame(frameId);
+        frameId = 0;
+      }
+    };
+
     const visibilityObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
+      if (!reducedMotion) syncActivity();
     });
 
     resizeObserver.observe(container);
@@ -219,17 +238,13 @@ export function GlitterWrap({ active }: { active: boolean }) {
     if (reducedMotion) {
       for (let frame = 0; frame < 70; frame += 1) drawFrame(1 / 60, true);
     } else {
-      const loop = (time: number) => {
-        const deltaSeconds = (time - previousTime) / 1000;
-        previousTime = time;
-        if (visible) drawFrame(deltaSeconds);
-        frameId = requestAnimationFrame(loop);
-      };
-      frameId = requestAnimationFrame(loop);
+      document.addEventListener("visibilitychange", syncActivity);
+      syncActivity();
     }
 
     return () => {
-      cancelAnimationFrame(frameId);
+      if (frameId !== 0) cancelAnimationFrame(frameId);
+      document.removeEventListener("visibilitychange", syncActivity);
       resizeObserver.disconnect();
       visibilityObserver.disconnect();
     };

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useReducedMotion } from "motion/react";
-import { SectionFrame } from "./landing-sections";
+import { SectionFrame } from "./section-frame";
 import SplitText from "./split-text";
 import OptionWheel from "@/components/ui/option-wheel";
 import { AgendaCalMotor } from "./motors/agenda-cal";

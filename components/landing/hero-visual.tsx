@@ -37,7 +37,7 @@ const engineTabLabels = [
   { short: "GAD-7", name: "Ansiedad" },
   { short: "Diario", name: "Emocional" },
   { short: "IMC", name: "Calculadora" },
-  { short: "Agendamiento", name: "Inteligente" },
+  { short: "Citas", name: "Agendamiento inteligente" },
 ];
 
 function EngineGad7View({ accent }: { accent: string }) {
@@ -255,10 +255,11 @@ function EngineAgendamientoView({ accent }: { accent: string }) {
 
 export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const tiltFrameRef = useRef<number | null>(null);
+  const pointerRef = useRef({ x: 0, y: 0 });
 
   // Check mobile / coarse pointer for 3D tilt disabling
   useEffect(() => {
@@ -295,21 +296,38 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
   // 3D Tilt handlers
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isTouchDevice || !cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const mouseX = e.clientX - centerX;
-    const mouseY = e.clientY - centerY;
+    pointerRef.current = { x: e.clientX, y: e.clientY };
+    if (tiltFrameRef.current !== null) return;
 
-    const rotateX = (-mouseY / (rect.height / 2)) * 7;
-    const rotateY = (mouseX / (rect.width / 2)) * 7;
-
-    setTilt({ rotateX, rotateY });
+    tiltFrameRef.current = requestAnimationFrame(() => {
+      tiltFrameRef.current = null;
+      const card = cardRef.current;
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      const mouseX = pointerRef.current.x - (rect.left + rect.width / 2);
+      const mouseY = pointerRef.current.y - (rect.top + rect.height / 2);
+      const rotateX = (-mouseY / (rect.height / 2)) * 7;
+      const rotateY = (mouseX / (rect.width / 2)) * 7;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
   };
 
   const handleMouseLeave = () => {
-    setTilt({ rotateX: 0, rotateY: 0 });
+    if (tiltFrameRef.current !== null) {
+      cancelAnimationFrame(tiltFrameRef.current);
+      tiltFrameRef.current = null;
+    }
+    if (cardRef.current) {
+      cardRef.current.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg)";
+    }
   };
+
+  useEffect(
+    () => () => {
+      if (tiltFrameRef.current !== null) cancelAnimationFrame(tiltFrameRef.current);
+    },
+    []
+  );
 
   const activeScreen = motorScreens[activeIndex];
   const activeIcon = motorIcon[activeScreen.icon];
@@ -319,11 +337,11 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
   return (
     <div
       ref={ref}
-      className="relative flex w-full flex-col items-center lg:items-end justify-center py-4 lg:py-0 min-w-0 overflow-visible"
+      className="relative flex min-w-0 w-full flex-col items-center justify-center py-4 lg:items-end lg:py-0"
     >
       {/* Main Container Shell for 3D Tilt */}
       <div
-        className="relative w-full max-w-[480px] sm:max-w-[520px] perspective-1000"
+        className="relative w-full max-w-[480px] sm:max-w-[520px] lg:perspective-1000"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
@@ -332,10 +350,10 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
           style={{
             transform: isTouchDevice
               ? "none"
-              : `perspective(1000px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
+              : "perspective(1000px) rotateX(0deg) rotateY(0deg)",
             transition: "transform 0.2s cubic-bezier(0.2, 0, 0, 1)",
           }}
-          className="relative w-full max-w-[480px] sm:max-w-[520px] shadow-2xl rounded-2xl border border-white/15 bg-[#1B1916]/95 p-5 backdrop-blur-xl transition-all duration-300"
+          className="relative w-full max-w-[480px] rounded-2xl border border-white/15 bg-[#1B1916]/95 p-3.5 shadow-xl sm:max-w-[520px] lg:p-5 lg:shadow-2xl lg:backdrop-blur-xl"
         >
           {/* Magic UI BorderBeam */}
           <BorderBeam size={280} duration={12} delay={0} colorFrom="var(--accent, #E27F62)" />
@@ -351,29 +369,30 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
           />
 
           {/* Dashboard Header */}
-          <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-4">
-            <div className="flex items-center gap-3">
+          <div className="relative z-10 flex items-center justify-between gap-2 border-b border-white/10 pb-3 lg:pb-4">
+            <div className="flex min-w-0 items-center gap-2.5 lg:gap-3">
               <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/15 shadow-inner transition-colors duration-300"
+                className="flex size-9 shrink-0 items-center justify-center rounded-xl border border-white/15 shadow-inner transition-colors duration-300 lg:size-10"
                 style={{ backgroundColor: `color-mix(in oklch, ${accent} 20%, transparent)` }}
               >
                 <Icon className="h-5 w-5 transition-colors duration-300" style={{ color: accent }} />
               </div>
-              <div>
-                <h3 className="text-sm sm:text-base font-bold text-white tracking-tight flex items-center gap-2">
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-bold text-white lg:text-base">
                   Dashboard Médico 24/7
                 </h3>
-                <p className="text-xs text-white/50 font-sans">Boreas Clinical Command Center</p>
+                <p className="truncate font-sans text-[10px] text-white/50 lg:text-xs">Boreas Clinical Command Center</p>
               </div>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-medium text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              24/7 Activo
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-400 lg:px-3 lg:text-[11px]">
+              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="lg:hidden">Activo</span>
+              <span className="hidden lg:inline">24/7 Activo</span>
             </span>
           </div>
 
           {/* Engine Selector Tabs */}
-          <div className="relative z-10 my-4 grid grid-cols-4 gap-1.5 rounded-xl border border-white/10 bg-black/40 p-1.5">
+          <div className="relative z-10 my-3 grid grid-cols-4 gap-1 rounded-xl border border-white/10 bg-black/40 p-1 lg:my-4 lg:gap-1.5 lg:p-1.5">
             {motorScreens.map((screen, idx) => {
               const TabIcon = motorIcon[screen.icon];
               const tabAccent = accentVar[screen.accent];
@@ -382,7 +401,7 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
                 <button
                   key={idx}
                   onClick={() => handleTabClick(idx)}
-                  className={`relative flex flex-col items-center justify-center rounded-lg py-2 px-1 text-center transition-colors duration-200 ${
+                  className={`relative flex min-h-11 min-w-0 flex-col items-center justify-center rounded-lg px-0.5 py-1.5 text-center transition-colors duration-200 lg:px-1 lg:py-2 ${
                     isActive
                       ? "text-white font-semibold"
                       : "text-white/50 hover:text-white/80 hover:bg-white/[0.03]"
@@ -398,10 +417,10 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
                     />
                   )}
                   <TabIcon
-                    className="relative z-10 h-4 w-4 mb-1 transition-colors"
+                    className="relative z-10 mb-0.5 size-3.5 transition-colors lg:mb-1 lg:size-4"
                     style={{ color: isActive ? tabAccent : "currentColor" }}
                   />
-                  <span className="relative z-10 text-[11px] leading-tight block truncate w-full font-medium">
+                  <span className="relative z-10 block w-full truncate text-[9px] font-medium leading-tight lg:text-[11px]">
                     {engineTabLabels[idx].short}
                   </span>
                   {isActive && (
@@ -416,8 +435,8 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
           </div>
 
           {/* Dynamic Active Engine Content */}
-          <div className="relative z-10 rounded-xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-md transition-all duration-300">
-            <div className="flex items-center justify-between border-b border-white/10 pb-2.5 mb-3">
+          <div className="relative z-10 rounded-xl border border-white/10 bg-white/[0.03] p-3 lg:p-4 lg:backdrop-blur-md">
+            <div className="mb-2.5 flex items-center justify-between border-b border-white/10 pb-2 lg:mb-3 lg:pb-2.5">
               <div className="flex items-center gap-2">
                 <span
                   className="h-2.5 w-2.5 rounded-full"
@@ -452,29 +471,30 @@ export const HeroVisual = forwardRef<HTMLDivElement>((_, ref) => {
           </div>
 
           {/* Footer status */}
-          <div className="relative z-10 flex items-center justify-between pt-3 mt-3 border-t border-white/10 text-[11px] text-white/50">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-white/60">
+          <div className="relative z-10 mt-2.5 flex items-center justify-between gap-2 border-t border-white/10 pt-2.5 text-[11px] text-white/50 lg:mt-3 lg:pt-3">
+            <span className="min-w-0 truncate font-mono text-[9px] uppercase text-white/60 lg:text-[10px]">
               {activeScreen.body}
             </span>
-            <span className="flex items-center gap-1.5 text-[10px] font-medium text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              Auto-Conversión ON
+            <span className="flex shrink-0 items-center gap-1.5 text-[9px] font-medium text-emerald-400 lg:text-[10px]">
+              <span className="size-1.5 rounded-full bg-emerald-400" />
+              <span className="lg:hidden">Auto ON</span>
+              <span className="hidden lg:inline">Auto-Conversión ON</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* HeroFeed Overlay - Live Notifications Ribbon */}
-      <div className="w-full max-w-[480px] mt-4 lg:mt-0 lg:absolute lg:-bottom-8 lg:-left-10 lg:w-[300px] z-20">
-        <div className="rounded-2xl border border-white/15 bg-[#131210]/95 p-3.5 shadow-2xl backdrop-blur-xl">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2.5">
+      <div className="z-20 mt-3 w-full max-w-[480px] sm:mt-4 lg:absolute lg:-bottom-8 lg:-left-10 lg:mt-0 lg:w-[300px]">
+        <div className="rounded-2xl border border-white/15 bg-[#131210]/95 p-3 shadow-xl sm:p-3.5 sm:shadow-2xl lg:backdrop-blur-xl">
+          <div className="mb-2 flex items-center justify-between border-b border-white/10 pb-2 sm:mb-2.5">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
               <span className="text-xs font-semibold text-white tracking-tight">Actividad en tiempo real</span>
             </div>
             <span className="text-[10px] font-mono text-white/60">Boreas Feed</span>
           </div>
-          <div className="h-[180px] w-full">
+          <div className="h-[132px] w-full sm:h-[156px] lg:h-[180px]">
             <HeroFeed />
           </div>
         </div>

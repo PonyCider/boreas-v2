@@ -28,10 +28,10 @@ const feedIcon: Record<FeedEvent["icon"], LucideIcon> = {
 function AccentBadge({ accent, Icon }: { accent: Accent; Icon: LucideIcon }) {
   return (
     <span
-      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+      className="flex size-7 shrink-0 items-center justify-center rounded-full sm:size-8"
       style={{ backgroundColor: `color-mix(in oklch, ${accentVar[accent]} 18%, transparent)` }}
     >
-      <Icon className="h-4 w-4" style={{ color: accentVar[accent] }} />
+      <Icon className="size-3.5 sm:size-4" style={{ color: accentVar[accent] }} />
     </span>
   );
 }
@@ -39,11 +39,11 @@ function AccentBadge({ accent, Icon }: { accent: Accent; Icon: LucideIcon }) {
 function FeedItem({ event }: { event: FeedEvent }) {
   const Icon = feedIcon[event.icon];
   return (
-    <div className="flex w-full items-center gap-3 rounded-[var(--radius-md)] border border-white/10 bg-black/50 px-4 py-3 backdrop-blur-sm">
+    <div className="flex w-full items-center gap-2.5 rounded-[var(--radius-md)] border border-white/10 bg-black/50 px-3 py-2.5 sm:gap-3 sm:px-4 sm:py-3">
       <AccentBadge accent={event.accent} Icon={Icon} />
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-white">{event.title}</p>
-        <p className="text-xs text-white/50">{event.meta}</p>
+        <p className="truncate text-xs font-medium text-white sm:text-sm">{event.title}</p>
+        <p className="truncate text-[11px] text-white/50 sm:text-xs">{event.meta}</p>
       </div>
     </div>
   );
@@ -77,7 +77,7 @@ export function HeroFeed() {
         WebkitMaskImage: "linear-gradient(to top, transparent 0%, black 20%)",
       }}
     >
-      <AnimatedList key={cycle} delay={FEED_ITEM_DELAY} className="gap-3">
+      <AnimatedList key={cycle} delay={FEED_ITEM_DELAY} maxItems={6} className="gap-2 sm:gap-3">
         {feedStream.map((event, i) => (
           <FeedItem key={i} event={event} />
         ))}

@@ -1,4 +1,4 @@
-import { SectionFrame } from "./landing-sections";
+import { SectionFrame } from "./section-frame";
 import { RelevoCuriositySection } from "./relevo-curiosity-section";
 import { sectionIds } from "@/content/site";
 

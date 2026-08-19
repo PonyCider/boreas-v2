@@ -99,7 +99,7 @@ export function RelevoCuriositySection() {
               href={relevoContent.ctaHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative inline-flex min-h-12 items-center gap-3 overflow-hidden rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-[#F5F1E8] shadow-[0_12px_30px_rgba(35,30,26,0.2)] outline-none transition-[background-color,box-shadow] duration-300 hover:bg-accent hover:shadow-[0_16px_36px_rgba(140,65,45,0.24)] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+              className="group relative inline-flex min-h-12 w-fit justify-self-start items-center gap-3 overflow-hidden rounded-full bg-foreground px-6 py-3 text-sm font-semibold text-[#F5F1E8] shadow-[0_12px_30px_rgba(35,30,26,0.2)] outline-none transition-[background-color,box-shadow] duration-300 hover:bg-accent hover:shadow-[0_16px_36px_rgba(140,65,45,0.24)] focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-4 focus-visible:ring-offset-background"
               style={{ color: "#F5F1E8" }}
               whileHover={reduceMotion ? undefined : { y: -2 }}
               whileTap={reduceMotion ? undefined : { scale: 0.98 }}

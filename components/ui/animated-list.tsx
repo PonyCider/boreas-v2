@@ -28,10 +28,11 @@ export function AnimatedListItem({ children }: { children: React.ReactNode }) {
 export interface AnimatedListProps extends ComponentPropsWithoutRef<"div"> {
   children: React.ReactNode
   delay?: number
+  maxItems?: number
 }
 
 export const AnimatedList = React.memo(
-  ({ children, className, delay = 1000, ...props }: AnimatedListProps) => {
+  ({ children, className, delay = 1000, maxItems = Number.POSITIVE_INFINITY, ...props }: AnimatedListProps) => {
     const [index, setIndex] = useState(0)
     const childrenArray = useMemo(
       () => React.Children.toArray(children),
@@ -55,9 +56,11 @@ export const AnimatedList = React.memo(
     }, [index, delay, childrenArray.length])
 
     const itemsToShow = useMemo(() => {
-      const result = childrenArray.slice(0, index + 1).reverse()
+      const result = childrenArray
+        .slice(Math.max(0, index + 1 - maxItems), index + 1)
+        .reverse()
       return result
-    }, [index, childrenArray])
+    }, [index, childrenArray, maxItems])
 
     return (
       <div

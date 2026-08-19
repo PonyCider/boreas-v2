@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useInView, useReducedMotion } from "motion/react";
-import { SectionFrame } from "./landing-sections";
+import { SectionFrame } from "./section-frame";
 import SplitText from "./split-text";
 import { TextEffect } from "./text-effect";
 import { GsapCounter } from "./gsap-counter";

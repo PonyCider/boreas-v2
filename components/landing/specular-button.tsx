@@ -222,8 +222,6 @@ const SpecularButton = forwardRef<HTMLButtonElement, SpecularButtonProps>(
         const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1));
         proximityT = t * t * (3 - 2 * t);
       };
-      window.addEventListener('pointermove', onPointerMove);
-
 const resolveToHex = (colorStr: string, element: HTMLElement | null): string => {
   if (!colorStr) return '#ffffff';
   const trimmed = colorStr.trim();
@@ -257,7 +255,6 @@ const resolveToHex = (colorStr: string, element: HTMLElement | null): string => 
       let bright = 0;
       let last = performance.now();
       let raf = 0;
-      let frameCount = 0;
 
       const lineC = new Color();
       const baseC = new Color();
@@ -283,15 +280,14 @@ const resolveToHex = (colorStr: string, element: HTMLElement | null): string => 
         const brightTarget = p.autoAnimate ? 1 : proximityT;
         bright += (brightTarget - bright) * (1 - Math.exp(-dt * 8));
 
-        if (frameCount % 30 === 0 || p.lineColor !== lastLineProp) {
+        if (p.lineColor !== lastLineProp) {
           lastLineProp = p.lineColor;
           resolvedLineColor = resolveToHex(p.lineColor, localRef.current);
         }
-        if (frameCount % 30 === 0 || p.baseColor !== lastBaseProp) {
+        if (p.baseColor !== lastBaseProp) {
           lastBaseProp = p.baseColor;
           resolvedBaseColor = resolveToHex(p.baseColor, localRef.current);
         }
-        frameCount++;
 
         lineC.set(resolvedLineColor);
         baseC.set(resolvedBaseColor);
@@ -305,12 +301,48 @@ const resolveToHex = (colorStr: string, element: HTMLElement | null): string => 
         program.uniforms.uThickness.value = p.thickness * dpr;
         renderer.render({ scene: mesh });
       };
-      raf = requestAnimationFrame(update);
+
+      let isIntersecting = false;
+      let listeningForPointer = false;
+
+      const setPointerListening = (active: boolean) => {
+        if (listeningForPointer === active) return;
+        if (active && !propsRef.current.followMouse) return;
+        listeningForPointer = active;
+        if (active) window.addEventListener('pointermove', onPointerMove, { passive: true });
+        else window.removeEventListener('pointermove', onPointerMove);
+      };
+
+      const syncActivity = () => {
+        const shouldRun = isIntersecting && !document.hidden;
+        setPointerListening(shouldRun);
+
+        if (shouldRun && raf === 0) {
+          const now = performance.now();
+          const elapsed = Math.max(0, (now - last) / 1000);
+          idleAngle += propsRef.current.speed * elapsed;
+          angle = idleAngle;
+          last = now;
+          raf = requestAnimationFrame(update);
+        } else if (!shouldRun && raf !== 0) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      };
+
+      const visibilityObserver = new IntersectionObserver(([entry]) => {
+        isIntersecting = entry.isIntersecting;
+        syncActivity();
+      });
+      visibilityObserver.observe(btn);
+      document.addEventListener('visibilitychange', syncActivity);
 
       return () => {
-        cancelAnimationFrame(raf);
+        if (raf !== 0) cancelAnimationFrame(raf);
         ro.disconnect();
-        window.removeEventListener('pointermove', onPointerMove);
+        visibilityObserver.disconnect();
+        document.removeEventListener('visibilitychange', syncActivity);
+        setPointerListening(false);
         if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);
         gl.getExtension('WEBGL_lose_context')?.loseContext();
       };

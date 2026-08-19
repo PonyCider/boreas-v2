@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect } from 'react';
 import { Renderer, Program, Triangle, Mesh } from 'ogl';
 
 export type RaysOrigin =
@@ -104,7 +104,8 @@ const LightRays: React.FC<LightRaysProps> = ({
   const animationIdRef = useRef<number | null>(null);
   const meshRef = useRef<Mesh | null>(null);
   const cleanupFunctionRef = useRef<(() => void) | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const isVisibleRef = useRef(false);
+  const resumeAnimationRef = useRef<(() => void) | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -113,14 +114,30 @@ const LightRays: React.FC<LightRaysProps> = ({
     observerRef.current = new IntersectionObserver(
       entries => {
         const entry = entries[0];
-        setIsVisible(entry.isIntersecting);
+        isVisibleRef.current = entry.isIntersecting;
+        if (entry.isIntersecting && !document.hidden) {
+          resumeAnimationRef.current?.();
+        } else if (animationIdRef.current !== null) {
+          cancelAnimationFrame(animationIdRef.current);
+          animationIdRef.current = null;
+        }
       },
       { threshold: 0.1 }
     );
 
     observerRef.current.observe(containerRef.current);
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isVisibleRef.current) {
+        resumeAnimationRef.current?.();
+      } else if (animationIdRef.current !== null) {
+        cancelAnimationFrame(animationIdRef.current);
+        animationIdRef.current = null;
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (observerRef.current) {
         observerRef.current.disconnect();
         observerRef.current = null;
@@ -129,7 +146,7 @@ const LightRays: React.FC<LightRaysProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!isVisible || !containerRef.current) return;
+    if (!containerRef.current) return;
 
     if (cleanupFunctionRef.current) {
       cleanupFunctionRef.current();
@@ -327,18 +344,27 @@ void main() {
 
         try {
           renderer.render({ scene: mesh });
-          animationIdRef.current = requestAnimationFrame(loop);
+          animationIdRef.current =
+            isVisibleRef.current && !document.hidden ? requestAnimationFrame(loop) : null;
         } catch (error) {
           console.warn('WebGL rendering error:', error);
           return;
         }
       };
 
+      const resumeAnimation = () => {
+        if (animationIdRef.current === null && isVisibleRef.current && !document.hidden) {
+          animationIdRef.current = requestAnimationFrame(loop);
+        }
+      };
+
       window.addEventListener('resize', updatePlacement);
       updatePlacement();
-      animationIdRef.current = requestAnimationFrame(loop);
+      resumeAnimationRef.current = resumeAnimation;
+      resumeAnimation();
 
       cleanupFunctionRef.current = () => {
+        resumeAnimationRef.current = null;
         if (animationIdRef.current) {
           cancelAnimationFrame(animationIdRef.current);
           animationIdRef.current = null;
@@ -377,7 +403,6 @@ void main() {
       }
     };
   }, [
-    isVisible,
     raysOrigin,
     raysColor,
     raysSpeed,
@@ -430,7 +455,7 @@ void main() {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current || !rendererRef.current) return;
+      if (!isVisibleRef.current || document.hidden || !containerRef.current || !rendererRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width;
       const y = (e.clientY - rect.top) / rect.height;

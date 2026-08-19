@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 
 interface VariableProximityProps {
@@ -18,15 +18,51 @@ export function VariableProximity({
   const [mousePosition, setMousePosition] = useState({ x: -1000, y: -1000 });
 
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let isIntersecting = false;
+    let listening = false;
+    let frame = 0;
+    let latest = { x: -1000, y: -1000 };
+
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      latest = { x: e.clientX, y: e.clientY };
+      if (frame !== 0) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        setMousePosition(latest);
+      });
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    const syncListener = () => {
+      const shouldListen = isIntersecting && !document.hidden;
+      if (shouldListen === listening) return;
+      listening = shouldListen;
+      if (shouldListen) {
+        window.addEventListener("mousemove", handleMouseMove, { passive: true });
+      } else {
+        window.removeEventListener("mousemove", handleMouseMove);
+        setMousePosition({ x: -1000, y: -1000 });
+      }
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isIntersecting = entry.isIntersecting;
+      syncListener();
+    });
+    observer.observe(container);
+    document.addEventListener("visibilitychange", syncListener);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", syncListener);
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (frame !== 0) cancelAnimationFrame(frame);
+    };
   }, []);
 
-  const letters = label.split("");
+  const letters = useMemo(() => label.split(""), [label]);
 
   return (
     <span
