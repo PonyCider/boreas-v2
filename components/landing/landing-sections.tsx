@@ -11,8 +11,8 @@ export function LandingSections() {
       <HeroSection />
       <ProblemSection />
       <MotorsSection />
-      <SocialProofSection />
       <PricingSection />
+      <SocialProofSection />
       <RelevoSection />
     </div>
   );

@@ -39,13 +39,3 @@ export const navCards: NavCard[] = [
 // Kept audience-neutral ("presencia digital") rather than "consultorio digital"
 // (V3's medico-specific term) per design spec §6. Confirmed in Epic 1.
 export const primaryCta = "Quiero mi presencia digital";
-
-export const sectionStubs: Record<
-  Exclude<SectionId, "hero" | "problema" | "motores" | "pricing" | "relevo">,
-  { eyebrow: string; heading: string }
-> = {
-  [sectionIds.socialProof]: {
-    eyebrow: "Epic 4",
-    heading: "Prueba social — pendiente de pulir",
-  },
-};

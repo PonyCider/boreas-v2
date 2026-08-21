@@ -6,6 +6,6 @@ export default defineConfig({
     alias: { "@": import.meta.dirname },
   },
   test: {
-    include: ["lib/**/*.test.ts"],
+    include: ["lib/**/*.test.ts", "content/**/*.test.ts"],
   },
 });
