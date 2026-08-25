@@ -6,13 +6,14 @@ export default function TeatroPreviewPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-            EPIC 3 · Fase 1
+            EPIC 3 · Fase 2
           </p>
           <h1 className="mt-3 font-display text-4xl text-foreground sm:text-5xl">
             Laboratorio del runtime portable
           </h1>
           <p className="mt-4 text-base leading-7 text-muted">
-            Ruta interna. Valida contratos, estados y transporte demo sin modificar la sección pública.
+            Ruta interna. Compara la nueva navegación con los seis motores V1
+            sin modificar la sección pública.
           </p>
         </div>
         <TheaterPreview />

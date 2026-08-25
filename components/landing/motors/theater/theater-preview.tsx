@@ -1,10 +1,59 @@
 "use client";
 
-import { runtimeContractDemoDefinition } from "@/content/motor-theater";
-import { resolveMotorView } from "./motor-registry";
-
-const PreviewView = resolveMotorView(runtimeContractDemoDefinition);
+import { useReducer } from "react";
+import {
+  runtimeContractDemoDefinition,
+  theaterMotorItems,
+} from "@/content/motor-theater";
+import {
+  createMotorSelectionState,
+  transitionMotorSelection,
+} from "@/lib/motors/runtime/selection";
+import { MotorBand } from "./motor-band";
+import { MotorStage } from "./motor-stage";
 
 export function TheaterPreview() {
-  return <PreviewView definition={runtimeContractDemoDefinition} />;
+  const [selection, dispatch] = useReducer(
+    (state, event) =>
+      transitionMotorSelection(state, event, theaterMotorItems.length),
+    theaterMotorItems.length,
+    createMotorSelectionState,
+  );
+  const activeItem = theaterMotorItems[selection.selectedIndex];
+
+  return (
+    <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#171713] shadow-[0_28px_90px_rgba(0,0,0,0.28)]">
+      <header className="px-5 pb-8 pt-7 sm:px-8 sm:pt-9 lg:px-10">
+        <div className="flex flex-wrap items-start justify-between gap-5">
+          <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-accent">
+              Banda expandible · Fase 2
+            </p>
+            <h2 className="mt-3 max-w-3xl font-display text-[clamp(2rem,5vw,4rem)] leading-[0.98] tracking-[-0.025em] text-foreground">
+              Seis puertas. Una escena.
+            </h2>
+          </div>
+          <p className="max-w-md text-sm leading-relaxed text-muted">
+            Elige una especialidad. Hover y foco solo anticipan; clic, Enter o
+            espacio cambian el motor.
+          </p>
+        </div>
+      </header>
+
+      <div className="px-4 sm:px-6 lg:px-10">
+        <MotorBand
+          items={theaterMotorItems}
+          selection={selection}
+          dispatch={dispatch}
+        />
+        <MotorStage item={activeItem} />
+      </div>
+
+      <footer className="mt-8 border-t border-white/10 px-5 py-5 text-xs leading-relaxed text-muted sm:px-8 lg:px-10">
+        Preview interno. Los seis componentes son los motores V1 actuales; la
+        banda y el registro portable son nuevos. El contrato de la Fase 1
+        permanece disponible como {runtimeContractDemoDefinition.motorId}.
+      </footer>
+    </div>
+  );
 }
