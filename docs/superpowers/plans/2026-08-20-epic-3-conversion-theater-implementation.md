@@ -225,6 +225,8 @@ arquitectura nueva necesita compartir contratos, no una UI rígida.
 ### Archivos previstos
 
 - Create: `lib/motors/runtime/types.ts`
+- Create: `lib/motors/runtime/domain.ts`
+- Create: `lib/motors/runtime/domain.test.ts`
 - Create: `lib/motors/runtime/state.ts`
 - Create: `lib/motors/runtime/state.test.ts`
 - Create: `lib/motors/runtime/transport.ts`
@@ -241,6 +243,10 @@ existente sin necesidad.
 
 - `MotorDefinition`: metadata pura — identidad, versión, especialidad, etiqueta y resultado
   prometido. No contiene renderer.
+- `MotorDomainRegistry`: registro TypeScript puro por `motorId@version` para validación de entrada,
+  cálculo de `PatientResult` y derivación de `SpecialistSummary`. No contiene React, transporte ni
+  copy de CTA. Esta frontera proviene de la auditoría del template: evita colocar `compute` o
+  `scoreToResult` dentro de la config que consume la vista.
 - `MotorViewRegistry`: registro React separado, fuera del runtime puro, con imports dinámicos por
   motor.
 - `MotorRuntimeState`: unión discriminada completa para `inicio`, `captura`, `resultado-paciente`,
@@ -256,6 +262,8 @@ existente sin necesidad.
 ### Reglas
 
 - El runtime no importa React, Next.js, Drizzle, Resend ni estilos.
+- `MotorDefinition` es metadata serializable; las funciones de dominio viven exclusivamente en
+  `MotorDomainRegistry`.
 - El registro visual no forma parte del paquete portable de lógica.
 - Cada renderer se carga de forma dinámica. Dental puede precargarse cerca del viewport; los otros
   cinco no entran al chunk inicial.
@@ -278,6 +286,8 @@ existente sin necesidad.
 - Demo transport no ejecuta `fetch`, almacenamiento ni efectos externos.
 - Demo transport nunca produce `confirmado`.
 - IDs y versiones del registro no se repiten.
+- Una definición puede serializarse sin funciones, JSX ni referencias a proveedores.
+- El registro de dominio deriva resultados con fixtures puras, sin montar React.
 
 ### Verificación
 
