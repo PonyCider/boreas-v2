@@ -1,4 +1,5 @@
 import { AlertTriangle, Check, Mail, MessageCircle, Phone, ShieldCheck } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode, RefObject } from "react";
 import type { MotorRuntimeState } from "@/lib/motors/runtime/state";
 
@@ -37,6 +38,16 @@ type DentalContactStepProps = {
   headingRef: RefObject<HTMLHeadingElement | null>;
 };
 
+const ease = [0.16, 1, 0.3, 1] as const;
+
+function contactMotion(reduceMotion: boolean) {
+  return {
+    initial: reduceMotion ? false : { opacity: 0, y: 8 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: reduceMotion ? 0 : 0.32, ease },
+  } as const;
+}
+
 function DemoField({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
   return (
     <div className="rounded-xl border border-border bg-background p-4">
@@ -63,19 +74,21 @@ export function DentalContactStep({
   onReset,
   headingRef,
 }: DentalContactStepProps) {
+  const reduceMotion = !!useReducedMotion();
+
   if (state.status === "enviando") {
     return (
-      <section className="rounded-[22px] border border-border bg-elevated p-6 text-center sm:p-8" aria-live="polite">
+      <motion.section key="sending" {...contactMotion(reduceMotion)} className="rounded-[22px] border border-border bg-elevated p-6 text-center sm:p-8" aria-live="polite">
         <span aria-hidden className="mx-auto block size-8 animate-spin rounded-full border-2 border-accent/25 border-t-accent motion-reduce:animate-none" />
         <h3 ref={headingRef} tabIndex={-1} className="mt-4 font-display text-2xl text-foreground outline-none">{copy.submitting}</h3>
         <p className="mt-2 text-sm text-muted">Adaptador local. Sin red y sin persistencia.</p>
-      </section>
+      </motion.section>
     );
   }
 
   if (state.status === "demo-completada") {
     return (
-      <section className="rounded-[22px] border border-mint/30 bg-mint/10 p-6 text-center sm:p-8" aria-live="polite">
+      <motion.section key="complete" {...contactMotion(reduceMotion)} className="rounded-[22px] border border-mint/30 bg-mint/10 p-6 text-center sm:p-8" aria-live="polite">
         <span className="mx-auto flex size-11 items-center justify-center rounded-full bg-mint text-background">
           <Check aria-hidden className="size-6" />
         </span>
@@ -87,13 +100,13 @@ export function DentalContactStep({
         <button type="button" className="btn btn-s mt-6" onClick={onReset}>
           Reiniciar cotizador
         </button>
-      </section>
+      </motion.section>
     );
   }
 
   if (state.status === "error-recuperable") {
     return (
-      <section className="rounded-[22px] border border-danger/30 bg-danger/10 p-6 sm:p-8" role="alert">
+      <motion.section key="error" {...contactMotion(reduceMotion)} className="rounded-[22px] border border-danger/30 bg-danger/10 p-6 sm:p-8" role="alert">
         <div className="flex gap-4">
           <AlertTriangle aria-hidden className="mt-1 size-6 shrink-0 text-danger" />
           <div>
@@ -104,12 +117,12 @@ export function DentalContactStep({
         <button type="button" className="btn btn-s mt-6 w-full sm:w-auto" onClick={onRetry}>
           {copy.retry}
         </button>
-      </section>
+      </motion.section>
     );
   }
 
   return (
-    <section className="rounded-[22px] border border-border bg-elevated p-5 sm:p-7">
+    <motion.section key="contact" {...contactMotion(reduceMotion)} className="rounded-[22px] border border-border bg-elevated p-5 sm:p-7">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Contacto después del resultado</p>
@@ -148,6 +161,6 @@ export function DentalContactStep({
         <button type="button" className="btn btn-p flex-1" onClick={onSubmit}>{copy.submit}</button>
         <button type="button" className="btn btn-s" onClick={onSimulateError}>Probar error recuperable</button>
       </div>
-    </section>
+    </motion.section>
   );
 }

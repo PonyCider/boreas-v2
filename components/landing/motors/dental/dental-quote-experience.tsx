@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, Clock3, ShieldCheck } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import { useReducer, useRef, useState } from "react";
 import {
   boreasDentalQuoteV2Config,
@@ -27,6 +28,19 @@ type DentalQuoteExperienceProps = { definition: MotorDefinition };
 type CaptureStep = "treatment" | "context";
 
 const demoTransport = new DemoMotorLeadTransport();
+const motionEase = [0.16, 1, 0.3, 1] as const;
+
+function stepMotion(reduceMotion: boolean, delay = 0) {
+  return {
+    initial: reduceMotion ? false : { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+      duration: reduceMotion ? 0 : 0.38,
+      ease: motionEase,
+      delay: reduceMotion ? 0 : delay,
+    },
+  } as const;
+}
 
 function isDentalResult(
   result: PatientResult,
@@ -39,6 +53,7 @@ function waitForDemoState() {
 }
 
 export function DentalQuoteExperience({ definition }: DentalQuoteExperienceProps) {
+  const reduceMotion = !!useReducedMotion();
   const [state, dispatch] = useReducer(
     transitionMotorState,
     definition,
@@ -160,7 +175,7 @@ export function DentalQuoteExperience({ definition }: DentalQuoteExperienceProps
 
   if (state.status === "inicio") {
     return (
-      <section className="relative isolate overflow-hidden rounded-[28px] border border-border bg-surface p-6 shadow-[0_28px_70px_-36px_rgb(0_0_0/0.9)] sm:p-9 lg:p-12">
+      <motion.section key="intro" {...stepMotion(reduceMotion)} className="relative isolate overflow-hidden rounded-[28px] border border-border bg-surface p-6 shadow-[0_28px_70px_-36px_rgb(0_0_0/0.9)] sm:p-9 lg:p-12">
         <div aria-hidden className="absolute -right-24 -top-24 size-80 rounded-full bg-accent/10 blur-3xl" />
         <div className="relative max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">{copy.intro.eyebrow}</p>
@@ -177,14 +192,14 @@ export function DentalQuoteExperience({ definition }: DentalQuoteExperienceProps
             {copy.intro.cta}<ArrowRight aria-hidden className="size-4" />
           </button>
         </div>
-      </section>
+      </motion.section>
     );
   }
 
   if (state.status === "captura") {
     const onTreatment = captureStep === "treatment";
     return (
-      <section className="overflow-hidden rounded-[28px] border border-border bg-surface shadow-[0_28px_70px_-36px_rgb(0_0_0/0.9)]">
+      <motion.section key={`capture-${captureStep}`} {...stepMotion(reduceMotion)} className="overflow-hidden rounded-[28px] border border-border bg-surface shadow-[0_28px_70px_-36px_rgb(0_0_0/0.9)]">
         <div className="border-b border-border px-5 py-5 sm:px-8">
           <div className="flex items-center gap-3" aria-label={`Paso ${onTreatment ? 1 : 2} de 2`}>
             {[1, 2].map((step) => (
@@ -259,7 +274,7 @@ export function DentalQuoteExperience({ definition }: DentalQuoteExperienceProps
             </div>
           )}
         </div>
-      </section>
+      </motion.section>
     );
   }
 
@@ -271,24 +286,28 @@ export function DentalQuoteExperience({ definition }: DentalQuoteExperienceProps
     state.status === "contacto" || state.status === "enviando" || state.status === "demo-completada" || state.status === "error-recuperable";
 
   return (
-    <section>
+    <motion.section key="result" {...stepMotion(reduceMotion)}>
       <div className="grid gap-4 lg:grid-cols-2">
-        <DentalPatientResult
-          result={dentalResult}
-          treatment={selectedTreatment}
-          reviewedAt={config.reviewedAt}
-          faceLabel={copy.faces.patient}
-          onRequestContact={requestContact}
-          showContactCta={state.status === "resultado-paciente"}
-          headingRef={resultHeadingRef}
-        />
-        <DentalSpecialistSummary
-          summary={state.specialistSummary}
-          faceLabel={copy.faces.specialist}
-          description={copy.faces.specialistDescription}
-          contactChannel={contactVisible ? boreasDentalQuoteV2DemoContact.preferredChannel : undefined}
-          demoCompleted={state.status === "demo-completada"}
-        />
+        <motion.div {...stepMotion(reduceMotion)}>
+          <DentalPatientResult
+            result={dentalResult}
+            treatment={selectedTreatment}
+            reviewedAt={config.reviewedAt}
+            faceLabel={copy.faces.patient}
+            onRequestContact={requestContact}
+            showContactCta={state.status === "resultado-paciente"}
+            headingRef={resultHeadingRef}
+          />
+        </motion.div>
+        <motion.div {...stepMotion(reduceMotion, 0.16)}>
+          <DentalSpecialistSummary
+            summary={state.specialistSummary}
+            faceLabel={copy.faces.specialist}
+            description={copy.faces.specialistDescription}
+            contactChannel={contactVisible ? boreasDentalQuoteV2DemoContact.preferredChannel : undefined}
+            demoCompleted={state.status === "demo-completada"}
+          />
+        </motion.div>
       </div>
 
       {contactVisible ? (
@@ -306,6 +325,6 @@ export function DentalQuoteExperience({ definition }: DentalQuoteExperienceProps
           />
         </div>
       ) : null}
-    </section>
+    </motion.section>
   );
 }

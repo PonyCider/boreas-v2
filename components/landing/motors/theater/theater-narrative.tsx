@@ -27,7 +27,7 @@ export function TheaterNarrative({
           >
             <div
               className={`relative max-w-md border-l pl-6 transition-colors duration-300 motion-reduce:transition-none ${
-                active ? "border-accent" : "border-white/12"
+                active ? "border-accent opacity-100" : "border-white/12 opacity-40"
               }`}
             >
               <span
