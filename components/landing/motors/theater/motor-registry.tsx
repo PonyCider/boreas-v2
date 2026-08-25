@@ -64,8 +64,12 @@ const EvaluadorDolorView = loadLegacyMotor(() =>
 const PreTriageView = loadLegacyMotor(() =>
   import("../pre-triage").then((module) => module.PreTriageMotor),
 );
-const CotizadorDentalView = loadLegacyMotor(() =>
-  import("../cotizador-dental").then((module) => module.CotizadorDentalMotor),
+const CotizadorDentalView = dynamic<MotorViewProps>(
+  () =>
+    import("../dental/dental-quote-experience").then(
+      (module) => module.DentalQuoteExperience,
+    ),
+  { loading: LoadingMotorView },
 );
 
 function createMotorViewRegistry(entries: readonly MotorViewEntry[]) {
@@ -106,8 +110,6 @@ export const motorViewRegistry = createMotorViewRegistry([
     View: PreTriageView,
   },
   {
-    // Adaptador temporal: la identidad ya es V2, pero la UI sigue siendo V1
-    // hasta que la Fase 3B monte la experiencia nueva.
     identity: { motorId: "cotizador-dental", version: "2.0.0" },
     View: CotizadorDentalView,
   },

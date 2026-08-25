@@ -27,7 +27,7 @@ export function TheaterPreview() {
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-accent">
-              Banda expandible · Fase 2
+              Experiencia dental V2 · Fase 3B
             </p>
             <h2 className="mt-3 max-w-3xl font-display text-[clamp(2rem,5vw,4rem)] leading-[0.98] tracking-[-0.025em] text-foreground">
               Seis puertas. Una escena.
@@ -50,9 +50,9 @@ export function TheaterPreview() {
       </div>
 
       <footer className="mt-8 border-t border-white/10 px-5 py-5 text-xs leading-relaxed text-muted sm:px-8 lg:px-10">
-        Preview interno. Los seis componentes son los motores V1 actuales; la
-        banda y el registro portable son nuevos. El contrato de la Fase 1
-        permanece disponible como {runtimeContractDemoDefinition.motorId}.
+        Preview interno. Dental usa el dominio y la experiencia V2; los otros
+        cinco motores permanecen en V1. Ningún dato del demo se persiste o se
+        envía. El contrato base sigue disponible como {runtimeContractDemoDefinition.motorId}.
       </footer>
     </div>
   );

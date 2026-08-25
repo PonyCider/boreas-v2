@@ -1,8 +1,8 @@
-import type { MotorDefinition } from "@/lib/motors/runtime/types";
 import {
-  dentalQuoteV2Identity,
   type DentalQuoteConfig,
 } from "@/lib/motors/cotizador-dental-v2";
+
+export { dentalQuoteV2Definition } from "./cotizador-dental-v2-definition";
 
 export const boreasDentalQuoteV2Config = {
   clientId: "boreas-demo-dental",
@@ -169,21 +169,56 @@ export const boreasDentalQuoteV2Config = {
   ],
 } as const satisfies DentalQuoteConfig;
 
-export const dentalQuoteV2Definition = {
-  ...dentalQuoteV2Identity,
-  family: "calculator",
-  specialties: ["dental"],
-  label: "Cotizador de tratamiento",
-  promise: "Mostrar rango, visitas e incluidos antes de la valoración.",
-  capabilities: [
-    "patient-result",
-    "specialist-summary",
-    "contact-after-result",
-  ],
-  consent: {
-    required: true,
-    version: "dental-v2-demo",
-    purpose:
-      "Entregar al consultorio el resumen mínimo después de mostrar el rango.",
+export const boreasDentalQuoteV2ExperienceCopy = {
+  intro: {
+    eyebrow: "Cotizador dental",
+    title: "Conoce un rango antes de pedir una cita",
+    description:
+      "Elige un tratamiento y revisa un rango estimado, las visitas y lo que incluye. Toma menos de un minuto.",
+    privacy:
+      "Primero verás tu resultado. No necesitas compartir datos personales para consultarlo.",
+    cta: "Comenzar",
   },
-} as const satisfies MotorDefinition;
+  treatment: {
+    title: "¿Qué tratamiento quieres cotizar?",
+    description:
+      "Elige la opción que más se acerque a lo que necesitas. La valoración profesional confirmará el tratamiento y el precio.",
+    cta: "Continuar",
+  },
+  context: {
+    title: "Dos detalles para preparar mejor el seguimiento",
+    description: "Son opcionales y no modifican el rango estimado.",
+    skip: "Omitir",
+    cta: "Ver mi rango",
+  },
+  contact: {
+    title: "Así continuaría en un sitio real",
+    description:
+      "El paciente ya recibió valor. Ahora puede decidir si desea que el consultorio le dé seguimiento.",
+    demoNotice:
+      "Demostración segura: estos datos son sintéticos, no editables y no se enviarán.",
+    consent:
+      "Acepto que el consultorio use mis datos de contacto y este resumen para responder mi solicitud de valoración. He leído el aviso de privacidad.",
+    submit: "Simular entrega",
+    submitting: "Preparando la demostración…",
+    completed: "Demo completada",
+    completedDescription:
+      "En un sitio real, el consultorio recibiría este resumen mediante una integración segura.",
+    error:
+      "La demostración no pudo completarse. Tu resultado sigue disponible.",
+    retry: "Intentar de nuevo",
+  },
+  faces: {
+    patient: "Lo que ve el paciente",
+    specialist: "Esto recibiría el consultorio",
+    specialistDescription:
+      "Un resumen listo para dar seguimiento, sin diagnóstico ni información innecesaria.",
+  },
+} as const;
+
+export const boreasDentalQuoteV2DemoContact = {
+  name: "Paciente de demostración",
+  phone: "+52 55 0000 0000",
+  email: "demo@ejemplo.invalid",
+  preferredChannel: "WhatsApp",
+} as const;

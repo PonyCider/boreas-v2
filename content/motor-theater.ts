@@ -1,6 +1,6 @@
 import type { MotorDefinition } from "@/lib/motors/runtime/types";
 import type { SpecialtyId } from "@/content/motors";
-import { dentalQuoteV2Definition } from "@/content/cotizador-dental-v2";
+import { dentalQuoteV2Definition } from "@/content/cotizador-dental-v2-definition";
 
 export const runtimeContractDemoDefinition = {
   motorId: "runtime-contract-demo",

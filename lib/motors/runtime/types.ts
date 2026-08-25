@@ -44,7 +44,7 @@ export type SpecialistSummary = {
 
 export type LeadContact = {
   name: string;
-  channel: "email" | "phone";
+  channel: "email" | "phone" | "whatsapp";
   value: string;
 };
 

@@ -8,6 +8,7 @@ type MotorStageProps = {
 
 export function MotorStage({ item }: MotorStageProps) {
   const viewKey = `${item.definition.motorId}@${item.definition.version}`;
+  const isDentalV2 = viewKey === "cotizador-dental@2.0.0";
 
   return (
     <section
@@ -27,8 +28,9 @@ export function MotorStage({ item }: MotorStageProps) {
           </h2>
         </div>
         <p className="max-w-sm text-sm leading-relaxed text-muted">
-          Motor actual montado sin modificar su flujo. Cambiar de segmento
-          reinicia su estado.
+          {isDentalV2
+            ? "Referencia V2 portable. El resultado aparece antes del contacto y el demo no envía datos."
+            : "Motor V1 montado sin modificar su flujo. Cambiar de segmento reinicia su estado."}
         </p>
       </div>
 
