@@ -8,16 +8,20 @@ import {
 import {
   createMotorSelectionState,
   transitionMotorSelection,
+  type MotorSelectionEvent,
+  type MotorSelectionState,
 } from "@/lib/motors/runtime/selection";
 import { MotorBand } from "./motor-band";
 import { MotorStage } from "./motor-stage";
 
 export function TheaterPreview() {
   const [selection, dispatch] = useReducer(
-    (state, event) =>
+    (state: MotorSelectionState, event: MotorSelectionEvent) =>
       transitionMotorSelection(state, event, theaterMotorItems.length),
-    theaterMotorItems.length,
-    createMotorSelectionState,
+    createMotorSelectionState(
+      theaterMotorItems.length,
+      theaterMotorItems.length - 1,
+    ),
   );
   const activeItem = theaterMotorItems[selection.selectedIndex];
 
@@ -27,15 +31,15 @@ export function TheaterPreview() {
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-accent">
-              Experiencia dental V2 · Fase 3B
+              Toma el control · Fase 4A
             </p>
             <h2 className="mt-3 max-w-3xl font-display text-[clamp(2rem,5vw,4rem)] leading-[0.98] tracking-[-0.025em] text-foreground">
-              Seis puertas. Una escena.
+              Ahora pruébalo.
             </h2>
           </div>
           <p className="max-w-md text-sm leading-relaxed text-muted">
-            Elige una especialidad. Hover y foco solo anticipan; clic, Enter o
-            espacio cambian el motor.
+            Elige una especialidad y completa el recorrido. La escena narrativa
+            termina aquí; la interacción es real.
           </p>
         </div>
       </header>

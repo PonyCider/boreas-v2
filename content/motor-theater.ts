@@ -24,6 +24,66 @@ export const runtimeContractDemoDefinition = {
 
 export const theaterMotorDefinitions = [runtimeContractDemoDefinition] as const;
 
+export type ConversionTheaterAct = {
+  id: "visit" | "motor" | "faces" | "control";
+  position: `0${number}`;
+  eyebrow: string;
+  title: string;
+  body: string;
+  proof: string;
+};
+
+export const conversionTheaterCopy = {
+  eyebrow: "La solución",
+  title: "Convierte visitas en pacientes preparados.",
+  description:
+    "Una web puede responder dudas, ordenar intención y preparar la siguiente conversación antes de que abras WhatsApp.",
+  stageLabel: "Teatro de conversión",
+  controlEyebrow: "Toma el control",
+  controlTitle: "Ahora pruébalo como lo haría un paciente.",
+  controlDescription:
+    "Elige una especialidad y completa un motor real. Dental ya usa el dominio V2 portable; los otros cinco conservan su versión actual.",
+} as const;
+
+export const conversionTheaterActs = [
+  {
+    id: "visit",
+    position: "01",
+    eyebrow: "La visita",
+    title: "Llega con una duda. Todavía no es un paciente.",
+    body:
+      "Busca precio, tiempo y certeza. Si la web solo informa, esa intención vuelve a convertirse en mensajes sueltos o abandono.",
+    proof: "Señal anónima → intención todavía dispersa",
+  },
+  {
+    id: "motor",
+    position: "02",
+    eyebrow: "El motor trabaja",
+    title: "La duda se convierte en contexto útil.",
+    body:
+      "El paciente elige un tratamiento. El motor devuelve rango, visitas, incluidos y factores que pueden modificar el precio.",
+    proof: "Tratamiento + reglas aprobadas → resultado estructurado",
+  },
+  {
+    id: "faces",
+    position: "03",
+    eyebrow: "Las dos caras",
+    title: "Claridad para avanzar. Contexto para responder mejor.",
+    body:
+      "El paciente recibe valor primero. El especialista recibe intención, señales relevantes y un siguiente paso sin respuestas crudas innecesarias.",
+    proof: "Resultado paciente ↔ resumen especialista",
+  },
+  {
+    id: "control",
+    position: "04",
+    eyebrow: "Toma el control",
+    title: "La demostración termina. El motor queda vivo.",
+    body:
+      "La misma interfaz queda disponible para explorarla. No es un video ni una simulación decorativa: puedes completar el recorrido.",
+    proof: "Narrativa → interacción real",
+  },
+] as const satisfies readonly ConversionTheaterAct[];
+
 export type TheaterMotorItem = {
   id: SpecialtyId;
   position: `0${number}`;
