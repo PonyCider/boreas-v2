@@ -4,12 +4,17 @@ import {
   conversionTheaterActs,
   conversionTheaterCopy,
 } from "@/content/motor-theater";
+import { sectionIds } from "@/content/site";
 import { TheaterNarrative } from "./theater-narrative";
 import { TheaterPreview } from "./theater-preview";
 import { TheaterScene } from "./theater-scene";
 import { useTheaterProgress } from "./use-theater-progress";
 
-export function ConversionTheater() {
+type ConversionTheaterProps = {
+  mode?: "preview" | "production";
+};
+
+export function ConversionTheater({ mode = "preview" }: ConversionTheaterProps) {
   const { trackRef, activeAct } = useTheaterProgress(conversionTheaterActs.length);
   const active = conversionTheaterActs[activeAct];
 
@@ -59,8 +64,27 @@ export function ConversionTheater() {
       </div>
 
       <div id="theater-control" className="scroll-mt-6 pt-6">
-        <TheaterPreview />
+        <TheaterPreview mode={mode} />
       </div>
+
+      {mode === "production" ? (
+        <div className="mt-6 flex flex-col items-start justify-between gap-5 rounded-[2rem] border border-white/10 bg-[#171713] px-5 py-7 sm:flex-row sm:items-center sm:px-8 lg:px-10">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+              Tu sitio puede hacer esto
+            </p>
+            <p className="mt-2 max-w-2xl font-display text-2xl leading-tight text-foreground sm:text-3xl">
+              Elige el motor. Nosotros construimos la experiencia alrededor de tu servicio.
+            </p>
+          </div>
+          <a
+            href={`#${sectionIds.pricing}`}
+            className="btn btn-p shrink-0"
+          >
+            Ver planes
+          </a>
+        </div>
+      ) : null}
     </section>
   );
 }

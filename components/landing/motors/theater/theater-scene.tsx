@@ -61,7 +61,7 @@ function SceneMotor({ reduceMotion }: { reduceMotion: boolean }) {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Tratamiento seleccionado</p>
             <h4 className="mt-2 font-display text-3xl text-foreground">Resina dental</h4>
           </div>
-          <span className="rounded-full border border-accent/25 bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent">Motor V2</span>
+          <span className="rounded-full border border-accent/25 bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent">Cotizador activo</span>
         </div>
         <div className="mt-7 space-y-3">
           {[

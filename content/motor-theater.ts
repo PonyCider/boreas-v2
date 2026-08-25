@@ -42,7 +42,9 @@ export const conversionTheaterCopy = {
   controlEyebrow: "Toma el control",
   controlTitle: "Ahora pruébalo como lo haría un paciente.",
   controlDescription:
-    "Elige una especialidad y completa un motor real. Dental ya usa el dominio V2 portable; los otros cinco conservan su versión actual.",
+    "Elige una especialidad y completa el recorrido. Cada motor entrega valor antes de pedirte iniciar una conversación.",
+  controlPreviewDescription:
+    "Elige una especialidad y completa un motor real. Dental usa el dominio portable; los otros cinco conservan su versión actual.",
 } as const;
 
 export const conversionTheaterActs = [

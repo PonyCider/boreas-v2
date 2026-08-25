@@ -4,9 +4,25 @@ import { RegisteredMotorView } from "./motor-registry";
 
 type MotorStageProps = {
   item: TheaterMotorItem;
+  mode?: "preview" | "production";
 };
 
-export function MotorStage({ item }: MotorStageProps) {
+export function MotorStagePlaceholder({ item }: { item: TheaterMotorItem }) {
+  return (
+    <section
+      id={motorPanelId(item.id)}
+      role="tabpanel"
+      aria-labelledby={motorTabId(item.id)}
+      className="mt-8 min-h-[34rem] rounded-[28px] border border-border bg-surface p-6 sm:p-9"
+    >
+      <p className="text-sm text-muted" role="status">
+        Preparando la experiencia interactiva…
+      </p>
+    </section>
+  );
+}
+
+export function MotorStage({ item, mode = "preview" }: MotorStageProps) {
   const viewKey = `${item.definition.motorId}@${item.definition.version}`;
   const isDentalV2 = viewKey === "cotizador-dental@2.0.0";
 
@@ -29,8 +45,12 @@ export function MotorStage({ item }: MotorStageProps) {
         </div>
         <p className="max-w-sm text-sm leading-relaxed text-muted">
           {isDentalV2
-            ? "Referencia V2 portable. El resultado aparece antes del contacto y el demo no envía datos."
-            : "Motor V1 montado sin modificar su flujo. Cambiar de segmento reinicia su estado."}
+            ? mode === "preview"
+              ? "Referencia portable. El resultado aparece antes del contacto y el demo no envía datos."
+              : "Obtén un rango orientativo antes de decidir si quieres iniciar una conversación."
+            : mode === "preview"
+              ? "Motor actual montado sin modificar su flujo. Cambiar de segmento reinicia su estado."
+              : "Completa el recorrido y recibe orientación antes de iniciar una conversación."}
         </p>
       </div>
 

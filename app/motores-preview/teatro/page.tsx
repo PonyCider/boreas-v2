@@ -6,14 +6,14 @@ export default function TeatroPreviewPage() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-            EPIC 3 · Fase 4A
+            EPIC 3 · Fase 6A
           </p>
           <h1 className="mt-3 font-display text-4xl text-foreground sm:text-5xl">
             Estructura del teatro de conversión
           </h1>
           <p className="mt-4 text-base leading-7 text-muted">
-            Ruta interna. Valida narrativa, ritmo y sticky antes de añadir
-            animaciones o ambientación avanzada.
+            Ruta interna. Compara el teatro completo antes de integrarlo como
+            experiencia pública predeterminada.
           </p>
         </div>
         <ConversionTheater />
