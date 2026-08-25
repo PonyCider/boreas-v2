@@ -106,7 +106,9 @@ export const motorViewRegistry = createMotorViewRegistry([
     View: PreTriageView,
   },
   {
-    identity: { motorId: "cotizador-dental", version: "1.0.0" },
+    // Adaptador temporal: la identidad ya es V2, pero la UI sigue siendo V1
+    // hasta que la Fase 3B monte la experiencia nueva.
+    identity: { motorId: "cotizador-dental", version: "2.0.0" },
     View: CotizadorDentalView,
   },
 ]);
@@ -141,7 +143,7 @@ export function RegisteredMotorView({ definition }: MotorViewProps) {
   if (key === "pre-triage@1.0.0") {
     return <PreTriageView definition={definition} />;
   }
-  if (key === "cotizador-dental@1.0.0") {
+  if (key === "cotizador-dental@2.0.0") {
     return <CotizadorDentalView definition={definition} />;
   }
 

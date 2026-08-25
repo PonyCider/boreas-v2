@@ -1,5 +1,6 @@
 import type { MotorDefinition } from "@/lib/motors/runtime/types";
 import type { SpecialtyId } from "@/content/motors";
+import { dentalQuoteV2Definition } from "@/content/cotizador-dental-v2";
 
 export const runtimeContractDemoDefinition = {
   motorId: "runtime-contract-demo",
@@ -149,19 +150,6 @@ export const theaterMotorItems = [
     specialty: "Dental",
     motor: "Cotizador de tratamiento",
     result: "Rango, visitas e incluidos",
-    definition: {
-      motorId: "cotizador-dental",
-      version: "1.0.0",
-      family: "calculator",
-      specialties: ["dental"],
-      label: "Cotizador de tratamiento",
-      promise: "Mostrar rango, visitas e incluidos antes de la valoración.",
-      capabilities: [
-        "patient-result",
-        "specialist-summary",
-        "contact-after-result",
-      ],
-      consent: legacyPreviewConsent,
-    },
+    definition: dentalQuoteV2Definition,
   },
 ] as const satisfies readonly TheaterMotorItem[];
