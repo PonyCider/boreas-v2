@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { resolveMotorsSectionVariant } from "./section-variant";
 
 describe("selección reversible de la sección de motores", () => {
-  it("conserva legacy como valor seguro por defecto", () => {
-    expect(resolveMotorsSectionVariant(undefined)).toBe("legacy");
-    expect(resolveMotorsSectionVariant("legacy")).toBe("legacy");
-    expect(resolveMotorsSectionVariant("otro")).toBe("legacy");
+  it("activa theater como valor predeterminado", () => {
+    expect(resolveMotorsSectionVariant(undefined)).toBe("theater");
+    expect(resolveMotorsSectionVariant("theater")).toBe("theater");
+    expect(resolveMotorsSectionVariant("otro")).toBe("theater");
   });
 
-  it("activa theater solo con una selección explícita", () => {
-    expect(resolveMotorsSectionVariant("theater")).toBe("theater");
+  it("restaura legacy solo con una selección explícita", () => {
+    expect(resolveMotorsSectionVariant("legacy")).toBe("legacy");
   });
 });
